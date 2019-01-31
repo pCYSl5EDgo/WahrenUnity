@@ -97,12 +97,12 @@ namespace pcysl5edgo.Wahren
 
         private static void SDetect(ref TryInterpretReturnValue answer, int column, int thisLineLength, ref char* ccp)
         {
-            if (column + 4 >= thisLineLength)
+            if (column + 3 >= thisLineLength)
                 answer.Fail(20);
             else switch (*++ccp)
                 {
                     case 'k':
-                        if (*++ccp == 'i' && *++ccp == 'l' && *++ccp == 'l')
+                        if (column + 4 < thisLineLength && *++ccp == 'i' && *++ccp == 'l' && *++ccp == 'l')
                         {
                             if (IsNextEndOfLineOrSpace(ccp, column + 4, thisLineLength))
                                 answer.Success(12, 5);
@@ -114,12 +114,12 @@ namespace pcysl5edgo.Wahren
                         else answer.Fail(16);
                         break;
                     case 'o':
-                        if (*++ccp == 'u' && *++ccp == 'n' && *++ccp == 'd' && IsNextEndOfLineOrSpaceOrLeftBrace(ccp, column + 4, thisLineLength))
+                        if (column + 4 < thisLineLength && *++ccp == 'u' && *++ccp == 'n' && *++ccp == 'd' && IsNextEndOfLineOrSpaceOrLeftBrace(ccp, column + 4, thisLineLength))
                             answer.Success(14, 5);
                         else answer.Fail(17);
                         break;
                     case 't':
-                        if (*++ccp == 'o' && *++ccp == 'r' && *++ccp == 'y' && IsNextEndOfLineOrSpace(ccp, column + 4, thisLineLength))
+                        if (column + 4 < thisLineLength && *++ccp == 'o' && *++ccp == 'r' && *++ccp == 'y' && IsNextEndOfLineOrSpace(ccp, column + 4, thisLineLength))
                             answer.Success(15, 5);
                         else answer.Fail(18);
                         break;
@@ -127,6 +127,11 @@ namespace pcysl5edgo.Wahren
                         if (column + 7 < thisLineLength && *++ccp == 'e' && *++ccp == 'n' && *++ccp == 'a' && *++ccp == 'r' && *++ccp == 'i' && *++ccp == 'o' && IsNextEndOfLineOrSpace(ccp, column + 7, thisLineLength))
                             answer.Success(16, 8);
                         else answer.Fail(19);
+                        break;
+                    case 'p':
+                        if(*++ccp == 'o' && *++ccp == 't' && IsNextEndOfLineOrSpace(ccp, column + 3, thisLineLength))
+                            answer.Success(17, 4);
+                        else answer.Fail(21);
                         break;
                     default:
                         answer.Fail(20);

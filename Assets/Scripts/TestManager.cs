@@ -38,9 +38,12 @@ public class TestManager : MonoBehaviour
                 break;
             case 1:
                 UnityEngine.Debug.Log("Done!");
-                var file = scriptLoadReturnValue.Files[3];
-                var value = file.TryGetFirstStructLocationUnsafe(default);
-                UnityEngine.Debug.Log(value.ToString(ref scriptLoadReturnValue));
+                for (int i = 0; i < scriptLoadReturnValue.Files.Length; i++)
+                {
+                    var file = scriptLoadReturnValue.Files[i];
+                    var value = file.TryGetFirstStructLocationUnsafe(default);
+                    UnityEngine.Debug.Log(value.ToString(ref scriptLoadReturnValue));
+                }
                 stage = 2;
                 break;
         }

@@ -34,6 +34,7 @@ public static class SuccessSentence
                 "'sound'", // 14
                 "'story'",
                 "'scenario'", // 16
+                "'spot'", // 17
             },
         };
     }

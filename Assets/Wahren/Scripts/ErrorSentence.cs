@@ -39,7 +39,8 @@ namespace pcysl5edgo.Wahren
                     "'sound'",
                     "'story'", //18
                     "'scenario'",
-                    "'skill', 'sound', 'story', 'scenario' or 'skillset'", //20
+                    "'spot', skill', 'sound', 'story', 'scenario' or 'skillset'", //20
+                    "'spot'", //21
                 },
             };
         }
