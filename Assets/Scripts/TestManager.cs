@@ -53,19 +53,17 @@ public class TestManager : MonoBehaviour
         var value0 = file.TryGetFirstStructLocation(default);
         UnityEngine.Debug.Log(value0.ToString(ref scriptLoadReturnValue));
         var span = value0.Span;
-        span.SkipToEnd();
+        span.SkipToNextOfEnd();
         if (StructAnalyzer.IsStructKindWithName(value0.SubDataIndex))
         {
             var value1 = file.TryGetStructName(span);
             UnityEngine.Debug.Log(value1.ToString(ref scriptLoadReturnValue));
-            span = value1.Span;
-            span.SkipToEnd();
+            span = value1.Span.SkipToNextOfEnd_Copy();
             if (file.TryGetParentStructName(span, out var value2))
             {
                 UnityEngine.Debug.Log(value2.ToString(ref scriptLoadReturnValue));
-                span = value2.Span;
+                span = value2.Span.SkipToNextOfEnd_Copy();
             }
         }
-        span.SkipToEnd();
     }
 }

@@ -6,10 +6,16 @@ namespace pcysl5edgo.Wahren
 {
     public static unsafe class SkipUtility
     {
-        public static void SkipToEnd(this ref Span span)
+        public static void SkipToNextOfEnd(this ref Span span)
         {
             span.Column += span.Length;
             span.Length = 0;
+        }
+        public static Span SkipToNextOfEnd_Copy(this Span span)
+        {
+            span.Column += span.Length;
+            span.Length = 0;
+            return span;
         }
         public static Span SkipWhiteSpace(this ref TextFile file, Span span)
         {
