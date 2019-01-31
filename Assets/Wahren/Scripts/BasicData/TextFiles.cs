@@ -54,6 +54,7 @@ namespace pcysl5edgo.Wahren
             if (Lines == null) throw new NullReferenceException();
             return new string(Lines[lineIndex], 0, LineLengths[lineIndex]);
         }
+        public string ToString(Span span) => new string(Lines[span.Line], span.Column, span.Length);
 
         public TextFile(int filePathId, int length)
         {

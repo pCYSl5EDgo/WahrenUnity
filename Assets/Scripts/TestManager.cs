@@ -38,16 +38,34 @@ public class TestManager : MonoBehaviour
                 break;
             case 1:
                 UnityEngine.Debug.Log("Done!");
-                var file = scriptLoadReturnValue.Files[0];
-                var value0 = file.TryGetFirstStructLocationUnsafe(default);
-                UnityEngine.Debug.Log(value0.ToString(ref scriptLoadReturnValue));
-                var span = value0.Span;
-                span.SkipToEnd();
-                UnityEngine.Debug.Log(span.ToString());
-                var value1 = file.TryGetStructName(span);
-                UnityEngine.Debug.Log(value1.ToString(ref scriptLoadReturnValue));
+                for (int i = 0; i < scriptLoadReturnValue.FullPaths.Length; i++)
+                {
+                    Debug(i);
+                }
                 stage = 2;
                 break;
         }
+    }
+
+    private void Debug(int index)
+    {
+        var file = scriptLoadReturnValue.Files[index];
+        var value0 = file.TryGetFirstStructLocation(default);
+        UnityEngine.Debug.Log(value0.ToString(ref scriptLoadReturnValue));
+        var span = value0.Span;
+        span.SkipToEnd();
+        if (StructAnalyzer.IsStructKindWithName(value0.SubDataIndex))
+        {
+            var value1 = file.TryGetStructName(span);
+            UnityEngine.Debug.Log(value1.ToString(ref scriptLoadReturnValue));
+            span = value1.Span;
+            span.SkipToEnd();
+            if (file.TryGetParentStructName(span, out var value2))
+            {
+                UnityEngine.Debug.Log(value2.ToString(ref scriptLoadReturnValue));
+                span = value2.Span;
+            }
+        }
+        span.SkipToEnd();
     }
 }
