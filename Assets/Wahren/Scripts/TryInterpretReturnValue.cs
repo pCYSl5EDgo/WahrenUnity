@@ -13,7 +13,11 @@
         {
             buffer.Clear();
             if (!IsSuccess)
-                buffer.AppendLine(ErrorSentence.Contents[DataIndex]).AppendLine(ErrorSentence.SubContents[DataIndex][SubDataIndex]);
+            {
+                buffer.AppendLine(ErrorSentence.Contents[DataIndex]);
+                if (ErrorSentence.SubContents[DataIndex] != null && ErrorSentence.SubContents[DataIndex].Length != 0)
+                    buffer.AppendLine(ErrorSentence.SubContents[DataIndex][SubDataIndex]);
+            }
             buffer.Append("@File: ").Append(script.FullPaths[Span.File]).Append(" in line ").Append(Span.Line + 1).Append('(').Append(Span.Column + 1).Append('-').Append(Span.Column + 1 + Span.Length).Append(")\n").Append(script.ToString(ref Span));
             return buffer.ToString();
         }

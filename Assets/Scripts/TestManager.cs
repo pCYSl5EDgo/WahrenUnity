@@ -18,10 +18,10 @@ public class TestManager : MonoBehaviour
         scriptLoadReturnValue = new ScriptLoadReturnValue(ref rawScriptLoadReturnValue);
         UnityEngine.Debug.Log("COUNT : " + rawScriptLoadReturnValue.Files.Length);
         deleteCommentJobs = new Unity.Collections.NativeList<Unity.Jobs.JobHandle>(rawScriptLoadReturnValue.Files.Length, Unity.Collections.Allocator.Persistent);
-        for (int i = 0; i < rawScriptLoadReturnValue.FullPaths.Length; i++)
-        {
-            UnityEngine.Debug.Log(rawScriptLoadReturnValue.FullPaths[i] + "\n Length : " + rawScriptLoadReturnValue.Files[i].Length);
-        }
+        // for (int i = 0; i < rawScriptLoadReturnValue.FullPaths.Length; i++)
+        // {
+        //     UnityEngine.Debug.Log(rawScriptLoadReturnValue.FullPaths[i] + "\n Length : " + rawScriptLoadReturnValue.Files[i].Length);
+        // }
     }
 
     void OnDestroy()
@@ -38,12 +38,14 @@ public class TestManager : MonoBehaviour
                 break;
             case 1:
                 UnityEngine.Debug.Log("Done!");
-                for (int i = 0; i < scriptLoadReturnValue.Files.Length; i++)
-                {
-                    var file = scriptLoadReturnValue.Files[i];
-                    var value = file.TryGetFirstStructLocationUnsafe(default);
-                    UnityEngine.Debug.Log(value.ToString(ref scriptLoadReturnValue));
-                }
+                var file = scriptLoadReturnValue.Files[0];
+                var value0 = file.TryGetFirstStructLocationUnsafe(default);
+                UnityEngine.Debug.Log(value0.ToString(ref scriptLoadReturnValue));
+                var span = value0.Span;
+                span.SkipToEnd();
+                UnityEngine.Debug.Log(span.ToString());
+                var value1 = file.TryGetStructName(span);
+                UnityEngine.Debug.Log(value1.ToString(ref scriptLoadReturnValue));
                 stage = 2;
                 break;
         }

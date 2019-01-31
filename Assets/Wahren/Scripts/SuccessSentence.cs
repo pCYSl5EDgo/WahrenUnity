@@ -6,12 +6,16 @@ public static class SuccessSentence
     public static readonly string[][] SubContents;
 
     internal const int StructKindInterpretSuccess = 1;
+    internal const int StructNameInterpretSuccess = 2;
+    internal const int ParentStructNameInterpretSuccess = 3;
     static SuccessSentence()
     {
         Contents = new string[]
         {
             "No Successful Token",
-            "Struct Kind Tag"
+            "Struct Kind Tag",
+            "Struct Name",
+            "Parent Struct Name",
         };
         SubContents = new string[][]
         {

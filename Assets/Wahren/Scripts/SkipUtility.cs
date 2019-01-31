@@ -4,8 +4,13 @@ using UnityEngine;
 
 namespace pcysl5edgo.Wahren
 {
-    public static unsafe class SkipWhiteSpaceUtility
+    public static unsafe class SkipUtility
     {
+        public static void SkipToEnd(this ref Span span)
+        {
+            span.Column += span.Length;
+            span.Length = 0;
+        }
         public static Span SkipWhiteSpace(this ref TextFile file, Span span)
         {
             span.File = file.FilePathId;
