@@ -1,14 +1,16 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using Unity.Jobs;
 using Unity.IO.LowLevel.Unsafe;
+using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 
 namespace pcysl5edgo.Wahren
 {
     public unsafe static class ScriptFileLoader
     {
-        public static bool TryConvertUnicodeAsync(ref RawScriptLoadReturnValue rawScriptLoadReturnValue, ref ScriptLoadReturnValue scriptLoadReturnValue)
+        public static bool TryConvertUnicodeAsync(ref RawScriptLoadReturnValue rawScriptLoadReturnValue, ref ScriptLoadReturnValue scriptLoadReturnValue, ref NativeList<JobHandle> deleteCommentJobsFinnalyDeallocated, bool isDebg)
         {
             var invalidCounter = 0;
             for (int i = 0; i < rawScriptLoadReturnValue.Handles.Length; i++)
@@ -22,6 +24,9 @@ namespace pcysl5edgo.Wahren
                             handle.Dispose();
                             scriptLoadReturnValue.Files[i] = TextFile.FromRawTextFileUtf16(rawScriptLoadReturnValue.Files[i]);
                             invalidCounter++;
+                            var (boolean, job) = DeleteCommentJob.Schedule(scriptLoadReturnValue.Files[i], isDebg, 256);
+                            if (boolean)
+                                deleteCommentJobsFinnalyDeallocated.Add(job);
                             break;
                         case ReadStatus.InProgress:
                             continue;
@@ -35,12 +40,19 @@ namespace pcysl5edgo.Wahren
             }
             if (invalidCounter != rawScriptLoadReturnValue.Handles.Length)
                 return false;
+            for (int i = 0; i < deleteCommentJobsFinnalyDeallocated.Length; i++)
+            {
+                if (deleteCommentJobsFinnalyDeallocated[i].IsCompleted)
+                    deleteCommentJobsFinnalyDeallocated[i].Complete();
+                else return false;
+            }
+            deleteCommentJobsFinnalyDeallocated.Dispose();
             rawScriptLoadReturnValue.Files.Dispose();
             rawScriptLoadReturnValue.DisposeExceptFiles();
             return true;
         }
 
-        public static bool TryConvertCp932Async(ref RawScriptLoadReturnValue rawScriptLoadReturnValue, ref ScriptLoadReturnValue scriptLoadReturnValue)
+        public static bool TryConvertCp932Async(ref RawScriptLoadReturnValue rawScriptLoadReturnValue, ref ScriptLoadReturnValue scriptLoadReturnValue, NativeList<JobHandle> deleteCommentJobs, bool isDebug)
         {
             var cp932 = Encoding.GetEncoding(932);
             var invalidCounter = 0;
@@ -53,8 +65,11 @@ namespace pcysl5edgo.Wahren
                     {
                         case ReadStatus.Complete:
                             handle.Dispose();
-                            scriptLoadReturnValue.Files[i] = TextFile.FromRawTextFileOtherEncoding(rawScriptLoadReturnValue.Files[i], cp932);
                             invalidCounter++;
+                            scriptLoadReturnValue.Files[i] = TextFile.FromRawTextFileOtherEncoding(rawScriptLoadReturnValue.Files[i], cp932);
+                            var (boolean, job) = DeleteCommentJob.Schedule(scriptLoadReturnValue.Files[i], isDebug, 256);
+                            if (boolean)
+                                deleteCommentJobs.Add(job);
                             break;
                         case ReadStatus.InProgress:
                             continue;
@@ -68,6 +83,13 @@ namespace pcysl5edgo.Wahren
             }
             if (invalidCounter != rawScriptLoadReturnValue.Handles.Length)
                 return false;
+            for (int i = 0; i < deleteCommentJobs.Length; i++)
+            {
+                if (deleteCommentJobs[i].IsCompleted)
+                    deleteCommentJobs[i].Complete();
+                else return false;
+            }
+            deleteCommentJobs.Dispose();
             rawScriptLoadReturnValue.Dispose();
             return true;
         }

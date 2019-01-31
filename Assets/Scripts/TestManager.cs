@@ -9,6 +9,7 @@ public class TestManager : MonoBehaviour
     [SerializeField] public string ScriptDirectoryFullPath;
     int stage;
     int frame;
+    Unity.Collections.NativeList<Unity.Jobs.JobHandle> deleteCommentJobs;
     void Start()
     {
         stage = 0;
@@ -16,6 +17,7 @@ public class TestManager : MonoBehaviour
         rawScriptLoadReturnValue = new System.IO.DirectoryInfo(ScriptDirectoryFullPath).LoadFileToMemoryAsync(System.Text.Encoding.Unicode);
         scriptLoadReturnValue = new ScriptLoadReturnValue(ref rawScriptLoadReturnValue);
         UnityEngine.Debug.Log("COUNT : " + rawScriptLoadReturnValue.Files.Length);
+        deleteCommentJobs = new Unity.Collections.NativeList<Unity.Jobs.JobHandle>(rawScriptLoadReturnValue.Files.Length, Unity.Collections.Allocator.Persistent);
         for (int i = 0; i < rawScriptLoadReturnValue.FullPaths.Length; i++)
         {
             UnityEngine.Debug.Log(rawScriptLoadReturnValue.FullPaths[i] + "\n Length : " + rawScriptLoadReturnValue.Files[i].Length);
@@ -31,19 +33,16 @@ public class TestManager : MonoBehaviour
         switch (stage)
         {
             case 0:
-                stage = ScriptFileLoader.TryConvertUnicodeAsync(ref rawScriptLoadReturnValue, ref scriptLoadReturnValue) ? 1 : 0;
+                stage = ScriptFileLoader.TryConvertUnicodeAsync(ref rawScriptLoadReturnValue, ref scriptLoadReturnValue, ref deleteCommentJobs, false) ? 1 : 0;
                 UnityEngine.Debug.Log("Frame : " + frame++);
                 break;
             case 1:
                 UnityEngine.Debug.Log("Done!");
                 var file = scriptLoadReturnValue.Files[0];
-                var tryInterpretReturnValue = file.TryGetFirstStructLocationUnsafe(false, new Span
+                for (int i = 0; i < file.LineCount; i++)
                 {
-                    File = 0,
-                    Line = 0,
-                    Column = 0,
-                });
-                UnityEngine.Debug.Log(tryInterpretReturnValue.ToString(ref scriptLoadReturnValue));
+                    UnityEngine.Debug.Log(file.ToStringUnsafe(i));
+                }
                 stage = 2;
                 break;
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using Unity.Jobs;
 using Unity.IO.LowLevel.Unsafe;
 using Unity.Collections;
 
@@ -34,7 +35,6 @@ namespace pcysl5edgo.Wahren
                     for (int i = 0; i < Files.Length; i++)
                         Files[i].Dispose();
                     Files.Dispose();
-                    Files = default;
                 }
                 IsCreated = false;
             }
@@ -49,12 +49,10 @@ namespace pcysl5edgo.Wahren
                         if (Handles[i].IsValid())
                             Handles[i].Dispose();
                     Handles.Dispose();
-                    Handles = default;
                 }
                 if (Commands.IsCreated)
                 {
                     Commands.Dispose();
-                    Commands = default;
                 }
                 Names = null;
                 FullPaths = null;
