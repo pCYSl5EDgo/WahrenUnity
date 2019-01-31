@@ -31,12 +31,9 @@ namespace pcysl5edgo.Wahren
         }
         public static TryInterpretReturnValue TryGetFirstStructLocationUnsafe(this ref TextFile file, Span spanIgnoreLength)
         {
-            if (spanIgnoreLength.Line < 0 || spanIgnoreLength.Column < 0 || spanIgnoreLength.Line >= file.LineCount || (spanIgnoreLength.Column > file.LineLengths[spanIgnoreLength.Line]))
-                throw new ArgumentOutOfRangeException($"spanIgnoreLength : {spanIgnoreLength}\nLineCount : {file.LineCount}");
             spanIgnoreLength.File = file.FilePathId;
-            var tmpLines = file.Lines;
-            var answer = new TryInterpretReturnValue(ref spanIgnoreLength, 0, 0, true);
-            answer.DataIndex = ErrorSentence.StructKindNotFoundError;
+            spanIgnoreLength = file.SkipWhiteSpace(spanIgnoreLength);
+            var answer = new TryInterpretReturnValue(ref spanIgnoreLength, ErrorSentence.StructKindNotFoundError, 0, true);
             ref var foundSpan = ref answer.Span;
             ref int raw = ref foundSpan.Line;
             ref int column = ref foundSpan.Column;
@@ -83,9 +80,6 @@ namespace pcysl5edgo.Wahren
                         case 's': // scenario, skill, skillset, sound, story
                             SDetect(ref answer, column, thisLineLength, ref ccp);
                             goto RETURN;
-                        case ' ':
-                        case '\t':
-                            continue;
                         default:
                             goto RETURN;
                     }
@@ -129,7 +123,7 @@ namespace pcysl5edgo.Wahren
                         else answer.Fail(19);
                         break;
                     case 'p':
-                        if(*++ccp == 'o' && *++ccp == 't' && IsNextEndOfLineOrSpace(ccp, column + 3, thisLineLength))
+                        if (*++ccp == 'o' && *++ccp == 't' && IsNextEndOfLineOrSpace(ccp, column + 3, thisLineLength))
                             answer.Success(17, 4);
                         else answer.Fail(21);
                         break;
