@@ -1,39 +1,7 @@
 ﻿using System;
-using System.Runtime.InteropServices;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
 
 namespace pcysl5edgo.Wahren
 {
-    public struct TryInterpretReturnValue
-    {
-        private static readonly System.Text.StringBuilder buffer = new System.Text.StringBuilder(4096);
-        public Span Span;
-        public int ErrorIndex;
-        public byte ErrorSubData;
-        public byte isSuccess;
-        public bool IsSuccess { get => isSuccess != 0; set => isSuccess = (byte)(value ? 1 : 0); }
-
-        public string ToString(ref ScriptLoadReturnValue script)
-        {
-            buffer.Clear();
-            if (!IsSuccess)
-                buffer.AppendLine(ErrorSentence.Contents[ErrorIndex]).AppendLine(ErrorSentence.SubContents[ErrorIndex][ErrorSubData]);
-            buffer.Append("@File: ").Append(script.FullPaths[Span.File]).Append(" in line ").Append(Span.Line + 1).Append('(').Append(Span.Column + 1).Append('-').Append(Span.Column + 1 + Span.Length).Append(")\n").Append(script.ToString(ref Span));
-            return buffer.ToString();
-        }
-
-        public TryInterpretReturnValue(ref Span errorLocation, int errorIndex, byte errorSubData, bool isSuccess)
-        {
-            this.Span = errorLocation;
-            this.isSuccess = (byte)(isSuccess ? 1 : 0);
-            this.ErrorIndex = errorIndex;
-            this.ErrorSubData = errorSubData;
-        }
-    }
     public unsafe static class StructAnalyzer
     {
         internal static bool IsNextEndOfLineOrSpaceOrLeftBrace(char* lastChar, int column, int length, bool isDebug)
@@ -271,7 +239,7 @@ namespace pcysl5edgo.Wahren
                 }
             }
             answer.isSuccess = 0;
-            answer.ErrorIndex = ErrorSentence.StructKindNotFoundError;
+            answer.DataIndex = ErrorSentence.StructKindNotFoundError;
             return answer;
         }
         public static TryInterpretReturnValue TryGetFirstStructLocationUnsafe(this ref ScriptLoadReturnValue script, bool isDebug, Span spanIgnoreLength)
@@ -284,8 +252,8 @@ namespace pcysl5edgo.Wahren
         private static void Fail(this ref TryInterpretReturnValue answer, byte errorSubData)
         {
             answer.isSuccess = 0;
-            answer.ErrorIndex = ErrorSentence.StructKindInterpretError;
-            answer.ErrorSubData = errorSubData;
+            answer.DataIndex = ErrorSentence.StructKindInterpretError;
+            answer.SubDataIndex = errorSubData;
         }
     }
 }
