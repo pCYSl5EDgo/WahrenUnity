@@ -5,7 +5,7 @@
         private static readonly System.Text.StringBuilder buffer = new System.Text.StringBuilder(4096);
         public Span Span;
         public int DataIndex;
-        public byte SubDataIndex;
+        public int SubDataIndex;
         public byte isSuccess;
         public bool IsSuccess { get => isSuccess != 0; set => isSuccess = (byte)(value ? 1 : 0); }
 
@@ -18,12 +18,12 @@
             return buffer.ToString();
         }
 
-        public TryInterpretReturnValue(ref Span errorLocation, int errorIndex, byte errorSubData, bool isSuccess)
+        public TryInterpretReturnValue(ref Span errorLocation, int dataIndex, int subDataIndex, bool isSuccess)
         {
             this.Span = errorLocation;
             this.isSuccess = (byte)(isSuccess ? 1 : 0);
-            this.DataIndex = errorIndex;
-            this.SubDataIndex = errorSubData;
+            this.DataIndex = dataIndex;
+            this.SubDataIndex = subDataIndex;
         }
     }
 }
