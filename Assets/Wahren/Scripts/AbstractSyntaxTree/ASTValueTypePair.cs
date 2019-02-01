@@ -2,7 +2,7 @@
 {
     public unsafe struct ASTValueTypePair
     {
-        public void* Value;
-        public int Type;
+        public int ValueIndex;
+        public int TypeIndex;
     }
 }
