@@ -46,7 +46,6 @@ public class TestManager : MonoBehaviour
                 break;
         }
     }
-
     private void Debug(int index)
     {
         var file = scriptLoadReturnValue.Files[index];
