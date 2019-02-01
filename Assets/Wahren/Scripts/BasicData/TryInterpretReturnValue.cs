@@ -22,9 +22,17 @@
             return buffer.ToString();
         }
 
-        public TryInterpretReturnValue(ref Span errorLocation, int dataIndex, int subDataIndex, bool isSuccess)
+        public TryInterpretReturnValue(Caret start, int dataIndex, int subDataIndex, bool isSuccess)
         {
-            this.Span = errorLocation;
+            this.Span = default;
+            this.Span.Start = start;
+            this.isSuccess = (byte)(isSuccess ? 1 : 0);
+            this.DataIndex = dataIndex;
+            this.SubDataIndex = subDataIndex;
+        }
+        public TryInterpretReturnValue(ref Span span, int dataIndex, int subDataIndex, bool isSuccess)
+        {
+            this.Span = span;
             this.isSuccess = (byte)(isSuccess ? 1 : 0);
             this.DataIndex = dataIndex;
             this.SubDataIndex = subDataIndex;

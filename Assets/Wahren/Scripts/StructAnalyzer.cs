@@ -62,10 +62,10 @@ namespace pcysl5edgo.Wahren
             }
         }
 
-        public static TryInterpretReturnValue TryGetFirstStructLocation(this ref TextFile file, Span spanIgnoreLength)
+        public static TryInterpretReturnValue TryGetFirstStructLocation(this ref TextFile file, Caret start)
         {
-            spanIgnoreLength = file.SkipWhiteSpace(spanIgnoreLength);
-            var answer = new TryInterpretReturnValue(ref spanIgnoreLength, ErrorSentence.StructKindNotFoundError, 0, false);
+            file.SkipWhiteSpace(ref start);
+            var answer = new TryInterpretReturnValue(start, ErrorSentence.StructKindNotFoundError, 0, false);
             switch (file.Lines[answer.Span.Line][answer.Span.Column])
             {
                 case 'p': // power

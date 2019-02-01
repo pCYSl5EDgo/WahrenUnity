@@ -4,10 +4,9 @@ namespace pcysl5edgo.Wahren
 {
     public static unsafe class StructWithNameAnalyzer
     {
-        public static TryInterpretReturnValue TryGetStructName(this ref TextFile file, Span spanIgnoreFile)
+        public static TryInterpretReturnValue TryGetStructName(this ref TextFile file, Caret start)
         {
-            spanIgnoreFile = file.SkipWhiteSpace(spanIgnoreFile);
-            var answer = new TryInterpretReturnValue(ref spanIgnoreFile, ErrorSentence.StructNameNotFoundError, 0, false);
+            var answer = new TryInterpretReturnValue(file.SkipWhiteSpace(start), ErrorSentence.StructNameNotFoundError, 0, false);
             ref var span = ref answer.Span;
             ref int length = ref span.Length;
             length = 0;
@@ -118,29 +117,34 @@ namespace pcysl5edgo.Wahren
             return answer;
         }
 
-        public static bool TryGetParentStructName(this ref TextFile file, Span spanIgnoreFile, out TryInterpretReturnValue value)
+        public static bool TryGetParentStructName(this ref TextFile file, Caret start, out TryInterpretReturnValue value)
         {
-            spanIgnoreFile = file.SkipWhiteSpace(spanIgnoreFile);
-            switch (file.Lines[spanIgnoreFile.Line][spanIgnoreFile.Column])
+            file.SkipWhiteSpace(ref start);
+            ref var column = ref start.Column;
+            switch (file.Lines[start.Line][column])
             {
                 case ':':
-                    spanIgnoreFile.Column++;
-                    spanIgnoreFile = file.SkipWhiteSpace(spanIgnoreFile);
-                    return GetParentStructNameInternal(ref file, spanIgnoreFile, out value);
+                    column++;
+                    file.SkipWhiteSpace(ref start);
+                    return GetParentStructNameInternal(ref file, start, out value);
                 case '{':
-                    value = new TryInterpretReturnValue(ref spanIgnoreFile, 0, 0, true);
+                    value = new TryInterpretReturnValue(start, 0, 0, true);
                     return false;
                 default:
-                    value = new TryInterpretReturnValue(ref spanIgnoreFile, ErrorSentence.NotExpectedIdentifierAfterStructNameError, 0, false);
+                    value = new TryInterpretReturnValue(start, ErrorSentence.NotExpectedIdentifierAfterStructNameError, 0, false);
                     return false;
             }
         }
 
-        private static bool GetParentStructNameInternal(ref TextFile file, Span span, out TryInterpretReturnValue value)
+        private static bool GetParentStructNameInternal(ref TextFile file, Caret caret, out TryInterpretReturnValue value)
         {
-            char* currentLine = file.Lines[span.Line];
+            char* currentLine = file.Lines[caret.Line];
             bool onlyDigit = true;
-            span.Length = 0;
+            Span span = new Span
+            {
+                Start = caret,
+                Length = 0,
+            };
             for (int thisLineLength = file.LineLengths[span.Line], column = span.Column; column < thisLineLength; column++)
             {
                 switch (currentLine[column])

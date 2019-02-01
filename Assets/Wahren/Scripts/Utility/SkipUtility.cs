@@ -17,11 +17,16 @@ namespace pcysl5edgo.Wahren
             span.Length = 0;
             return span;
         }
-        public static Span SkipWhiteSpace(this ref TextFile file, Span span)
+        public static Caret SkipWhiteSpace(this in TextFile file, Caret caret)
         {
-            span.File = file.FilePathId;
-            ref int raw = ref span.Line;
-            ref int column = ref span.Column;
+            file.SkipWhiteSpace(ref caret);
+            return caret;
+        }
+        public static void SkipWhiteSpace(this in TextFile file, ref Caret caret)
+        {
+            caret.File = file.FilePathId;
+            ref int raw = ref caret.Line;
+            ref int column = ref caret.Column;
             for (char* currentLine; raw < file.LineCount; raw++, column = 0)
             {
                 currentLine = file.Lines[raw];
@@ -33,11 +38,10 @@ namespace pcysl5edgo.Wahren
                         case ' ':
                             break;
                         default:
-                            return span;
+                            return;
                     }
                 }
             }
-            return span;
         }
     }
 }
