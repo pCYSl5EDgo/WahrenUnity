@@ -119,19 +119,19 @@ namespace pcysl5edgo.Wahren
 
         public static bool TryGetParentStructName(this ref TextFile file, Caret start, out TryInterpretReturnValue value)
         {
-            file.SkipWhiteSpace(ref start);
+            file.SkipWhiteSpace(start);
             ref var column = ref start.Column;
             switch (file.Lines[start.Line][column])
             {
                 case ':':
                     column++;
-                    file.SkipWhiteSpace(ref start);
+                    file.SkipWhiteSpace(start);
                     return GetParentStructNameInternal(ref file, start, out value);
                 case '{':
                     value = new TryInterpretReturnValue(start, 0, 0, true);
                     return false;
                 default:
-                    value = new TryInterpretReturnValue(start, ErrorSentence.NotExpectedIdentifierAfterStructNameError, 0, false);
+                    value = new TryInterpretReturnValue(start, ErrorSentence.NotExpectedCharacterError, 0, false);
                     return false;
             }
         }
@@ -226,22 +226,22 @@ namespace pcysl5edgo.Wahren
                     case '{':
                         goto RETURN;
                     default:
-                        value = new TryInterpretReturnValue(ref span, ErrorSentence.InvalidIdentifierError, 0, false);
+                        value = new TryInterpretReturnValue(span, ErrorSentence.InvalidIdentifierError, 0, false);
                         return false;
                 }
             }
         RETURN:
             if (span.Length == 0)
             {
-                value = new TryInterpretReturnValue(ref span, ErrorSentence.ParentStructNameNotFoundError, 0, false);
+                value = new TryInterpretReturnValue(span, ErrorSentence.ParentStructNameNotFoundError, 0, false);
                 return false;
             }
             if (onlyDigit)
             {
-                value = new TryInterpretReturnValue(ref span, ErrorSentence.IdentifierCannotBeNumberError, 0, false);
+                value = new TryInterpretReturnValue(span, ErrorSentence.IdentifierCannotBeNumberError, 0, false);
                 return false;
             }
-            value = new TryInterpretReturnValue(ref span, SuccessSentence.ParentStructNameInterpretSuccess, 0, true);
+            value = new TryInterpretReturnValue(span, SuccessSentence.ParentStructNameInterpretSuccess, 0, true);
             return true;
         }
     }

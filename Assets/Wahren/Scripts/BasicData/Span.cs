@@ -17,6 +17,21 @@ namespace pcysl5edgo.Wahren
         [FieldOffset(0)]
         public Caret Start;
 
+        public Span(int file, int line, int column, int length)
+        {
+            Start = default;
+            File = file;
+            Line = line;
+            Column = column;
+            Length = length;
+        }
+        public Span(Caret start, int length)
+        {
+            this = default;
+            Start = start;
+            Length = length;
+        }
+
         public Caret CaretNextToEndOfThisSpan => new Caret { File = this.File, Line = this.Line, Column = this.Column + this.Length };
 
         public override string ToString() => $"({File}, {Line}, {Column}, {Length})";

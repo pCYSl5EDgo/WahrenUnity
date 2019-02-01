@@ -24,13 +24,12 @@
 
         public TryInterpretReturnValue(Caret start, int dataIndex, int subDataIndex, bool isSuccess)
         {
-            this.Span = default;
-            this.Span.Start = start;
+            this.Span = new Span { Start = start, Length = 0 };
             this.isSuccess = (byte)(isSuccess ? 1 : 0);
             this.DataIndex = dataIndex;
             this.SubDataIndex = subDataIndex;
         }
-        public TryInterpretReturnValue(ref Span span, int dataIndex, int subDataIndex, bool isSuccess)
+        public TryInterpretReturnValue(Span span, int dataIndex, int subDataIndex, bool isSuccess)
         {
             this.Span = span;
             this.isSuccess = (byte)(isSuccess ? 1 : 0);

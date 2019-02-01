@@ -11,7 +11,8 @@ namespace pcysl5edgo.Wahren
         internal const int ParentStructNameNotFoundError = 4;
         internal const int IdentifierCannotBeNumberError = 5;
         internal const int InvalidIdentifierError = 6;
-        internal const int NotExpectedIdentifierAfterStructNameError = 7;
+        internal const int NotExpectedCharacterError = 7;
+        internal const int ExpectedCharNotFoundError = 8;
         static ErrorSentence()
         {
             Contents = new string[]
@@ -23,7 +24,8 @@ namespace pcysl5edgo.Wahren
                 "Parent Struct Name Not Found", // 4
                 "Identifier Should NOT be a Number",
                 "Invalid Identifier", // 6
-                "':' or '{' are expected. Invalid Character Found", // 7
+                "Invalid Character", // 7
+                "Expects Character Not Found", // 8
             };
             SubContents = new string[][] {
                 null,
@@ -58,8 +60,16 @@ namespace pcysl5edgo.Wahren
                 null, // 3
                 null, // 4
                 null, // 5
-                null, // 6
+                new []{
+                    "Expects 'name'"
+                }, // 6
                 null, // 7
+                new string[]{
+                    "'='",
+                    "'{'",
+                    "'}",
+                }, // 8
+                null, // 9
             };
         }
     }

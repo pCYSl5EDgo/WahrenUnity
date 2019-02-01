@@ -8,18 +8,27 @@ public static class SuccessSentence
     internal const int StructKindInterpretSuccess = 1;
     internal const int StructNameInterpretSuccess = 2;
     internal const int ParentStructNameInterpretSuccess = 3;
+    internal const int ScenarioVariantInterpretSuccess = 4;
+    internal const int RaceTreeIntrepretSuccess = 5;
+    internal const int AssignmentInterpretationSuccess = 6;
+    internal const int LeftBraceConfirmationSuccess = 7;
+
     static SuccessSentence()
     {
         Contents = new string[]
         {
             "No Successful Token",
             "Struct Kind Tag",
-            "Struct Name",
+            "Struct Name", // 2
             "Parent Struct Name",
+            "Scenario Variant Name Interpretation Success", // 4
+            "Struct 'race' Interpretation Success", //5
+            "Assignment Interpretation Success", // 6
+            "'{' was Confirmed", // 7
         };
         SubContents = new string[][]
         {
-            Array.Empty<string>(),
+            null,
             new string[]{
                 "'power'", // 0
                 "'unit'",
@@ -42,6 +51,15 @@ public static class SuccessSentence
                 "'voice'", // 18
                 "'workspace'", // 19
             },
+            null, // 2
+            null,
+            null, // 4
+            null,
+            new string[]
+            {
+                "'name'",
+            },
+            null, // 7
         };
     }
 }

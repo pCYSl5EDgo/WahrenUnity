@@ -15,7 +15,6 @@ namespace pcysl5edgo.Wahren
         public int LineCount;
 
         public override string ToString() => new string(Contents, 0, Length);
-        public string ToStringUnsafe(int lineIndex) => new string(Lines[lineIndex], 0, LineLengths[lineIndex]);
         public string ToString(int lineIndex)
         {
             if (lineIndex < 0 || lineIndex >= LineCount) throw new ArgumentOutOfRangeException();

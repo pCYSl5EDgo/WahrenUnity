@@ -2,7 +2,13 @@
 {
     public unsafe struct ASTValueTypePair
     {
-        public int ValueIndex;
-        public int TypeIndex;
+        public int Value;
+        public int Type;
+
+        public ASTValueTypePair(int value, int type)
+        {
+            this.Value = value;
+            this.Type = type;
+        }
     }
 }

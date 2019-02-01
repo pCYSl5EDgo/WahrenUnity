@@ -6,24 +6,17 @@ namespace pcysl5edgo.Wahren
 {
     public static unsafe class VerifyUtility
     {
-        public static bool IsNextValidCharacter(this ref TextFile file, Span span, char expectedCharacter)
+        public static TryInterpretReturnValue IsCurrentCharEquals(this ref TextFile file, Caret caret, char c)
         {
-            span.Column++;
-            for (; span.Line < file.LineCount; span.Line++)
+
+            if(file.CurrentChar(caret) == c)
             {
-                for (; span.Column < file.LineLengths[span.Line]; span.Column++)
-                {
-                    switch (file.Lines[span.Line][span.Column])
-                    {
-                        case ' ':
-                        case '\t':
-                            continue;
-                        default:
-                            return expectedCharacter == file.Lines[span.Line][span.Column];
-                    }
-                }
+                return new TryInterpretReturnValue(new Span(caret, 1), SuccessSentence.LeftBraceConfirmationSuccess, 0, true);
             }
-            return false;
+            else
+            {
+                return new TryInterpretReturnValue(new Span(caret, 1), ErrorSentence.ExpectedCharNotFoundError, 1, false);
+            }
         }
     }
 }
