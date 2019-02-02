@@ -47,17 +47,25 @@ namespace pcysl5edgo.Wahren.AST
                 var pair = Contents[i];
                 switch (pair.Type)
                 {
-                    case 0:
+                    case name:
                         buffer.Append("\n  ");
                         tempData.NameList[pair.Value].Append(ref script, buffer);
                         break;
-                    case 1:
+                    case align:
+                        buffer.Append("\n  ");
+                        tempData.AlignList[pair.Value].Append(ref script, buffer);
                         break;
-                    case 2:
+                    case brave:
+                        buffer.Append("\n  ");
+                        tempData.BraveList[pair.Value].Append(ref script, buffer);
                         break;
-                    case 3:
+                    case consti:
+                        buffer.Append("\n  ");
+                        tempData.ConstiList[pair.Value].Append(ref script, buffer);
                         break;
-                    case 4:
+                    case movetype:
+                        buffer.Append("\n  ");
+                        tempData.MoveTypeList[pair.Value].Append(ref script, buffer);
                         break;
                 }
             }
@@ -83,11 +91,29 @@ namespace pcysl5edgo.Wahren.AST
         {
             public Span ScenarioVariant;
             public sbyte Value;
+
+            public StringBuilder Append(ref ScriptLoadReturnValue script, StringBuilder buffer)
+            {
+                if (ScenarioVariant.Length == 0)
+                    buffer.Append("align = ");
+                else
+                    buffer.Append("align@").Append(script.ToString(ref ScenarioVariant)).Append(" = ");
+                return buffer.Append(Value);
+            }
         }
         public struct BraveAssignExpression // 2
         {
             public Span ScenarioVariant;
             public sbyte Value;
+
+            public StringBuilder Append(ref ScriptLoadReturnValue script, StringBuilder buffer)
+            {
+                if (ScenarioVariant.Length == 0)
+                    buffer.Append("brave = ");
+                else
+                    buffer.Append("brave@").Append(script.ToString(ref ScenarioVariant)).Append(" = ");
+                return buffer.Append(Value);
+            }
         }
         public unsafe struct ConstiAssignExpression : IDisposable // 3
         {
@@ -105,11 +131,35 @@ namespace pcysl5edgo.Wahren.AST
                     Values = null;
                 }
             }
+
+            public StringBuilder Append(ref ScriptLoadReturnValue script, StringBuilder buffer)
+            {
+                if (ScenarioVariant.Length == 0)
+                    buffer.Append("consti = ");
+                else
+                    buffer.Append("consti@").Append(script.ToString(ref ScenarioVariant)).Append(" = ");
+                if (Length == 0)
+                    return buffer.Append('@');
+                buffer.Append(Values[0]).Append('*').Append(Attributes[0]);
+                for (int i = 1; i < Length; i++)
+                {
+                    buffer.Append(", ").Append(Values[i]).Append('*').Append(Attributes[i]);
+                }
+                return buffer;
+            }
         }
         public struct MoveTypeAssignExpression // 4
         {
             public Span ScenarioVariant;
             public Span Value;
+
+            public StringBuilder Append(ref ScriptLoadReturnValue script, StringBuilder buffer)
+            {
+                if (ScenarioVariant.Length == 0)
+                    return buffer.Append("movetype = ").Append(script.ToString(ref Value));
+                else
+                    return buffer.Append("movetype@").Append(script.ToString(ref ScenarioVariant)).Append(" = ").Append(script.ToString(ref Value));
+            }
         }
     }
 }

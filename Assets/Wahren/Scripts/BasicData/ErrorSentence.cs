@@ -13,6 +13,7 @@ namespace pcysl5edgo.Wahren
         internal const int InvalidIdentifierError = 6;
         internal const int NotExpectedCharacterError = 7;
         internal const int ExpectedCharNotFoundError = 8;
+        internal const int NotNumberError = 9;
         static ErrorSentence()
         {
             Contents = new string[]
@@ -26,6 +27,7 @@ namespace pcysl5edgo.Wahren
                 "Invalid Identifier", // 6
                 "Invalid Character", // 7
                 "Expects Character Not Found", // 8
+                "Expects Number but Found Identifier", // 9
             };
             SubContents = new string[][] {
                 null,
@@ -60,9 +62,7 @@ namespace pcysl5edgo.Wahren
                 null, // 3
                 null, // 4
                 null, // 5
-                new []{
-                    "Expects 'name'"
-                }, // 6
+                null, // 6
                 null, // 7
                 new string[]{
                     "'='",

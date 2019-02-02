@@ -30,30 +30,38 @@ namespace pcysl5edgo.Wahren.AST
                                 nextToRightBrace.Column++;
                                 tree.CopyFrom(list);
                                 return new TryInterpretReturnValue(nextToRightBrace, SuccessSentence.RaceTreeIntrepretSuccess, 0, true);
-                            case 'a': // attribute
-                                if (!AttributeDetect(ref file, ref tempData, ref nextToRightBrace, out answer, list))
+                            case 'a': // align
+                                answer = AlignDetect(ref file, ref tempData, ref nextToRightBrace, list);
+                                if (!answer.IsSuccess)
                                     return answer;
                                 nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
                                 break;
                             case 'b': // brave
-                                if (!BraveDetect(ref file, ref tempData, ref nextToRightBrace, out answer, list))
+                                answer = BraveDetect(ref file, ref tempData, ref nextToRightBrace, list);
+                                if (!answer.IsSuccess)
                                     return answer;
                                 nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
                                 break;
                             case 'c': // consti
-                                if (!ConstibuteDetect(ref file, ref tempData, ref nextToRightBrace, out answer, list))
+                                answer = ConstibuteDetect(ref file, ref tempData, ref nextToRightBrace, list);
+                                if (!answer.IsSuccess)
                                     return answer;
                                 nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
                                 break;
                             case 'm': // movetype
-                                if (!MoveTypeDetect(ref file, ref tempData, ref nextToRightBrace, out answer, list))
+                                answer = MoveTypeDetect(ref file, ref tempData, ref nextToRightBrace, list);
+                                if (!answer.IsSuccess)
                                     return answer;
                                 nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
                                 break;
                             case 'n': // name
-                                if (!NameDetect(ref file, ref tempData, ref nextToRightBrace, out answer, list))
+                                answer = NameDetect(ref file, ref tempData, ref nextToRightBrace, list);
+                                if (!answer.IsSuccess)
                                     return answer;
                                 nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
+                                break;
+                            case ' ':
+                            case '\t':
                                 break;
                             default:
                                 tree = default;
@@ -65,79 +73,144 @@ namespace pcysl5edgo.Wahren.AST
             return new TryInterpretReturnValue(nextToRightBrace, ErrorSentence.ExpectedCharNotFoundError, 2, false);
         }
 
-        private static bool NameDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, out TryInterpretReturnValue answer, NativeList<ASTValueTypePair> list)
+        private static TryInterpretReturnValue NameDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, NativeList<ASTValueTypePair> list)
         {
             char* cs = file.CurrentCharPointer(current);
-            answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, 0, false);
+            var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, 0, false);
             int thisLineLength = file.CurrentLineLength(current);
-            if (current.Column + 3 >= thisLineLength)
-            {
-                return false;
-            }
-            if (*++cs != 'a')
-            {
-                answer.Span.Length = 2;
-                return false;
-            }
-            if (*++cs != 'm')
-            {
-                answer.Span.Length = 3;
-                return false;
-            }
-            if (*++cs != 'e')
-            {
-                answer.Span.Length = 4;
-                return false;
-            }
+            if (current.Column + 3 >= thisLineLength || *++cs != 'a' || *++cs != 'm' || *++cs != 'e')
+                goto RETURN;
             current.Column += 4;
             RaceTree.NameAssignExpression expression = new RaceTree.NameAssignExpression();
             if (current.Column < thisLineLength && *++cs == '@')
             {
-                if (file.TryGetScenarioVariantName(current, out var trial))
-                {
-                    expression.ScenarioVariant = trial.Span;
-                    current = trial.Span.CaretNextToEndOfThisSpan;
-                }
-                else
-                {
-                    answer = trial;
-                    return false;
-                }
+                if (!file.TryGetScenarioVariantName(current, out answer))
+                    goto RETURN;
+                expression.ScenarioVariant = answer.Span;
+                current = answer.Span.CaretNextToEndOfThisSpan;
             }
             file.SkipWhiteSpace(ref current);
             if (file.CurrentChar(current) != '=')
             {
                 answer.DataIndex = ErrorSentence.ExpectedCharNotFoundError;
-                return false;
+                goto RETURN;
             }
             current.Column++;
             file.SkipWhiteSpace(ref current);
-            UnityEngine.Debug.Log("AT " + file.CurrentChar(current) + current.ToString());
-            answer = new TryInterpretReturnValue(new Span(current, file.CurrentLineLength(current) - current.Column), SuccessSentence.AssignmentInterpretationSuccess, 0, true);
+            answer = new TryInterpretReturnValue(file.ReadLine(current), SuccessSentence.AssignmentInterpretationSuccess, 0, true);
             expression.Value = answer.Span;
             list.Add(new ASTValueTypePair(tempData.NameList.Length, RaceTree.name));
             tempData.NameList.Add(expression);
-            return true;
+        RETURN:
+            return answer;
         }
 
-        private static bool MoveTypeDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, out TryInterpretReturnValue answer, NativeList<ASTValueTypePair> list)
+        private static TryInterpretReturnValue MoveTypeDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, NativeList<ASTValueTypePair> list)
+        {
+            char* cs = file.CurrentCharPointer(current);
+            var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, 0, false);
+            int thisLineLength = file.CurrentLineLength(current);
+            if (current.Column + 7 >= thisLineLength || *++cs != 'o' || *++cs != 'v' || *++cs != 'e' || *++cs != 't' || *++cs != 'y' || *++cs != 'p' || *++cs != 'e')
+                goto RETURN;
+            current.Column += 8;
+            var expression = new RaceTree.MoveTypeAssignExpression();
+            if (current.Column < thisLineLength && *++cs == '@')
+            {
+                if (!file.TryGetScenarioVariantName(current, out answer))
+                    goto RETURN;
+                expression.ScenarioVariant = answer.Span;
+                current = answer.Span.CaretNextToEndOfThisSpan;
+            }
+            file.SkipWhiteSpace(ref current);
+            if (file.CurrentChar(current) != '=')
+            {
+                answer.DataIndex = ErrorSentence.ExpectedCharNotFoundError;
+                goto RETURN;
+            }
+            current.Column++;
+            file.SkipWhiteSpace(ref current);
+            answer = file.TryReadIdentifier(current);
+            if (!answer.IsSuccess)
+                goto RETURN;
+            answer.DataIndex = SuccessSentence.AssignmentInterpretationSuccess;
+            expression.Value = answer.Span;
+            list.Add(new ASTValueTypePair(tempData.MoveTypeList.Length, RaceTree.movetype));
+            tempData.MoveTypeList.Add(expression);
+        RETURN:
+            return answer;
+        }
+
+        private static TryInterpretReturnValue ConstibuteDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, NativeList<ASTValueTypePair> list)
         {
             throw new NotImplementedException();
         }
 
-        private static bool ConstibuteDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, out TryInterpretReturnValue answer, NativeList<ASTValueTypePair> list)
+        private static TryInterpretReturnValue BraveDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, NativeList<ASTValueTypePair> list)
         {
-            throw new NotImplementedException();
+            char* cs = file.CurrentCharPointer(current);
+            var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, 0, false);
+            int thisLineLength = file.CurrentLineLength(current);
+            if (current.Column + 4 >= thisLineLength || *++cs != 'r' || *++cs != 'a' || *++cs != 'v' || *++cs != 'e')
+                goto RETURN;
+            current.Column += 5;
+            var expression = new RaceTree.BraveAssignExpression();
+            if (current.Column < thisLineLength && *++cs == '@')
+            {
+                if (!file.TryGetScenarioVariantName(current, out answer))
+                    goto RETURN;
+                expression.ScenarioVariant = answer.Span;
+                current = answer.Span.CaretNextToEndOfThisSpan;
+            }
+            file.SkipWhiteSpace(ref current);
+            if (file.CurrentChar(current) != '=')
+            {
+                answer.DataIndex = ErrorSentence.ExpectedCharNotFoundError;
+                goto RETURN;
+            }
+            current.Column++;
+            file.SkipWhiteSpace(ref current);
+            answer = file.TryReadNumber(current, out var value);
+            if (!answer.IsSuccess)
+                goto RETURN;
+            expression.Value = (sbyte)value;
+            list.Add(new ASTValueTypePair(tempData.BraveList.Length, RaceTree.brave));
+            tempData.BraveList.Add(expression);
+        RETURN:
+            return answer;
         }
 
-        private static bool BraveDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, out TryInterpretReturnValue answer, NativeList<ASTValueTypePair> list)
+        private static TryInterpretReturnValue AlignDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, NativeList<ASTValueTypePair> list)
         {
-            throw new NotImplementedException();
-        }
-
-        private static bool AttributeDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, out TryInterpretReturnValue answer, NativeList<ASTValueTypePair> list)
-        {
-            throw new NotImplementedException();
+            char* cs = file.CurrentCharPointer(current);
+            var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, 0, false);
+            int thisLineLength = file.CurrentLineLength(current);
+            if (current.Column + 4 >= thisLineLength || *++cs != 'l' || *++cs != 'i' || *++cs != 'g' || *++cs != 'n')
+                goto RETURN;
+            current.Column += 5;
+            var expression = new RaceTree.AlignAssignExpression();
+            if (current.Column < thisLineLength && *++cs == '@')
+            {
+                if (!file.TryGetScenarioVariantName(current, out answer))
+                    goto RETURN;
+                expression.ScenarioVariant = answer.Span;
+                current = answer.Span.CaretNextToEndOfThisSpan;
+            }
+            file.SkipWhiteSpace(ref current);
+            if (file.CurrentChar(current) != '=')
+            {
+                answer.DataIndex = ErrorSentence.ExpectedCharNotFoundError;
+                goto RETURN;
+            }
+            current.Column++;
+            file.SkipWhiteSpace(ref current);
+            answer = file.TryReadNumber(current, out var value);
+            if (!answer.IsSuccess)
+                goto RETURN;
+            expression.Value = (sbyte)value;
+            list.Add(new ASTValueTypePair(tempData.AlignList.Length, RaceTree.align));
+            tempData.AlignList.Add(expression);
+        RETURN:
+            return answer;
         }
     }
 
