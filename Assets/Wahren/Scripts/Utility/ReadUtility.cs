@@ -3,7 +3,16 @@
     public static unsafe class ReadUtility
     {
         public static Span ReadLine(this ref TextFile file, Caret current) => new Span(current, file.CurrentLineLength(current) - current.Column);
-        public static TryInterpretReturnValue TryReadIdentifier(this ref TextFile file, Caret current)
+        public static TryInterpretReturnValue TryReadIdentifierValuePairs(this ref TextFile file, Caret current, out int length, out IdentifierNumberPair* pairs)
+        {
+            var cptr = (ushort*)file.CurrentCharPointer(current);
+            length = 0;
+            int capacity = 2;
+            IdentifierNumberPair* tmpPairs = stackalloc IdentifierNumberPair[capacity];
+            
+            throw new System.NotImplementedException();
+        }
+        public static TryInterpretReturnValue TryReadIdentifierNotEmpty(this ref TextFile file, Caret current)
         {
             var cptr = (ushort*)file.CurrentCharPointer(current);
             Span span = new Span(current, 0);

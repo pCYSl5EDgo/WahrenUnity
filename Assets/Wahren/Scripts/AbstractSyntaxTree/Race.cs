@@ -10,25 +10,12 @@ namespace pcysl5edgo.Wahren.AST
         public Span Name;
         public Span ParentName;
 
-        public int Length;
-        public ASTValueTypePair* Contents;
+        public ASTValueTypePairList List;
 
         public void Dispose()
         {
-            if (Length != 0)
-            {
-                UnsafeUtility.Free(Contents, Allocator.Persistent);
-                Contents = null;
-                Length = 0;
-            }
-        }
-
-        public void CopyFrom(Unity.Collections.NativeList<ASTValueTypePair> list)
-        {
-            if (Length != 0) return;
-            Length = list.Length;
-            Contents = (ASTValueTypePair*)UnsafeUtility.Malloc(sizeof(ASTValueTypePair) * list.Length, 4, Allocator.Persistent);
-            UnsafeUtility.MemCpy(Contents, list.GetUnsafePtr(), sizeof(ASTValueTypePair) * Length);
+            List.Dispose();
+            this = default;
         }
 
         public string ToString(ref ScriptLoadReturnValue script, ref RaceParserTempData tempData)
@@ -42,30 +29,30 @@ namespace pcysl5edgo.Wahren.AST
             {
                 buffer.Append('@').Append(script.ToString(ref ParentName)).Append("\n{");
             }
-            for (int i = 0; i < Length; i++)
+            for (int i = 0; i < List.Length; i++)
             {
-                var pair = Contents[i];
+                var pair = List.Values[i];
                 switch (pair.Type)
                 {
                     case name:
                         buffer.Append("\n  ");
-                        tempData.NameList[pair.Value].Append(ref script, buffer);
+                        tempData.Names[pair.Value].Append(ref script, buffer);
                         break;
                     case align:
                         buffer.Append("\n  ");
-                        tempData.AlignList[pair.Value].Append(ref script, buffer);
+                        tempData.Aligns[pair.Value].Append(ref script, buffer);
                         break;
                     case brave:
                         buffer.Append("\n  ");
-                        tempData.BraveList[pair.Value].Append(ref script, buffer);
+                        tempData.Braves[pair.Value].Append(ref script, buffer);
                         break;
                     case consti:
                         buffer.Append("\n  ");
-                        tempData.ConstiList[pair.Value].Append(ref script, buffer);
+                        tempData.Constis[pair.Value].Append(ref script, buffer);
                         break;
                     case movetype:
                         buffer.Append("\n  ");
-                        tempData.MoveTypeList[pair.Value].Append(ref script, buffer);
+                        tempData.MoveTypes[pair.Value].Append(ref script, buffer);
                         break;
                 }
             }
@@ -119,16 +106,13 @@ namespace pcysl5edgo.Wahren.AST
         {
             public Span ScenarioVariant;
             public int Length;
-            public Span* Attributes;
-            public sbyte* Values;
+            public IdentifierNumberPair* Pairs;
             public void Dispose()
             {
                 if (Length != 0)
                 {
-                    UnsafeUtility.Free(Attributes, Allocator.Persistent);
-                    UnsafeUtility.Free(Values, Allocator.Persistent);
-                    Attributes = null;
-                    Values = null;
+                    UnsafeUtility.Free(Pairs, Allocator.Persistent);
+                    Pairs = null;
                 }
             }
 
@@ -140,10 +124,10 @@ namespace pcysl5edgo.Wahren.AST
                     buffer.Append("consti@").Append(script.ToString(ref ScenarioVariant)).Append(" = ");
                 if (Length == 0)
                     return buffer.Append('@');
-                buffer.Append(Values[0]).Append('*').Append(Attributes[0]);
+                buffer.Append(script.ToString(ref Pairs[0].Span)).Append('*').Append(Pairs[0].Number);
                 for (int i = 1; i < Length; i++)
                 {
-                    buffer.Append(", ").Append(Values[i]).Append('*').Append(Attributes[i]);
+                    buffer.Append(", ").Append(script.ToString(ref Pairs[i].Span)).Append('*').Append(Pairs[i].Number);
                 }
                 return buffer;
             }

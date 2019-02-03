@@ -21,6 +21,7 @@ namespace pcysl5edgo.Wahren.AST
 
         public bool TryAddAST<T>(T* list, in T value, int capacity, ref int length) where T : unmanaged
         {
+            UnityEngine.Debug.Log("CAPACITY : " + capacity + "\nLENGTH : " + length);
             do
             {
                 if (capacity == length)

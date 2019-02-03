@@ -57,13 +57,13 @@ public class TestManager : MonoBehaviour
         var value0 = file.TryGetFirstStructLocation(default);
         TryInterpretReturnValue nameResult, parentNameResult, value3, value4;
         nameResult = parentNameResult = value3 = value4 = new TryInterpretReturnValue { Span = new Span { File = index } };
-        UnityEngine.Debug.Log("================");
+        // UnityEngine.Debug.Log("================");
         UnityEngine.Debug.Log(value0.ToString(ref scriptLoadReturnValue));
         Caret caret = value0.Span.CaretNextToEndOfThisSpan;
         file.SkipWhiteSpace(ref caret);
         if (StructAnalyzer.IsStructKindWithName(value0.SubDataIndex))
         {
-            UnityEngine.Debug.Log("----------------");
+            // UnityEngine.Debug.Log("----------------");
             nameResult = file.TryGetStructName(caret);
             UnityEngine.Debug.Log(nameResult.ToString(ref scriptLoadReturnValue));
             caret = nameResult.Span.CaretNextToEndOfThisSpan;
@@ -74,7 +74,7 @@ public class TestManager : MonoBehaviour
                 caret = parentNameResult.Span.CaretNextToEndOfThisSpan;
                 file.SkipWhiteSpace(ref caret);
             }
-            UnityEngine.Debug.Log("----------------");
+            // UnityEngine.Debug.Log("----------------");
         }
         value3 = file.IsCurrentCharEquals(caret, '{');
         caret = value3.Span.CaretNextToEndOfThisSpan;
@@ -82,7 +82,7 @@ public class TestManager : MonoBehaviour
         switch (value0.SubDataIndex)
         {
             case 2:
-                value4 = file.TryParseRaceStruct(ref raceParserTempData, nameResult.Span, parentNameResult.Span, caret, out var nextToRightBrace, out var raceTree);
+                value4 = file.TryParseRaceStructMultiThread(ref raceParserTempData, nameResult.Span, parentNameResult.Span, caret, out var nextToRightBrace, out var raceTree);
                 if (value4.IsSuccess)
                     UnityEngine.Debug.Log(raceTree.ToString(ref scriptLoadReturnValue, ref raceParserTempData));
                 else
