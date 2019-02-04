@@ -14,6 +14,9 @@ namespace pcysl5edgo.Wahren
         internal const int NotExpectedCharacterError = 7;
         internal const int ExpectedCharNotFoundError = 8;
         internal const int NotNumberError = 9;
+        internal const int InvalidEndOfLineError = 10;
+        internal const int InvalidMinusNumberError = 11;
+        internal const int OutOfRangeError = 12;
         static ErrorSentence()
         {
             Contents = new string[]
@@ -26,8 +29,11 @@ namespace pcysl5edgo.Wahren
                 "Identifier Should NOT be a Number",
                 "Invalid Identifier", // 6
                 "Invalid Character", // 7
-                "Expects Character Not Found", // 8
+                "Expected Character Not Found", // 8
                 "Expects Number but Found Identifier", // 9
+                "Invalid End of Line", // 10
+                "Minus number should consist of '-' and digits", // 11
+                "Out of Range Error", // 12
             };
             SubContents = new string[][] {
                 null,
@@ -70,6 +76,9 @@ namespace pcysl5edgo.Wahren
                     "'}",
                 }, // 8
                 null, // 9
+                null, // 10
+                null, // 11
+                null, // 12
             };
         }
     }
