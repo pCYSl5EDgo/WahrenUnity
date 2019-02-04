@@ -6,7 +6,7 @@ namespace pcysl5edgo.Wahren.AST
 {
     public static unsafe class RaceParser
     {
-        public static TryInterpretReturnValue TryParseRaceStructMultiThread(this ref TextFile file, ref RaceParserTempData tempData, Span name, Span parentName, Caret nextToLeftBrace, out Caret nextToRightBrace, out RaceTree tree)
+        public static TryInterpretReturnValue TryParseRaceStructMultiThread(this ref TextFile file, ref RaceParserTempData tempData, ref IdentifierNumberPairList pairList, Span name, Span parentName, Caret nextToLeftBrace, out Caret nextToRightBrace, out RaceTree tree)
         {
             nextToRightBrace = file.SkipWhiteSpace(nextToLeftBrace);
             ref var column = ref nextToRightBrace.Column;
@@ -27,47 +27,59 @@ namespace pcysl5edgo.Wahren.AST
                     {
                         case '}':
                             nextToRightBrace.Column++;
-                            return new TryInterpretReturnValue(nextToRightBrace, SuccessSentence.RaceTreeIntrepretSuccess, 0, true);
+                            return new TryInterpretReturnValue(nextToRightBrace, SuccessSentence.RaceTreeIntrepretSuccess, InterpreterStatus.Success);
                         case 'a': // align
+                            UnityEngine.Debug.Log("a" + nextToRightBrace.ToString() + " " + file.CurrentChar(nextToRightBrace));
                             answer = AlignDetect(ref file, ref tempData, ref nextToRightBrace, ref list);
                             if (!answer.IsSuccess)
                                 goto RETURN;
                             nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
+                            UnityEngine.Debug.Log("a" + nextToRightBrace.ToString() + " " + file.CurrentChar(nextToRightBrace));
                             break;
                         case 'b': // brave
+                            UnityEngine.Debug.Log("b" + nextToRightBrace.ToString() + " " + file.CurrentChar(nextToRightBrace));
                             answer = BraveDetect(ref file, ref tempData, ref nextToRightBrace, ref list);
                             if (!answer.IsSuccess)
                                 goto RETURN;
                             nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
+                            UnityEngine.Debug.Log("b" + nextToRightBrace.ToString() + " " + file.CurrentChar(nextToRightBrace));
                             break;
                         case 'c': // consti
-                            answer = ConstiDetect(ref file, ref tempData, ref nextToRightBrace, ref list);
+                            UnityEngine.Debug.Log("c" + nextToRightBrace.ToString() + " " + file.CurrentChar(nextToRightBrace));
+                            answer = ConstiDetect(ref file, ref tempData, ref nextToRightBrace, ref list, ref pairList);
                             if (!answer.IsSuccess)
                                 goto RETURN;
+                            UnityEngine.Debug.Log("ck" + answer.Span.ToString());
                             nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
+                            UnityEngine.Debug.Log("c" + nextToRightBrace.ToString() + " " + file.CurrentChar(nextToRightBrace));
                             break;
                         case 'm': // movetype
+                            UnityEngine.Debug.Log("m" + nextToRightBrace.ToString() + " " + file.CurrentChar(nextToRightBrace));
                             answer = MoveTypeDetect(ref file, ref tempData, ref nextToRightBrace, ref list);
                             if (!answer.IsSuccess)
                                 goto RETURN;
                             nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
+                            UnityEngine.Debug.Log("m" + nextToRightBrace.ToString() + " " + file.CurrentChar(nextToRightBrace));
                             break;
                         case 'n': // name
+                            UnityEngine.Debug.Log("n" + nextToRightBrace.ToString() + " " + file.CurrentChar(nextToRightBrace));
                             answer = NameDetect(ref file, ref tempData, ref nextToRightBrace, ref list);
                             if (!answer.IsSuccess)
                                 goto RETURN;
                             nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
+                            UnityEngine.Debug.Log("n" + nextToRightBrace.ToString() + " " + file.CurrentChar(nextToRightBrace));
                             break;
                         case ' ':
                         case '\t':
                             break;
                         default:
-                            answer = new TryInterpretReturnValue(new Span { Start = nextToRightBrace, Length = 1 }, ErrorSentence.NotExpectedCharacterError, 0, false);
+                            UnityEngine.Debug.Log("z" + nextToRightBrace.ToString() + " " + file.CurrentChar(nextToRightBrace));
+                            answer = new TryInterpretReturnValue(new Span(nextToRightBrace, 1), ErrorSentence.NotExpectedCharacterError, InterpreterStatus.Error);
                             goto RETURN;
                     }
                 }
             }
-            answer = new TryInterpretReturnValue(nextToRightBrace, ErrorSentence.ExpectedCharNotFoundError, 2, false);
+            answer = new TryInterpretReturnValue(nextToRightBrace, ErrorSentence.ExpectedCharNotFoundError, 2, InterpreterStatus.Error);
         RETURN:
             tree.Dispose();
             return answer;
@@ -76,7 +88,7 @@ namespace pcysl5edgo.Wahren.AST
         private static TryInterpretReturnValue NameDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref ASTValueTypePairList list)
         {
             char* cs = file.CurrentCharPointer(current);
-            var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, 0, false);
+            var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, 0, InterpreterStatus.Error);
             int thisLineLength = file.CurrentLineLength(current);
             if (current.Column + 3 >= thisLineLength || *++cs != 'a' || *++cs != 'm' || *++cs != 'e')
                 goto RETURN;
@@ -97,18 +109,23 @@ namespace pcysl5edgo.Wahren.AST
             }
             current.Column++;
             file.SkipWhiteSpace(ref current);
-            answer = new TryInterpretReturnValue(file.ReadLine(current), SuccessSentence.AssignmentInterpretationSuccess, 0, true);
+            answer = new TryInterpretReturnValue(file.ReadLine(current), SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Success);
             expression.Value = answer.Span;
             var ast = new ASTValueTypePair(RaceTree.name);
             if (ast.TryAddAST(tempData.Names, expression, tempData.NameCapacity, ref tempData.NameLength))
             {
                 if (list.TryAddMultiThread(ast))
+                {
                     goto RETURN;
+                }
                 else
-                    UnityEngine.Debug.Log("HOGE");
+                {
+                }
             }
-            else UnityEngine.Debug.Log("FUGA");
-            answer = new TryInterpretReturnValue(file.ReadLine(current), SuccessSentence.AssignmentInterpretationSuccess, 0, false);
+            else
+            {
+            }
+            answer = new TryInterpretReturnValue(file.ReadLine(current), SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Error);
         RETURN:
             return answer;
         }
@@ -116,7 +133,7 @@ namespace pcysl5edgo.Wahren.AST
         private static TryInterpretReturnValue MoveTypeDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref ASTValueTypePairList list)
         {
             char* cs = file.CurrentCharPointer(current);
-            var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, 0, false);
+            var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, InterpreterStatus.Error);
             int thisLineLength = file.CurrentLineLength(current);
             if (current.Column + 7 >= thisLineLength || *++cs != 'o' || *++cs != 'v' || *++cs != 'e' || *++cs != 't' || *++cs != 'y' || *++cs != 'p' || *++cs != 'e')
                 goto RETURN;
@@ -149,14 +166,16 @@ namespace pcysl5edgo.Wahren.AST
             return answer;
         }
 
-        private static TryInterpretReturnValue ConstiDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref ASTValueTypePairList list)
+        private static TryInterpretReturnValue ConstiDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref ASTValueTypePairList list, ref IdentifierNumberPairList pairList)
         {
+            UnityEngine.Debug.Log("0:" + current.ToString() + " " + file.CurrentChar(current));
             char* cs = file.CurrentCharPointer(current);
-            var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, 0, false);
+            var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, InterpreterStatus.Error);
             int thisLineLength = file.CurrentLineLength(current);
             if (current.Column + 5 >= thisLineLength || *++cs != 'o' || *++cs != 'n' || *++cs != 's' || *++cs != 't' || *++cs != 'i')
                 goto RETURN;
             current.Column += 6;
+            UnityEngine.Debug.Log("0:" + current.ToString() + " " + file.CurrentChar(current));
             var expression = new RaceTree.ConstiAssignExpression();
             if (current.Column < thisLineLength && *++cs == '@')
             {
@@ -166,6 +185,7 @@ namespace pcysl5edgo.Wahren.AST
                 current = answer.Span.CaretNextToEndOfThisSpan;
             }
             file.SkipWhiteSpace(ref current);
+            UnityEngine.Debug.Log("0:" + current.ToString() + " " + file.CurrentChar(current));
             if (file.CurrentChar(current) != '=')
             {
                 answer.DataIndex = ErrorSentence.ExpectedCharNotFoundError;
@@ -173,21 +193,68 @@ namespace pcysl5edgo.Wahren.AST
             }
             current.Column++;
             file.SkipWhiteSpace(ref current);
-            answer = file.TryReadIdentifierValuePairs(current, out expression.Length, out expression.Pairs);
+            UnityEngine.Debug.Log("0:" + current.ToString() + " " + file.CurrentChar(current));
+            answer = file.TryReadIdentifierNumberPairs(ref pairList, current, out expression.Start, out expression.Length);
+            UnityEngine.Debug.Log("ckckck" + answer.Span.ToString());
             if (!answer.IsSuccess)
                 goto RETURN;
-            answer.DataIndex = SuccessSentence.AssignmentInterpretationSuccess;
+#if UNITY_EDITOR
+            answer = VerifyConsti(expression, pairList, answer.Span);
+            if (answer.IsError)
+                goto RETURN;
+#else
+            if (!VerifyConsti(expression, pairList))
+                return new TryInterpretReturnValue(current, ErrorSentence.OutOfRangeError, InterpreterStatus.Error);
+#endif
             var ast = new ASTValueTypePair(RaceTree.consti);
             if (ast.TryAddAST(tempData.Constis, expression, tempData.ConstiCapacity, ref tempData.ConstiLength))
-                list.TryAddMultiThread(ast);
-            RETURN:
+            {
+                if (!list.TryAddMultiThread(ast))
+                {
+                    answer.Status = InterpreterStatus.Pending;
+                }
+            }
+            else
+            {
+                answer.Status = InterpreterStatus.Pending;
+            }
+        RETURN:
             return answer;
+        }
+
+        internal static
+#if UNITY_EDITOR
+        TryInterpretReturnValue
+#else
+        bool
+#endif
+        VerifyConsti(RaceTree.ConstiAssignExpression expression, in IdentifierNumberPairList list
+#if UNITY_EDITOR
+        , Span span
+#endif
+        )
+        {
+            for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
+            {
+                ref IdentifierNumberPair val = ref list.Values[i];
+                if (val.Span.Length == 0 || val.Number < 0 || val.Number > 10)
+#if UNITY_EDITOR
+                    return new TryInterpretReturnValue(val.NumberSpan, ErrorSentence.OutOfRangeError, InterpreterStatus.Error);
+#else
+                    return false;
+#endif
+            }
+#if UNITY_EDITOR
+            return new TryInterpretReturnValue(span, default, default, InterpreterStatus.Success);
+#else
+            return true;
+#endif
         }
 
         private static TryInterpretReturnValue BraveDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref ASTValueTypePairList list)
         {
             char* cs = file.CurrentCharPointer(current);
-            var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, 0, false);
+            var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, InterpreterStatus.Error);
             int thisLineLength = file.CurrentLineLength(current);
             if (current.Column + 4 >= thisLineLength || *++cs != 'r' || *++cs != 'a' || *++cs != 'v' || *++cs != 'e')
                 goto RETURN;
@@ -222,7 +289,7 @@ namespace pcysl5edgo.Wahren.AST
         private static TryInterpretReturnValue AlignDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref ASTValueTypePairList list)
         {
             char* cs = file.CurrentCharPointer(current);
-            var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, 0, false);
+            var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, InterpreterStatus.Error);
             int thisLineLength = file.CurrentLineLength(current);
             if (current.Column + 4 >= thisLineLength || *++cs != 'l' || *++cs != 'i' || *++cs != 'g' || *++cs != 'n')
                 goto RETURN;
@@ -298,13 +365,7 @@ namespace pcysl5edgo.Wahren.AST
             if (MoveTypeCapacity != 0)
                 UnsafeUtility.Free(MoveTypes, Allocator.Persistent);
             if (ConstiCapacity != 0)
-            {
-                for (int i = 0; i < ConstiLength; i++)
-                {
-                    Constis[i].Dispose();
-                }
                 UnsafeUtility.Free(Constis, Allocator.Persistent);
-            }
             this = default;
         }
     }

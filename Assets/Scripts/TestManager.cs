@@ -1,4 +1,9 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Text;
+
+using UnityEngine;
+using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 
 using pcysl5edgo.Wahren;
 using pcysl5edgo.Wahren.AST;
@@ -10,8 +15,11 @@ public class TestManager : MonoBehaviour
     [SerializeField] public string ScriptDirectoryFullPath;
     int stage;
     int frame;
-    Unity.Collections.NativeList<Unity.Jobs.JobHandle> deleteCommentJobs;
+    NativeList<Unity.Jobs.JobHandle> deleteCommentJobs;
     RaceParserTempData raceParserTempData;
+    IdentifierNumberPairList identifierNumberPairList;
+
+    StringBuilder buffer;
     void Start()
     {
         stage = 0;
@@ -25,6 +33,8 @@ public class TestManager : MonoBehaviour
         {
             UnityEngine.Debug.Log(i + " -> " + rawScriptLoadReturnValue.FullPaths[i] + "\n Length : " + rawScriptLoadReturnValue.Files[i].Length);
         }
+        buffer = new StringBuilder(1024);
+        identifierNumberPairList = new IdentifierNumberPairList(1024);
     }
 
     void OnDestroy()
@@ -51,46 +61,56 @@ public class TestManager : MonoBehaviour
                 break;
         }
     }
-    private void Debug(int index)
+    private unsafe void Debug(int index)
     {
         var file = scriptLoadReturnValue.Files[index];
         var value0 = file.TryGetFirstStructLocation(default);
         TryInterpretReturnValue nameResult, parentNameResult, value3, value4;
         nameResult = parentNameResult = value3 = value4 = new TryInterpretReturnValue { Span = new Span { File = index } };
-        // UnityEngine.Debug.Log("================");
-        UnityEngine.Debug.Log(value0.ToString(ref scriptLoadReturnValue));
+        buffer.Clear().AppendLine(value0.ToString(scriptLoadReturnValue));
         Caret caret = value0.Span.CaretNextToEndOfThisSpan;
         file.SkipWhiteSpace(ref caret);
         if (StructAnalyzer.IsStructKindWithName(value0.SubDataIndex))
         {
-            // UnityEngine.Debug.Log("----------------");
             nameResult = file.TryGetStructName(caret);
-            UnityEngine.Debug.Log(nameResult.ToString(ref scriptLoadReturnValue));
+            buffer.AppendLine(nameResult.ToString(scriptLoadReturnValue));
             caret = nameResult.Span.CaretNextToEndOfThisSpan;
             file.SkipWhiteSpace(ref caret);
             if (file.TryGetParentStructName(caret, out parentNameResult))
             {
-                UnityEngine.Debug.Log(parentNameResult.ToString(ref scriptLoadReturnValue));
+                buffer.AppendLine(parentNameResult.ToString(scriptLoadReturnValue));
                 caret = parentNameResult.Span.CaretNextToEndOfThisSpan;
                 file.SkipWhiteSpace(ref caret);
             }
-            // UnityEngine.Debug.Log("----------------");
         }
         value3 = file.IsCurrentCharEquals(caret, '{');
+        UnityEngine.Debug.Log(caret.ToString() + " " + file.CurrentChar(caret));
         caret = value3.Span.CaretNextToEndOfThisSpan;
+        UnityEngine.Debug.Log(caret.ToString() + " " + file.CurrentChar(caret));
         file.SkipWhiteSpace(ref caret);
+        UnityEngine.Debug.Log(caret.ToString() + " " + file.CurrentChar(caret));
         switch (value0.SubDataIndex)
         {
             case 2:
-                value4 = file.TryParseRaceStructMultiThread(ref raceParserTempData, nameResult.Span, parentNameResult.Span, caret, out var nextToRightBrace, out var raceTree);
+                value4 = file.TryParseRaceStructMultiThread(ref raceParserTempData, ref identifierNumberPairList, nameResult.Span, parentNameResult.Span, caret, out var nextToRightBrace, out var raceTree);
                 if (value4.IsSuccess)
-                    UnityEngine.Debug.Log(raceTree.ToString(ref scriptLoadReturnValue, ref raceParserTempData));
-                else
-                    UnityEngine.Debug.Log(value4.ToString(ref scriptLoadReturnValue));
+                {
+                    buffer.Append(raceTree, (TextFile*)scriptLoadReturnValue.Files.GetUnsafePtr(), raceParserTempData, identifierNumberPairList);
+                }
+                else if (value4.IsPending)
+                {
+                    buffer.Append(value4.ToString(scriptLoadReturnValue));
+                }
+                else if (value4.IsError)
+                {
+                    UnityEngine.Debug.Log(value4.Span.ToString() + " " + file.CurrentChar(value4.Span.Start));
+                    buffer.Append(value4.ToString(scriptLoadReturnValue));
+                }
                 raceTree.Dispose();
                 break;
             default:
                 break;
         }
+        UnityEngine.Debug.Log(buffer.ToString());
     }
 }
