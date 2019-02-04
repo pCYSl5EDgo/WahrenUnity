@@ -65,7 +65,7 @@ namespace pcysl5edgo.Wahren
         public static TryInterpretReturnValue TryGetFirstStructLocation(this ref TextFile file, Caret start)
         {
             file.SkipWhiteSpace(ref start);
-            var answer = new TryInterpretReturnValue(start, ErrorSentence.StructKindNotFoundError, 0, false);
+            var answer = new TryInterpretReturnValue(start, ErrorSentence.StructKindNotFoundError, InterpreterStatus.Error);
             switch (file.Lines[answer.Span.Line][answer.Span.Column])
             {
                 case 'p': // power
@@ -286,14 +286,14 @@ namespace pcysl5edgo.Wahren
 
         private static void Fail(this ref TryInterpretReturnValue answer, byte errorSubData)
         {
-            answer.isSuccess = 0;
+            answer.Status = 0;
             answer.DataIndex = ErrorSentence.StructKindInterpretError;
             answer.SubDataIndex = errorSubData;
         }
 
         private static void Success(this ref TryInterpretReturnValue answer, byte successSubData, int length)
         {
-            answer.isSuccess = 1;
+            answer.Status = InterpreterStatus.Success;
             answer.DataIndex = SuccessSentence.StructKindInterpretSuccess;
             answer.SubDataIndex = successSubData;
             answer.Span.Length = length;
