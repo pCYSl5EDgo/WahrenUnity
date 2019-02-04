@@ -6,7 +6,7 @@
         {
             char* cptr = file.Lines[start.Line];
             start.Column++;
-            value = new TryInterpretReturnValue(start, SuccessSentence.ScenarioVariantInterpretSuccess, 0, true);
+            value = new TryInterpretReturnValue(start, SuccessSentence.ScenarioVariantInterpretSuccess, InterpreterStatus.Success);
             ref var length = ref value.Span.Length;
             bool onlyDigit = true;
             for (int i = length + value.Span.Column; i < file.LineLengths[value.Span.Line]; i++)
@@ -92,7 +92,7 @@
                     default:
                         length++;
                         value.DataIndex = ErrorSentence.InvalidIdentifierError;
-                        value.isSuccess = 0;
+                        value.Status = 0;
                         return false;
                 }
             }
@@ -100,7 +100,7 @@
             if (onlyDigit && length != 0)
             {
                 value.DataIndex = ErrorSentence.IdentifierCannotBeNumberError;
-                value.isSuccess = 0;
+                value.Status = 0;
                 return false;
             }
             return true;
