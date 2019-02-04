@@ -11,16 +11,25 @@ namespace pcysl5edgo.Wahren
         public int Length;
         public IdentifierNumberPair* Values;
 
-        public bool TryAddMultiThread(in IdentifierNumberPair pair)
+        public IdentifierNumberPairList(int capacity)
         {
-            int last;
+            Length = 0;
+            Capacity = capacity;
+            if (Capacity == 0)
+                Values = null;
+            else
+                Values = (IdentifierNumberPair*)UnsafeUtility.Malloc(sizeof(IdentifierNumberPair) * capacity, 4, Allocator.Persistent);
+        }
+
+        public bool TryAddMultiThread(IdentifierNumberPair* pairs, int length, out int start)
+        {
             do
             {
-                last = Length;
-                if (last == Capacity)
+                start = Length;
+                if (start + length > Capacity)
                     return false;
-            } while (last != Interlocked.CompareExchange(ref Length, last + 1, last));
-            Values[last] = pair;
+            } while (start != Interlocked.CompareExchange(ref Length, start + length, start));
+            UnsafeUtility.MemCpy(Values + start, pairs, length * sizeof(IdentifierNumberPair));
             return true;
         }
 
