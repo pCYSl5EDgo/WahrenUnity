@@ -34,7 +34,7 @@ namespace pcysl5edgo.Wahren.AST
             Values[last] = pair;
             return true;
         }
-        public void LengthenMainThread()
+        public void Lengthen()
         {
             if (Capacity == 0)
             {
