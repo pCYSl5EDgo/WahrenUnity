@@ -52,23 +52,13 @@
             SubdData0 = SubdData1 = 0;
         }
 
-        public static TryInterpretReturnValue CreatePending(Span span, int dataIndex, int subDataIndex, long subData0, long subData1)
-        => new TryInterpretReturnValue
+        public static TryInterpretReturnValue CreatePending(Span span, AST.PendingLocation location, AST.PendingReason reason, long subData0 = 0, long subData1 = 0) => new TryInterpretReturnValue
         {
             Span = span,
-            DataIndex = dataIndex,
-            SubDataIndex = subDataIndex,
+            DataIndex = ((byte)location << 24) | (byte)reason,
             SubdData0 = subData0,
             SubdData1 = subData1,
-        };
-        public static TryInterpretReturnValue CreatePending(Caret caret, int dataIndex, int subDataIndex, long subData0, long subData1)
-        => new TryInterpretReturnValue
-        {
-            Span = new Span(caret, 0),
-            DataIndex = dataIndex,
-            SubDataIndex = subDataIndex,
-            SubdData0 = subData0,
-            SubdData1 = subData1,
+            Status = InterpreterStatus.Pending,
         };
     }
 }
