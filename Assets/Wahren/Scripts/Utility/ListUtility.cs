@@ -7,14 +7,15 @@ namespace pcysl5edgo.Wahren
 {
     public static unsafe class ListUtility
     {
-        public static void Lengthen<T>(ref T* ptr, int currentCapacity) where T : unmanaged
+        public static void Lengthen<T>(ref T* ptr, ref int currentCapacity, Allocator allocator = Allocator.Persistent) where T : unmanaged
         {
             if (currentCapacity < 0) throw new ArgumentOutOfRangeException(nameof(currentCapacity) + " : " + currentCapacity);
             if (currentCapacity == 0) return;
-            var _ = (T*)UnsafeUtility.Malloc(sizeof(T) * currentCapacity * 2, UnsafeUtility.AlignOf<T>(), Allocator.Persistent);
+            var _ = (T*)UnsafeUtility.Malloc(sizeof(T) * currentCapacity * 2, UnsafeUtility.AlignOf<T>(), allocator);
             UnsafeUtility.MemCpy(_, ptr, sizeof(T) * currentCapacity);
-            UnsafeUtility.Free(ptr, Allocator.Persistent);
+            UnsafeUtility.Free(ptr, allocator);
             ptr = _;
+            currentCapacity *= 2;
         }
 
         public static void AddToTempJob<T>(this ref T value, ref T* values, ref int capacity, ref int length, out int index) where T : unmanaged
