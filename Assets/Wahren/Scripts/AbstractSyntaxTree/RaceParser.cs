@@ -30,7 +30,7 @@ namespace pcysl5edgo.Wahren.AST
                             if (tree.Start == -1)
                             {
                                 raceTreeIndex = -1;
-                                return new TryInterpretReturnValue(nextToLeftBrace, 0, 0, InterpreterStatus.Pending);
+                                return TryInterpretReturnValue.CreatePending(new Span(nextToLeftBrace, 0), PendingLocation.Race, PendingReason.ASTValueTypePairListCapacityShortage);
                             }
                             if (tree.TryAddToMultiThread(ref tempData.Values, tempData.Capacity, ref tempData.Length, out raceTreeIndex))
                             {
@@ -38,10 +38,9 @@ namespace pcysl5edgo.Wahren.AST
                             }
                             else
                             {
-                                return new TryInterpretReturnValue(nextToLeftBrace, 0, 0, InterpreterStatus.Pending);
+                                return TryInterpretReturnValue.CreatePending(new Span(nextToLeftBrace, 0), PendingLocation.Race, PendingReason.TreeListCapacityShortage);
                             }
                         case 'a': // align
-
                             answer = AlignDetect(ref file, ref tempData, ref nextToRightBrace, ref list);
                             if (!answer.IsSuccess)
                                 goto RETURN;
@@ -120,7 +119,7 @@ namespace pcysl5edgo.Wahren.AST
             }
             else
             {
-                return TryInterpretReturnValue.CreatePending(answer.Span, 0, 0, 0, 0);
+                answer = TryInterpretReturnValue.CreatePending(answer.Span, PendingLocation.Race, PendingReason.SectionListCapacityShortage);
             }
         RETURN:
             return answer;
@@ -162,7 +161,7 @@ namespace pcysl5edgo.Wahren.AST
             }
             else
             {
-                answer.Status = InterpreterStatus.Pending;
+                answer = TryInterpretReturnValue.CreatePending(answer.Span, PendingLocation.Race, PendingReason.SectionListCapacityShortage);
             }
         RETURN:
             return answer;
@@ -210,7 +209,7 @@ namespace pcysl5edgo.Wahren.AST
             }
             else
             {
-                answer.Status = InterpreterStatus.Pending;
+                answer = TryInterpretReturnValue.CreatePending(answer.Span, PendingLocation.Race, PendingReason.SectionListCapacityShortage);
             }
         RETURN:
             return answer;

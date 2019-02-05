@@ -101,7 +101,7 @@ public class TestManager : MonoBehaviour
                 }
                 else if (value4.IsPending)
                 {
-                    buffer.Append(value4.ToString(scriptLoadReturnValue));
+                    buffer.Append("Pending").Append(value4.ToString(scriptLoadReturnValue));
                 }
                 else if (value4.IsError)
                 {

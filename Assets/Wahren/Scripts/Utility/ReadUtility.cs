@@ -383,13 +383,12 @@ namespace pcysl5edgo.Wahren
                 }
             }
         RETURN:
+            length = tmpList.Length;
             if (pairList.TryAddMultiThread(tmpList.Values, tmpList.Length, out start))
             {
-                length = tmpList.Length;
                 return new TryInterpretReturnValue(span, SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Success);
             }
-            length = 0;
-            return new TryInterpretReturnValue(preservedFirstLocation, 0, 0, InterpreterStatus.Pending);
+            return TryInterpretReturnValue.CreatePending(span, AST.PendingLocation.None, AST.PendingReason.IdentifierNumberPairListCapacityShortage, tmpList.Length);
         ERROR:
             start = 0;
             length = 0;
