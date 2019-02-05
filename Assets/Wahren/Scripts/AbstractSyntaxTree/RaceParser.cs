@@ -6,19 +6,18 @@ namespace pcysl5edgo.Wahren.AST
 {
     public static unsafe class RaceParser
     {
-        public static TryInterpretReturnValue TryParseRaceStructMultiThread(this ref TextFile file, ref RaceParserTempData tempData, ref IdentifierNumberPairList pairList, Span name, Span parentName, Caret nextToLeftBrace, out Caret nextToRightBrace, out RaceTree tree)
+        public static TryInterpretReturnValue TryParseRaceStructMultiThread(this ref TextFile file, ref RaceParserTempData tempData, ref IdentifierNumberPairList identifierNumberPairList, ref ASTValueTypePairList astValueTypePairList, Span name, Span parentName, Caret nextToLeftBrace, out Caret nextToRightBrace, out int raceTreeIndex)
         {
             nextToRightBrace = file.SkipWhiteSpace(nextToLeftBrace);
             ref var column = ref nextToRightBrace.Column;
             TryInterpretReturnValue answer;
             answer.Span.File = file.FilePathId;
-            tree = new RaceTree
+            var tree = new RaceTree
             {
                 Name = name,
                 ParentName = parentName,
-                List = new ASTValueTypePairList(8),
             };
-            ref var list = ref tree.List;
+            var list = ASTValueTypePairList.MallocTemp(4);
             for (ref var raw = ref nextToRightBrace.Line; raw < file.LineCount; raw++, column = 0)
             {
                 for (int lineLength = file.LineLengths[raw]; column < lineLength; column++)
@@ -27,7 +26,20 @@ namespace pcysl5edgo.Wahren.AST
                     {
                         case '}':
                             nextToRightBrace.Column++;
-                            return new TryInterpretReturnValue(nextToRightBrace, SuccessSentence.RaceTreeIntrepretSuccess, InterpreterStatus.Success);
+                            (tree.Start, tree.Length) = astValueTypePairList.TryAddBulkMultiThread(list);
+                            if (tree.Start == -1)
+                            {
+                                raceTreeIndex = -1;
+                                return new TryInterpretReturnValue(nextToLeftBrace, 0, 0, InterpreterStatus.Pending);
+                            }
+                            if (tree.TryAddToMultiThread(ref tempData.Values, tempData.Capacity, ref tempData.Length, out raceTreeIndex))
+                            {
+                                return new TryInterpretReturnValue(nextToRightBrace, SuccessSentence.RaceTreeIntrepretSuccess, InterpreterStatus.Success);
+                            }
+                            else
+                            {
+                                return new TryInterpretReturnValue(nextToLeftBrace, 0, 0, InterpreterStatus.Pending);
+                            }
                         case 'a': // align
 
                             answer = AlignDetect(ref file, ref tempData, ref nextToRightBrace, ref list);
@@ -42,7 +54,7 @@ namespace pcysl5edgo.Wahren.AST
                             nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
                             break;
                         case 'c': // consti
-                            answer = ConstiDetect(ref file, ref tempData, ref nextToRightBrace, ref list, ref pairList);
+                            answer = ConstiDetect(ref file, ref tempData, ref nextToRightBrace, ref list, ref identifierNumberPairList);
                             if (!answer.IsSuccess)
                                 goto RETURN;
                             nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
@@ -70,7 +82,7 @@ namespace pcysl5edgo.Wahren.AST
             }
             answer = new TryInterpretReturnValue(nextToRightBrace, ErrorSentence.ExpectedCharNotFoundError, 2, InterpreterStatus.Error);
         RETURN:
-            tree.Dispose();
+            raceTreeIndex = -1;
             return answer;
         }
 
@@ -94,6 +106,7 @@ namespace pcysl5edgo.Wahren.AST
             if (file.CurrentChar(current) != '=')
             {
                 answer.DataIndex = ErrorSentence.ExpectedCharNotFoundError;
+                answer.Status = InterpreterStatus.Error;
                 goto RETURN;
             }
             current.Column++;
@@ -103,23 +116,17 @@ namespace pcysl5edgo.Wahren.AST
             var ast = new ASTValueTypePair(RaceTree.name);
             if (ast.TryAddAST(tempData.Names, expression, tempData.NameCapacity, ref tempData.NameLength))
             {
-                if (list.TryAddMultiThread(ast))
-                {
-                    goto RETURN;
-                }
-                else
-                {
-                }
+                ast.AddToTempJob(ref list.Values, ref list.Capacity, ref list.Length, out _);
             }
             else
             {
+                return TryInterpretReturnValue.CreatePending(answer.Span, 0, 0, 0, 0);
             }
-            answer = new TryInterpretReturnValue(file.ReadLine(current), SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Error);
         RETURN:
             return answer;
         }
 
-        private static TryInterpretReturnValue MoveTypeDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref ASTValueTypePairList list)
+        private static TryInterpretReturnValue MoveTypeDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref ASTValueTypePairList listTemp)
         {
             char* cs = file.CurrentCharPointer(current);
             var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, InterpreterStatus.Error);
@@ -150,12 +157,18 @@ namespace pcysl5edgo.Wahren.AST
             expression.Value = answer.Span;
             var ast = new ASTValueTypePair(RaceTree.movetype);
             if (ast.TryAddAST(tempData.MoveTypes, expression, tempData.MoveTypeCapacity, ref tempData.MoveTypeLength))
-                list.TryAddMultiThread(ast);
-            RETURN:
+            {
+                ast.AddToTempJob(ref listTemp.Values, ref listTemp.Capacity, ref listTemp.Length, out _);
+            }
+            else
+            {
+                answer.Status = InterpreterStatus.Pending;
+            }
+        RETURN:
             return answer;
         }
 
-        private static TryInterpretReturnValue ConstiDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref ASTValueTypePairList list, ref IdentifierNumberPairList pairList)
+        private static TryInterpretReturnValue ConstiDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref ASTValueTypePairList listTemp, ref IdentifierNumberPairList pairList)
         {
             char* cs = file.CurrentCharPointer(current);
             var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, InterpreterStatus.Error);
@@ -193,10 +206,7 @@ namespace pcysl5edgo.Wahren.AST
             var ast = new ASTValueTypePair(RaceTree.consti);
             if (ast.TryAddAST(tempData.Constis, expression, tempData.ConstiCapacity, ref tempData.ConstiLength))
             {
-                if (!list.TryAddMultiThread(ast))
-                {
-                    answer.Status = InterpreterStatus.Pending;
-                }
+                ast.AddToTempJob(ref listTemp.Values, ref listTemp.Capacity, ref listTemp.Length, out _);
             }
             else
             {
@@ -212,30 +222,18 @@ namespace pcysl5edgo.Wahren.AST
 #else
         bool
 #endif
-        VerifyConsti(RaceTree.ConstiAssignExpression expression, in IdentifierNumberPairList list
-#if UNITY_EDITOR
-        , Span span
-#endif
-        )
+        VerifyConsti(RaceTree.ConstiAssignExpression expression, in IdentifierNumberPairList list, Span span)
         {
             for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
             {
                 ref IdentifierNumberPair val = ref list.Values[i];
                 if (val.Span.Length == 0 || val.Number < 0 || val.Number > 10)
-#if UNITY_EDITOR
                     return new TryInterpretReturnValue(val.NumberSpan, ErrorSentence.OutOfRangeError, InterpreterStatus.Error);
-#else
-                    return false;
-#endif
             }
-#if UNITY_EDITOR
             return new TryInterpretReturnValue(span, default, default, InterpreterStatus.Success);
-#else
-            return true;
-#endif
         }
 
-        private static TryInterpretReturnValue BraveDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref ASTValueTypePairList list)
+        private static TryInterpretReturnValue BraveDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref ASTValueTypePairList listTemp)
         {
             char* cs = file.CurrentCharPointer(current);
             var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, InterpreterStatus.Error);
@@ -265,12 +263,18 @@ namespace pcysl5edgo.Wahren.AST
             expression.Value = (sbyte)value;
             var ast = new ASTValueTypePair(RaceTree.brave);
             if (ast.TryAddAST(tempData.Braves, expression, tempData.BraveCapacity, ref tempData.BraveLength))
-                list.TryAddMultiThread(ast);
-            RETURN:
+            {
+                ast.AddToTempJob(ref listTemp.Values, ref listTemp.Capacity, ref listTemp.Length, out _);
+            }
+            else
+            {
+
+            }
+        RETURN:
             return answer;
         }
 
-        private static TryInterpretReturnValue AlignDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref ASTValueTypePairList list)
+        private static TryInterpretReturnValue AlignDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref ASTValueTypePairList listTemp)
         {
             char* cs = file.CurrentCharPointer(current);
             var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, InterpreterStatus.Error);
@@ -300,14 +304,23 @@ namespace pcysl5edgo.Wahren.AST
             expression.Value = (sbyte)value;
             var ast = new ASTValueTypePair(RaceTree.align);
             if (ast.TryAddAST(tempData.Aligns, expression, tempData.AlignCapacity, ref tempData.AlignLength))
-                list.TryAddMultiThread(ast);
-            RETURN:
+            {
+                ast.AddToTempJob(ref listTemp.Values, ref listTemp.Capacity, ref listTemp.Length, out _);
+            }
+            else
+            {
+
+            }
+        RETURN:
             return answer;
         }
     }
 
     public unsafe struct RaceParserTempData : IDisposable
     {
+        public RaceTree* Values;
+        public int Length;
+        public int Capacity;
         public RaceTree.NameAssignExpression* Names;
         public int NameLength;
         public int NameCapacity;
@@ -326,15 +339,25 @@ namespace pcysl5edgo.Wahren.AST
 
         public RaceParserTempData(int capacity)
         {
-            this = default;
-            NameCapacity = AlignCapacity = BraveCapacity = ConstiCapacity = MoveTypeCapacity = capacity;
+            Length = NameLength = AlignLength = BraveLength = ConstiLength = MoveTypeLength = 0;
+            Capacity = NameCapacity = AlignCapacity = BraveCapacity = ConstiCapacity = MoveTypeCapacity = capacity;
             if (capacity != 0)
             {
-                this.Names = (RaceTree.NameAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.NameAssignExpression) * capacity, 4, Allocator.Persistent);
-                this.Aligns = (RaceTree.AlignAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.AlignAssignExpression) * capacity, 4, Allocator.Persistent);
-                this.Braves = (RaceTree.BraveAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.BraveAssignExpression) * capacity, 4, Allocator.Persistent);
-                this.Constis = (RaceTree.ConstiAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.ConstiAssignExpression) * capacity, 4, Allocator.Persistent);
-                this.MoveTypes = (RaceTree.MoveTypeAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.MoveTypeAssignExpression) * capacity, 4, Allocator.Persistent);
+                Values = (RaceTree*)UnsafeUtility.Malloc(sizeof(RaceTree) * capacity, 4, Allocator.Persistent);
+                Names = (RaceTree.NameAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.NameAssignExpression) * capacity, 4, Allocator.Persistent);
+                Aligns = (RaceTree.AlignAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.AlignAssignExpression) * capacity, 4, Allocator.Persistent);
+                Braves = (RaceTree.BraveAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.BraveAssignExpression) * capacity, 4, Allocator.Persistent);
+                Constis = (RaceTree.ConstiAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.ConstiAssignExpression) * capacity, 4, Allocator.Persistent);
+                MoveTypes = (RaceTree.MoveTypeAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.MoveTypeAssignExpression) * capacity, 4, Allocator.Persistent);
+            }
+            else
+            {
+                Values = null;
+                Names = null;
+                Aligns = null;
+                Braves = null;
+                Constis = null;
+                MoveTypes = null;
             }
         }
 
@@ -350,6 +373,8 @@ namespace pcysl5edgo.Wahren.AST
                 UnsafeUtility.Free(MoveTypes, Allocator.Persistent);
             if (ConstiCapacity != 0)
                 UnsafeUtility.Free(Constis, Allocator.Persistent);
+            if (Capacity != 0)
+                UnsafeUtility.Free(Values, Allocator.Persistent);
             this = default;
         }
     }

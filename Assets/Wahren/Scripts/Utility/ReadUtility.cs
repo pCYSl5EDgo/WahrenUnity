@@ -8,16 +8,15 @@ namespace pcysl5edgo.Wahren
         public static Span ReadLine(this ref TextFile file, Caret current) => new Span(current, file.CurrentLineLength(current) - current.Column);
         public static TryInterpretReturnValue TryReadIdentifierNumberPairs(this ref TextFile file, ref IdentifierNumberPairList pairList, Caret current, out int start, out int length)
         {
-            length = 0;
             file.SkipWhiteSpace(ref current);
             var preservedFirstLocation = current;
             if (file.CurrentChar(current) == '@')
             {
                 start = pairList.Length - 1;
+                length = 0;
                 return new TryInterpretReturnValue(new Span(current, 1), SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Success);
             }
-            int capacity = 4;
-            IdentifierNumberPair* tmpList = stackalloc IdentifierNumberPair[capacity];
+            var tmpList = IdentifierNumberPairList.MallocTemp(4);
             int state = 0;
             ref var raw = ref current.Line;
             ref var column = ref current.Column;
@@ -95,12 +94,9 @@ namespace pcysl5edgo.Wahren
                                     state = 1;
                                     span = new Span(current, 1);
                                     isOnlyDigit = false;
-                                    if (++length > capacity)
+                                    if (++tmpList.Length > tmpList.Capacity)
                                     {
-                                        capacity *= 2;
-                                        var _ = stackalloc IdentifierNumberPair[capacity];
-                                        UnsafeUtility.MemCpy(_, tmpList, sizeof(IdentifierNumberPair) * capacity / 2);
-                                        tmpList = _;
+                                        tmpList.Lengthen(Allocator.Temp);
                                     }
                                     break;
                                 #region Digit
@@ -118,12 +114,9 @@ namespace pcysl5edgo.Wahren
                                     state = 1;
                                     isOnlyDigit = true;
                                     span = new Span(current, 1);
-                                    if (++length > capacity)
+                                    if (++tmpList.Length > tmpList.Capacity)
                                     {
-                                        capacity *= 2;
-                                        var _ = stackalloc IdentifierNumberPair[capacity];
-                                        UnsafeUtility.MemCpy(_, tmpList, sizeof(IdentifierNumberPair) * capacity / 2);
-                                        tmpList = _;
+                                        tmpList.Lengthen(Allocator.Temp);
                                     }
                                     break;
                                 case ' ':
@@ -210,26 +203,23 @@ namespace pcysl5edgo.Wahren
                                     break;
                                 case ' ':
                                 case '\t':
-                                    tmpList[length - 1].Span = span;
+                                    tmpList.Values[tmpList.Length - 1].Span = span;
                                     state = 2;
                                     break;
                                 case '*':
-                                    tmpList[length - 1].Span = span;
+                                    tmpList.Values[tmpList.Length - 1].Span = span;
                                     state = 3;
                                     if (isOnlyDigit)
                                     {
                                         start = 0;
+                                        length = 0;
                                         return new TryInterpretReturnValue(current, ErrorSentence.IdentifierCannotBeNumberError, InterpreterStatus.Error);
                                     }
                                     column++;
                                     file.SkipWhiteSpace(ref current);
                                     goto PARSE;
                                 case ',':
-#if UNITY_EDITOR
-                                    tmpList[length - 1] = new IdentifierNumberPair(span, 0, numberSpan);
-#else
-                                    tmpList[length - 1] = new IdentifierNumberPair(span, 0);
-#endif
+                                    tmpList.Values[tmpList.Length - 1] = new IdentifierNumberPair(span, 0, numberSpan);
                                     state = 0;
                                     column++;
                                     file.SkipWhiteSpace(ref current);
@@ -250,10 +240,8 @@ namespace pcysl5edgo.Wahren
                                     file.SkipWhiteSpace(ref current);
                                     goto PARSE;
                                 case ',':
-                                    tmpList[length - 1].Number = 0;
-#if UNITY_EDITOR
-                                    tmpList[length - 1].NumberSpan = new Span { Start = current, Length = 0 };
-#endif
+                                    tmpList.Values[tmpList.Length - 1].Number = 0;
+                                    tmpList.Values[tmpList.Length - 1].NumberSpan = new Span { Start = current, Length = 0 };
                                     state = 0;
                                     column++;
                                     file.SkipWhiteSpace(ref current);
@@ -279,17 +267,13 @@ namespace pcysl5edgo.Wahren
                                     #endregion
                                     state = 4;
                                     number = file.Lines[raw][column] - '0';
-#if UNITY_EDITOR
                                     numberSpan.Start = current;
                                     numberSpan.Length = 1;
-#endif
                                     break;
                                 case '-':
                                     state = 5;
-#if UNITY_EDITOR
                                     numberSpan.Start = current;
                                     numberSpan.Length = 1;
-#endif
                                     break;
                                 case ' ':
                                 case '\t':
@@ -315,26 +299,20 @@ namespace pcysl5edgo.Wahren
                                     #endregion
                                     number *= 10;
                                     number += file.Lines[raw][column] - '0';
-#if UNITY_EDITOR
                                     numberSpan.Length++;
-#endif
                                     break;
                                 case ' ':
                                 case '\t':
                                     state = 6;
-                                    tmpList[length - 1].Number = number;
-#if UNITY_EDITOR
-                                    tmpList[length - 1].NumberSpan = numberSpan;
-#endif
+                                    tmpList.Values[tmpList.Length - 1].Number = number;
+                                    tmpList.Values[tmpList.Length - 1].NumberSpan = numberSpan;
                                     break;
                                 case ',':
-                                    tmpList[length - 1].Number = number;
+                                    tmpList.Values[tmpList.Length - 1].Number = number;
                                     state = 0;
                                     column++;
                                     file.SkipWhiteSpace(ref current);
-#if UNITY_EDITOR
-                                    tmpList[length - 1].NumberSpan = numberSpan;
-#endif
+                                    tmpList.Values[tmpList.Length - 1].NumberSpan = numberSpan;
                                     goto PARSE;
                                 default:
                                     goto ERROR;
@@ -356,9 +334,7 @@ namespace pcysl5edgo.Wahren
                                     #endregion
                                     number = -file.Lines[raw][column] + '0';
                                     state = 4;
-#if UNITY_EDITOR
                                     numberSpan.Length++;
-#endif
                                     break;
                                 default:
                                     goto ERROR;
@@ -392,15 +368,15 @@ namespace pcysl5edgo.Wahren
                         break;
                     case 1:
                         start = 0;
+                        length = 0;
                         return new TryInterpretReturnValue(span, ErrorSentence.InvalidEndOfLineError, InterpreterStatus.Error);
                     case 5:
                         start = 0;
+                        length = 0;
                         return new TryInterpretReturnValue(span, ErrorSentence.InvalidMinusNumberError, InterpreterStatus.Error);
                     case 4:
-                        tmpList[length - 1].Number = number;
-#if UNITY_EDITOR
-                        tmpList[length - 1].NumberSpan = numberSpan;
-#endif
+                        tmpList.Values[tmpList.Length - 1].Number = number;
+                        tmpList.Values[tmpList.Length - 1].NumberSpan = numberSpan;
                         span = new Span(current, 0);
                         goto RETURN;
                     case 6:
@@ -409,13 +385,16 @@ namespace pcysl5edgo.Wahren
                 }
             }
         RETURN:
-            if (pairList.TryAddMultiThread(tmpList, length, out start))
+            if (pairList.TryAddMultiThread(tmpList.Values, tmpList.Length, out start))
             {
+                length = tmpList.Length;
                 return new TryInterpretReturnValue(span, SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Success);
             }
+            length = 0;
             return new TryInterpretReturnValue(preservedFirstLocation, 0, 0, InterpreterStatus.Pending);
         ERROR:
             start = 0;
+            length = 0;
             return new TryInterpretReturnValue(current, ErrorSentence.NotExpectedCharacterError, InterpreterStatus.Error);
         }
         public static TryInterpretReturnValue TryReadIdentifierNotEmpty(this ref TextFile file, Caret current)

@@ -50,5 +50,18 @@ namespace pcysl5edgo.Wahren
             values[index] = value;
             return true;
         }
+        public static T* MallcTemp<T>(int capacity, out int length) where T : unmanaged
+        {
+            length = 0;
+            return (T*)UnsafeUtility.Malloc(sizeof(T) * capacity, 4, Allocator.Temp);
+        }
+        public static void FreeTemp<T>(ref T* values, ref int capacity, ref int length) where T : unmanaged
+        {
+            if (capacity != 0)
+                UnsafeUtility.Free(values, Allocator.Temp);
+            length = 0;
+            values = null;
+            capacity = 0;
+        }
     }
 }

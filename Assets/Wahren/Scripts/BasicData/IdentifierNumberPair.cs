@@ -4,21 +4,14 @@
     {
         public Span Span;
         public long Number;
-#if UNITY_EDITOR
         public Span NumberSpan;
-#endif
 
-        public IdentifierNumberPair(Span span, long number
-#if UNITY_EDITOR
-        , Span numberSpan
-#endif        
+        public IdentifierNumberPair(Span span, long number, Span numberSpan
         )
         {
             Span = span;
             Number = number;
-#if UNITY_EDITOR
             NumberSpan = numberSpan;
-#endif
         }
     }
 }

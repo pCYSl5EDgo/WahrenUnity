@@ -33,13 +33,13 @@ namespace pcysl5edgo.Wahren
             return true;
         }
 
-        public void Lengthen()
+        public void Lengthen(Allocator allocator = Allocator.Persistent)
         {
             if (Capacity == 0) return;
             int size = sizeof(IdentifierNumberPair) * Capacity;
-            var _ = UnsafeUtility.Malloc(size * 2, 4, Allocator.Persistent);
+            var _ = UnsafeUtility.Malloc(size * 2, 4, allocator);
             UnsafeUtility.MemCpy(_, Values, size);
-            UnsafeUtility.Free(Values, Allocator.Persistent);
+            UnsafeUtility.Free(Values, allocator);
             Values = (IdentifierNumberPair*)_;
             Capacity *= 2;
         }
@@ -57,7 +57,7 @@ namespace pcysl5edgo.Wahren
         {
             Capacity = capacity,
             Length = 0,
-            Values = (IdentifierNumberPair*)UnsafeUtility.Malloc(sizeof(IdentifierNumberPair) * capacity, 4, Allocator.Temp);
+            Values = (IdentifierNumberPair*)UnsafeUtility.Malloc(sizeof(IdentifierNumberPair) * capacity, 4, Allocator.Temp),
         };
         public static void FreeTemp(ref IdentifierNumberPairList list)
         {

@@ -67,7 +67,7 @@ namespace pcysl5edgo.Wahren
             return buffer;
         }
 
-        public static unsafe StringBuilder Append(this StringBuilder buffer, in AST.RaceTree tree, TextFile* files, in AST.RaceParserTempData tempData, in IdentifierNumberPairList list)
+        public static unsafe StringBuilder Append(this StringBuilder buffer, in AST.RaceTree tree, TextFile* files, in AST.RaceParserTempData tempData, in IdentifierNumberPairList list, in AST.ASTValueTypePairList astValueTypePairList)
         {
             buffer.Append("race ").Append(files, tree.Name);
             if (tree.ParentName.Length == 0)
@@ -78,9 +78,9 @@ namespace pcysl5edgo.Wahren
             {
                 buffer.Append('@').Append(files, tree.ParentName).Append("\n{");
             }
-            for (int i = 0; i < tree.List.Length; i++)
+            for (int i = tree.Start, end = tree.Start + tree.Length; i < end; i++)
             {
-                var pair = tree.List.Values[i];
+                var pair = astValueTypePairList.Values[i];
                 buffer.Append("\n  ");
                 switch (pair.Type)
                 {

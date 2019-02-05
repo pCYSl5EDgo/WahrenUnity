@@ -18,6 +18,7 @@ public class TestManager : MonoBehaviour
     NativeList<Unity.Jobs.JobHandle> deleteCommentJobs;
     RaceParserTempData raceParserTempData;
     IdentifierNumberPairList identifierNumberPairList;
+    ASTValueTypePairList astValueTypePairList;
 
     StringBuilder buffer;
     void Start()
@@ -35,12 +36,15 @@ public class TestManager : MonoBehaviour
         }
         buffer = new StringBuilder(1024);
         identifierNumberPairList = new IdentifierNumberPairList(1024);
+        astValueTypePairList = new ASTValueTypePairList(1024);
     }
 
     void OnDestroy()
     {
         scriptLoadReturnValue.Dispose();
         raceParserTempData.Dispose();
+        identifierNumberPairList.Dispose();
+        astValueTypePairList.Dispose();
     }
     void Update()
     {
@@ -89,10 +93,11 @@ public class TestManager : MonoBehaviour
         switch (value0.SubDataIndex)
         {
             case 2:
-                value4 = file.TryParseRaceStructMultiThread(ref raceParserTempData, ref identifierNumberPairList, nameResult.Span, parentNameResult.Span, caret, out var nextToRightBrace, out var raceTree);
+                value4 = file.TryParseRaceStructMultiThread(ref raceParserTempData, ref identifierNumberPairList, ref astValueTypePairList, nameResult.Span, parentNameResult.Span, caret, out var nextToRightBrace, out int raceTreeIndex);
+                var raceTree = raceParserTempData.Values[raceTreeIndex];
                 if (value4.IsSuccess)
                 {
-                    buffer.Append(raceTree, (TextFile*)scriptLoadReturnValue.Files.GetUnsafePtr(), raceParserTempData, identifierNumberPairList);
+                    buffer.Append(raceTree, (TextFile*)scriptLoadReturnValue.Files.GetUnsafePtr(), raceParserTempData, identifierNumberPairList, astValueTypePairList);
                 }
                 else if (value4.IsPending)
                 {
@@ -100,10 +105,8 @@ public class TestManager : MonoBehaviour
                 }
                 else if (value4.IsError)
                 {
-                    UnityEngine.Debug.Log(value4.Span.ToString() + " " + file.CurrentChar(value4.Span.Start));
                     buffer.Append(value4.ToString(scriptLoadReturnValue));
                 }
-                raceTree.Dispose();
                 break;
             default:
                 break;

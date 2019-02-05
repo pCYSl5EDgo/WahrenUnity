@@ -1,22 +1,12 @@
-﻿using System;
-using System.Text;
-using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
-
-namespace pcysl5edgo.Wahren.AST
+﻿namespace pcysl5edgo.Wahren.AST
 {
-    public unsafe struct RaceTree : IDisposable
+    public struct RaceTree
     {
         public Span Name;
         public Span ParentName;
 
-        public ASTValueTypePairList List;
-
-        public void Dispose()
-        {
-            List.Dispose();
-            this = default;
-        }
+        public int Start;
+        public int Length;
 
         internal const int name = 0, align = 1, brave = 2, consti = 3, movetype = 4;
 
