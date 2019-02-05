@@ -6,7 +6,7 @@ namespace pcysl5edgo.Wahren
     public static unsafe class ReadUtility
     {
         public static Span ReadLine(this ref TextFile file, Caret current) => new Span(current, file.CurrentLineLength(current) - current.Column);
-        public static TryInterpretReturnValue TryReadIdentifierNumberPairs(this ref TextFile file, ref IdentifierNumberPairList pairList, Caret current, out int start, out int length)
+        public static TryInterpretReturnValue TryReadIdentifierNumberPairs(this ref TextFile file, ref IdentifierNumberPairList pairList, Caret current, out int start, out int length, long defaultValue = 0)
         {
             file.SkipWhiteSpace(ref current);
             var preservedFirstLocation = current;
@@ -21,10 +21,8 @@ namespace pcysl5edgo.Wahren
             ref var raw = ref current.Line;
             ref var column = ref current.Column;
             Span span = new Span { File = file.FilePathId };
-#if UNITY_EDITOR
             Span numberSpan = new Span { File = file.FilePathId };
-#endif
-            long number = 0;
+            long number = defaultValue;
             bool isOnlyDigit = true;
             for (; raw < file.LineCount; raw++, column = 0)
             {
@@ -345,7 +343,7 @@ namespace pcysl5edgo.Wahren
                             {
                                 case ',':
                                     state = 0;
-                                    number = 0;
+                                    number = defaultValue;
                                     span = new Span { Start = current, Length = 0 };
                                     isOnlyDigit = true;
                                     column++;
