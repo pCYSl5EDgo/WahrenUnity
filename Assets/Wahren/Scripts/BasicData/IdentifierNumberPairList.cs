@@ -51,5 +51,21 @@ namespace pcysl5edgo.Wahren
                 this = default;
             }
         }
+
+        public static IdentifierNumberPairList MallocTemp(int capacity)
+        => new IdentifierNumberPairList
+        {
+            Capacity = capacity,
+            Length = 0,
+            Values = (IdentifierNumberPair*)UnsafeUtility.Malloc(sizeof(IdentifierNumberPair) * capacity, 4, Allocator.Temp);
+        };
+        public static void FreeTemp(ref IdentifierNumberPairList list)
+        {
+            if (list.Capacity != 0)
+            {
+                UnsafeUtility.Free(list.Values, Allocator.Temp);
+            }
+            list = default;
+        }
     }
 }

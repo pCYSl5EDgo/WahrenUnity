@@ -34,25 +34,26 @@ namespace pcysl5edgo.Wahren.AST
             Values[last] = pair;
             return true;
         }
-        public void Lengthen()
-        {
-            if (Capacity == 0)
-            {
-                this = new ASTValueTypePairList(1);
-                return;
-            }
-            var _ = new ASTValueTypePairList(Capacity * 2);
-            UnsafeUtility.MemCpy(_.Values, Values, sizeof(ASTValueTypePair) * Capacity);
-            UnsafeUtility.Free(Values, Allocator.Persistent);
-            Values = _.Values;
-            Capacity = _.Capacity;
-        }
 
         public void Dispose()
         {
             if (Capacity != 0)
                 UnsafeUtility.Free(Values, Allocator.Persistent);
             this = default;
+        }
+
+        public static ASTValueTypePairList MallocTemp(int capacity)
+        => new ASTValueTypePairList
+        {
+            Capacity = capacity,
+            Length = 0,
+            Values = (ASTValueTypePair*)UnsafeUtility.Malloc(sizeof(ASTValueTypePair) * capacity, 4, Allocator.Temp),
+        };
+        public static void FreeTemp(ref ASTValueTypePairList list)
+        {
+            if (list.Capacity != 0)
+                UnsafeUtility.Free(list.Values, Allocator.Temp);
+            list = default;
         }
     }
 }
