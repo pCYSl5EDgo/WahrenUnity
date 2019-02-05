@@ -26,12 +26,12 @@ public class TestManager : MonoBehaviour
         frame = 0;
         rawScriptLoadReturnValue = new System.IO.DirectoryInfo(ScriptDirectoryFullPath).LoadFileToMemoryAsync(System.Text.Encoding.Unicode);
         scriptLoadReturnValue = new ScriptLoadReturnValue(ref rawScriptLoadReturnValue);
-        UnityEngine.Debug.Log("COUNT : " + rawScriptLoadReturnValue.Files.Length);
+        // UnityEngine.Debug.Log("COUNT : " + rawScriptLoadReturnValue.Files.Length);
         deleteCommentJobs = new Unity.Collections.NativeList<Unity.Jobs.JobHandle>(rawScriptLoadReturnValue.Files.Length, Unity.Collections.Allocator.Persistent);
         raceParserTempData = new RaceParserTempData(16);
         for (int i = 0; i < rawScriptLoadReturnValue.FullPaths.Length; i++)
         {
-            UnityEngine.Debug.Log(i + " -> " + rawScriptLoadReturnValue.FullPaths[i] + "\n Length : " + rawScriptLoadReturnValue.Files[i].Length);
+            // UnityEngine.Debug.Log(i + " -> " + rawScriptLoadReturnValue.FullPaths[i] + "\n Length : " + rawScriptLoadReturnValue.Files[i].Length);
         }
         buffer = new StringBuilder(1024);
         identifierNumberPairList = new IdentifierNumberPairList(1024);
@@ -84,11 +84,8 @@ public class TestManager : MonoBehaviour
             }
         }
         value3 = file.IsCurrentCharEquals(caret, '{');
-        UnityEngine.Debug.Log(caret.ToString() + " " + file.CurrentChar(caret));
         caret = value3.Span.CaretNextToEndOfThisSpan;
-        UnityEngine.Debug.Log(caret.ToString() + " " + file.CurrentChar(caret));
         file.SkipWhiteSpace(ref caret);
-        UnityEngine.Debug.Log(caret.ToString() + " " + file.CurrentChar(caret));
         switch (value0.SubDataIndex)
         {
             case 2:
