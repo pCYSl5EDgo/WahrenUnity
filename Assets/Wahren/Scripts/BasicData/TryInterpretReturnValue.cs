@@ -59,10 +59,11 @@
             SubdData1 = 0,
         };
 
-        public static TryInterpretReturnValue CreatePending(Span span, AST.Location location, AST.PendingReason reason, long subData0 = 0, long subData1 = 0) => new TryInterpretReturnValue
+        public static TryInterpretReturnValue CreatePending(Span span, AST.Location location, AST.PendingReason reason, int subDataIndex = 0, long subData0 = 0, long subData1 = 0) => new TryInterpretReturnValue
         {
             Span = span,
             DataIndex = ((byte)location << 24) | (byte)reason,
+            SubDataIndex = subDataIndex,
             SubdData0 = subData0,
             SubdData1 = subData1,
             Status = InterpreterStatus.Pending,

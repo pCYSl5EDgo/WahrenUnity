@@ -9,25 +9,16 @@ namespace pcysl5edgo.Wahren
     {
         public int FilePathId;
         public int Length;
-        public char* Contents;
-        public char** Lines;
-        public int* LineLengths;
+        [NativeDisableUnsafePtrRestriction] public ushort* Contents;
+        [NativeDisableUnsafePtrRestriction] public ushort** Lines;
+        [NativeDisableUnsafePtrRestriction] public int* LineLengths;
         public int LineCount;
-
-        public override string ToString() => new string(Contents, 0, Length);
-        public string ToString(int lineIndex)
-        {
-            if (lineIndex < 0 || lineIndex >= LineCount) throw new ArgumentOutOfRangeException();
-            if (Lines == null) throw new NullReferenceException();
-            return new string(Lines[lineIndex], 0, LineLengths[lineIndex]);
-        }
-        public string ToString(Span span) => new string(Lines[span.Line], span.Column, span.Length);
 
         public TextFile(int filePathId, int length)
         {
             FilePathId = filePathId;
             Length = length;
-            Contents = (char*)UnsafeUtility.Malloc(sizeof(char) * length, 1, Allocator.Persistent);
+            Contents = (ushort*)UnsafeUtility.Malloc(sizeof(char) * length, 1, Allocator.Persistent);
             Lines = null;
             LineLengths = null;
             LineCount = 0;
@@ -42,7 +33,7 @@ namespace pcysl5edgo.Wahren
         {
             var answer = new TextFile
             {
-                Contents = (char*)file.Contents,
+                Contents = (ushort*)file.Contents,
                 Length = (int)(file.Length / 2),
                 FilePathId = file.FilePathId,
             };
@@ -55,7 +46,7 @@ namespace pcysl5edgo.Wahren
             if (file.IsCreated)
             {
                 var answer = new TextFile(file.FilePathId, encoding.GetCharCount(file.Contents, (int)file.Length));
-                encoding.GetChars(file.Contents, (int)file.Length, answer.Contents, answer.Length);
+                encoding.GetChars(file.Contents, (int)file.Length, (char*)answer.Contents, answer.Length);
                 answer.Split();
                 return answer;
             }
@@ -75,7 +66,7 @@ namespace pcysl5edgo.Wahren
                         break;
                 }
             }
-            Lines = (char**)UnsafeUtility.Malloc(sizeof(IntPtr) * LineCount, 4, Allocator.Persistent);
+            Lines = (ushort**)UnsafeUtility.Malloc(sizeof(IntPtr) * LineCount, 4, Allocator.Persistent);
             Lines[0] = Contents;
             LineLengths = (int*)UnsafeUtility.Malloc(sizeof(int) * LineCount, 4, Allocator.Persistent);
             UnsafeUtility.MemClear(LineLengths, sizeof(int) * LineCount);

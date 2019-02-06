@@ -4,7 +4,7 @@
     {
         public static bool TryGetScenarioVariantName(this ref TextFile file, Caret start, out TryInterpretReturnValue value)
         {
-            char* cptr = file.Lines[start.Line];
+            var cptr = file.Lines[start.Line];
             start.Column++;
             value = new TryInterpretReturnValue(start, SuccessSentence.ScenarioVariantInterpretSuccess, InterpreterStatus.Success);
             ref var length = ref value.Span.Length;

@@ -48,64 +48,33 @@ public class TestManager : MonoBehaviour
                 UnityEngine.Debug.Log("Frame : " + frame++);
                 break;
             case 1:
+                UnityEngine.Debug.Log("Frame : " + frame++);
                 UnityEngine.Debug.Log("Done!");
                 scriptAnalyzeDataManager = ScriptAnalyzeDataManager.Create(ref scriptLoadReturnValue);
+                scriptAnalyzeDataManager.ParseStart();
                 stage = 2;
                 break;
             case 2:
-                for (int i = 0; i < scriptAnalyzeDataManager.Length; i++)
+                UnityEngine.Debug.Log("Frame : " + frame++);
+                scriptAnalyzeDataManager.Update();
+                if (scriptAnalyzeDataManager.CurrentStage == 3)
+                    stage = 3;
+                break;
+            case 3:
+                UnityEngine.Debug.Log("Frame : " + frame++);
+                var d = scriptAnalyzeDataManager.RaceParserTempData;
+                UnityEngine.Debug.Log(d.Length);
+                for (int i = 0; i < d.Length; i++)
                 {
-                    if (i == 5)
-                        Debug(i);
+                    buffer.Clear().Append(d.Values[i], scriptAnalyzeDataManager.Files, scriptAnalyzeDataManager.RaceParserTempData, scriptAnalyzeDataManager.IdentifierNumberPairList, scriptAnalyzeDataManager.ASTValueTypePairList).AppendLine();
+                    UnityEngine.Debug.Log(buffer.ToString());
                 }
-                stage = 3;
+                stage = 4;
                 break;
         }
     }
     private unsafe void Debug(int index)
     {
-        var file = scriptAnalyzeDataManager[index];
-        var value0 = file.TryGetFirstStructLocation(default);
-        TryInterpretReturnValue nameResult, parentNameResult, value3, value4;
-        nameResult = parentNameResult = value3 = value4 = new TryInterpretReturnValue { Span = new Span { File = index } };
-        Caret caret = value0.Span.CaretNextToEndOfThisSpan;
-        file.SkipWhiteSpace(ref caret);
-        if (StructAnalyzer.IsStructKindWithName(value0.SubDataIndex))
-        {
-            nameResult = file.TryGetStructName(caret);
-            caret = nameResult.Span.CaretNextToEndOfThisSpan;
-            file.SkipWhiteSpace(ref caret);
-            if (file.TryGetParentStructName(caret, out parentNameResult))
-            {
-                caret = parentNameResult.Span.CaretNextToEndOfThisSpan;
-                file.SkipWhiteSpace(ref caret);
-            }
-        }
-        value3 = file.IsCurrentCharEquals(caret, '{');
-        caret = value3.Span.CaretNextToEndOfThisSpan;
-        file.SkipWhiteSpace(ref caret);
-        switch (value0.SubDataIndex)
-        {
-            case 2:
-                value4 = file.TryParseRaceStructMultiThread(ref scriptAnalyzeDataManager.RaceParserTempData, ref scriptAnalyzeDataManager.IdentifierNumberPairList, ref scriptAnalyzeDataManager.ASTValueTypePairList, nameResult.Span, parentNameResult.Span, caret, out var nextToRightBrace, out int raceTreeIndex);
-                var raceTree = scriptAnalyzeDataManager.RaceParserTempData.Values[raceTreeIndex];
-                if (value4.IsSuccess)
-                {
-                    buffer.Append(raceTree, scriptAnalyzeDataManager.Files, scriptAnalyzeDataManager.RaceParserTempData, scriptAnalyzeDataManager.IdentifierNumberPairList, scriptAnalyzeDataManager.ASTValueTypePairList);
-                    file.SkipWhiteSpace(ref nextToRightBrace);
-                }
-                else if (value4.IsPending)
-                {
-                    buffer.Append("Pending");
-                }
-                else if (value4.IsError)
-                {
-                    buffer.Append(value4, scriptAnalyzeDataManager);
-                }
-                break;
-            default:
-                break;
-        }
         UnityEngine.Debug.Log(buffer.ToString());
     }
 }

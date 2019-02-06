@@ -8,7 +8,8 @@ namespace pcysl5edgo.Wahren.AST
     {
         public static TryInterpretReturnValue TryParseRaceStructMultiThread(this ref TextFile file, ref RaceParserTempData tempData, ref IdentifierNumberPairList identifierNumberPairList, ref ASTValueTypePairList astValueTypePairList, Span name, Span parentName, Caret nextToLeftBrace, out Caret nextToRightBrace, out int raceTreeIndex)
         {
-            nextToRightBrace = file.SkipWhiteSpace(nextToLeftBrace);
+            nextToRightBrace = nextToLeftBrace;
+            file.SkipWhiteSpace(ref nextToRightBrace);
             ref var column = ref nextToRightBrace.Column;
             TryInterpretReturnValue answer;
             answer.Span.File = file.FilePathId;
@@ -119,7 +120,7 @@ namespace pcysl5edgo.Wahren.AST
             }
             else
             {
-                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Race, PendingReason.SectionListCapacityShortage);
+                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Race, PendingReason.SectionListCapacityShortage, 1);
             }
         RETURN:
             return answer;
@@ -161,7 +162,7 @@ namespace pcysl5edgo.Wahren.AST
             }
             else
             {
-                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Race, PendingReason.SectionListCapacityShortage);
+                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Race, PendingReason.SectionListCapacityShortage, 5);
             }
         RETURN:
             return answer;
@@ -209,7 +210,7 @@ namespace pcysl5edgo.Wahren.AST
             }
             else
             {
-                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Race, PendingReason.SectionListCapacityShortage);
+                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Race, PendingReason.SectionListCapacityShortage, 4);
             }
         RETURN:
             return answer;
@@ -267,7 +268,7 @@ namespace pcysl5edgo.Wahren.AST
             }
             else
             {
-
+                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Race, PendingReason.SectionListCapacityShortage, 3);
             }
         RETURN:
             return answer;
@@ -308,7 +309,7 @@ namespace pcysl5edgo.Wahren.AST
             }
             else
             {
-
+                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Race, PendingReason.SectionListCapacityShortage, 2);
             }
         RETURN:
             return answer;
@@ -317,24 +318,36 @@ namespace pcysl5edgo.Wahren.AST
 
     public unsafe struct RaceParserTempData : IDisposable
     {
-        public RaceTree* Values;
+        internal struct OldLengths
+        {
+            public int Length;
+            public int NameLength;
+            public int AlignLength;
+            public int BraveLength;
+            public int ConstiLength;
+            public int MoveTypeLength;
+
+            public static bool IsChanged(OldLengths* left, RaceParserTempData* right)
+            => UnsafeUtility.MemCmp(left, right, sizeof(OldLengths)) == 0;
+        }
         public int Length;
-        public int Capacity;
-        public RaceTree.NameAssignExpression* Names;
         public int NameLength;
-        public int NameCapacity;
-        public readonly RaceTree.AlignAssignExpression* Aligns;
         public int AlignLength;
-        public int AlignCapacity;
-        public RaceTree.BraveAssignExpression* Braves;
         public int BraveLength;
-        public int BraveCapacity;
-        public RaceTree.ConstiAssignExpression* Constis;
         public int ConstiLength;
-        public int ConstiCapacity;
-        public RaceTree.MoveTypeAssignExpression* MoveTypes;
         public int MoveTypeLength;
+        public int Capacity;
+        public int NameCapacity;
+        public int AlignCapacity;
+        public int BraveCapacity;
+        public int ConstiCapacity;
         public int MoveTypeCapacity;
+        public RaceTree* Values;
+        public RaceTree.NameAssignExpression* Names;
+        public RaceTree.AlignAssignExpression* Aligns;
+        public RaceTree.BraveAssignExpression* Braves;
+        public RaceTree.ConstiAssignExpression* Constis;
+        public RaceTree.MoveTypeAssignExpression* MoveTypes;
 
         public RaceParserTempData(int capacity)
         {

@@ -4,7 +4,7 @@ namespace pcysl5edgo.Wahren.AST
 {
     public unsafe static class StructAnalyzer
     {
-        internal static bool IsNextEndOfLineOrSpaceOrLeftBrace(char* lastChar, int column, int length)
+        internal static bool IsNextEndOfLineOrSpaceOrLeftBrace(ushort* lastChar, int column, int length)
         {
             if (column + 1 == length) return true;
             switch (*++lastChar)
@@ -17,7 +17,7 @@ namespace pcysl5edgo.Wahren.AST
                     return false;
             }
         }
-        internal static bool IsNextEndOfLineOrSpace(char* lastChar, int column, int length)
+        internal static bool IsNextEndOfLineOrSpace(ushort* lastChar, int column, int length)
         {
             if (column == length - 1) return true;
             switch (*++lastChar)
@@ -30,16 +30,16 @@ namespace pcysl5edgo.Wahren.AST
             }
         }
 
-        public static bool IsStructKindWithName(int subDataIndex)
+        public static bool IsStructKindWithName(Location location)
         {
-            switch (subDataIndex)
+            switch (location)
             {
                 // No Name
-                case 3:
-                case 9:
-                case 11:
-                case 14:
-                case 19:
+                case Location.Attribute:
+                case Location.Detail:
+                case Location.Context:
+                case Location.Sound:
+                case Location.WorkSpace:
                     return false;
                 // Name
                 // case 0:
@@ -114,7 +114,7 @@ namespace pcysl5edgo.Wahren.AST
             return answer;
         }
 
-        private static void WorkspaceDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, char* ccp)
+        private static void WorkspaceDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, ushort* ccp)
         {
             const int _length = 9;
             const int _len1 = _length - 1;
@@ -128,7 +128,7 @@ namespace pcysl5edgo.Wahren.AST
             }
         }
 
-        private static void VoiceDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, char* ccp)
+        private static void VoiceDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, ushort* ccp)
         {
             const int _length = 5;
             const int _len1 = _length - 1;
@@ -142,7 +142,7 @@ namespace pcysl5edgo.Wahren.AST
             }
         }
 
-        private static void SDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, char* ccp)
+        private static void SDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, ushort* ccp)
         {
             if (column + 3 >= thisLineLength)
                 answer.Fail(20);
@@ -215,7 +215,7 @@ namespace pcysl5edgo.Wahren.AST
                 }
         }
 
-        private static void ClassOrContextDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, char* ccp)
+        private static void ClassOrContextDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, ushort* ccp)
         {
             if (column + 4 >= thisLineLength)
                 answer.Fail(13);
@@ -247,7 +247,7 @@ namespace pcysl5edgo.Wahren.AST
                 }
         }
 
-        private static void DungeonOrDetailDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, char* ccp)
+        private static void DungeonOrDetailDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, ushort* ccp)
         {
             if (column + 5 >= thisLineLength)
                 answer.Fail(10);
@@ -279,7 +279,7 @@ namespace pcysl5edgo.Wahren.AST
                 }
         }
 
-        private static void EventDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, char* ccp)
+        private static void EventDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, ushort* ccp)
         {
             const int _length = 5;
             const int _len1 = _length - 1;
@@ -293,7 +293,7 @@ namespace pcysl5edgo.Wahren.AST
             }
         }
 
-        private static void MoveTypeDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, char* ccp)
+        private static void MoveTypeDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, ushort* ccp)
         {
             const int _length = 8;
             const int _len1 = _length - 1;
@@ -307,7 +307,7 @@ namespace pcysl5edgo.Wahren.AST
             }
         }
 
-        private static void ObjectDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, char* ccp)
+        private static void ObjectDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, ushort* ccp)
         {
             const int _length = 6;
             const int _len1 = _length - 1;
@@ -321,7 +321,7 @@ namespace pcysl5edgo.Wahren.AST
             }
         }
 
-        private static void FieldDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, char* ccp)
+        private static void FieldDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, ushort* ccp)
         {
             const int _length = 5;
             const int _len1 = _length - 1;
@@ -335,7 +335,7 @@ namespace pcysl5edgo.Wahren.AST
             }
         }
 
-        private static void AttributeDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, char* ccp)
+        private static void AttributeDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, ushort* ccp)
         {
             const int _length = 9;
             if (column + _length - 1 < thisLineLength && *++ccp == 't' && *++ccp == 't' && *++ccp == 'r' && *++ccp == 'i' && *++ccp == 'b' && *++ccp == 'u' && *++ccp == 't' && *++ccp == 'e' && IsNextEndOfLineOrSpace(ccp, column + _length - 1, thisLineLength))
@@ -348,7 +348,7 @@ namespace pcysl5edgo.Wahren.AST
             }
         }
 
-        private static void RaceDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, char* ccp)
+        private static void RaceDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, ushort* ccp)
         {
             const int _length = 4;
             if (column + _length - 1 < thisLineLength && *++ccp == 'a' && *++ccp == 'c' && *++ccp == 'e' && IsNextEndOfLineOrSpace(ccp, column + _length - 1, thisLineLength))
@@ -361,7 +361,7 @@ namespace pcysl5edgo.Wahren.AST
             }
         }
 
-        private static void UnitDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, char* ccp)
+        private static void UnitDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, ushort* ccp)
         {
             const int _length = 4;
             if (column + _length - 1 < thisLineLength && *++ccp == 'n' && *++ccp == 'i' && *++ccp == 't' && IsNextEndOfLineOrSpace(ccp, column + _length - 1, thisLineLength))
@@ -375,7 +375,7 @@ namespace pcysl5edgo.Wahren.AST
             }
         }
 
-        private static void PowerDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, char* ccp)
+        private static void PowerDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, ushort* ccp)
         {
             const int _length = 5;
             if (column + _length - 1 < thisLineLength && *++ccp == 'o' && *++ccp == 'w' && *++ccp == 'e' && *++ccp == 'r' && IsNextEndOfLineOrSpace(ccp, column + _length - 1, thisLineLength))

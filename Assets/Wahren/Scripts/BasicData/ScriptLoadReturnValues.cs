@@ -79,7 +79,7 @@ namespace pcysl5edgo.Wahren
             this.isCreated = true;
         }
 
-        public unsafe string ToString(ref Span span) => new string(Files[span.File].Lines[span.Line], span.Column, span.Length);
+        public unsafe string ToString(ref Span span) => new string((char*)Files[span.File].Lines[span.Line], span.Column, span.Length);
 
         public void Dispose()
         {

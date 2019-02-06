@@ -8,8 +8,8 @@ namespace pcysl5edgo.Wahren
         {
             if (span0.Length != span1.Length)
                 return false;
-            char* ptr0 = script.Files[span0.File].Lines[span0.Line] + span0.Column;
-            char* ptr1 = script.Files[span1.File].Lines[span1.Line] + span1.Column;
+            var ptr0 = script.Files[span0.File].Lines[span0.Line] + span0.Column;
+            var ptr1 = script.Files[span1.File].Lines[span1.Line] + span1.Column;
             return UnsafeUtility.MemCmp(ptr0, ptr1, sizeof(char) * span0.Length) == 0;
         }
     }

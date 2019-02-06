@@ -6,17 +6,13 @@ namespace pcysl5edgo.Wahren
 {
     public static unsafe class SkipUtility
     {
-        public static Caret SkipWhiteSpace(this in TextFile file, Caret caret)
-        {
-            file.SkipWhiteSpace(ref caret);
-            return caret;
-        }
         public static void SkipWhiteSpace(this in TextFile file, ref Caret caret)
         {
+            // if (!file.IsCreated) throw new System.ArgumentNullException();
             caret.File = file.FilePathId;
             ref int raw = ref caret.Line;
             ref int column = ref caret.Column;
-            for (char* currentLine; raw < file.LineCount; raw++, column = 0)
+            for (ushort* currentLine; raw < file.LineCount; raw++, column = 0)
             {
                 currentLine = file.Lines[raw];
                 for (int thisLineLength = file.LineLengths[raw]; column < thisLineLength; column++)

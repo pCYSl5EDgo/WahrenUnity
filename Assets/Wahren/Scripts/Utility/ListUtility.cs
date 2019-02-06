@@ -7,6 +7,12 @@ namespace pcysl5edgo.Wahren
 {
     public static unsafe class ListUtility
     {
+        public static void MemMove<T>(ref T* ptr, ref int listLength, int destinationIndex, int sourceIndex) where T : unmanaged
+        {
+            UnsafeUtility.MemMove(ptr + destinationIndex, ptr + sourceIndex, (listLength - sourceIndex) * sizeof(T));
+            listLength -= sourceIndex - destinationIndex;
+        }
+
         public static void Lengthen<T>(ref T* ptr, ref int currentCapacity, Allocator allocator = Allocator.Persistent) where T : unmanaged
         {
             if (currentCapacity < 0) throw new ArgumentOutOfRangeException(nameof(currentCapacity) + " : " + currentCapacity);
