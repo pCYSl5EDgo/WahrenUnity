@@ -10,8 +10,8 @@ namespace pcysl5edgo.Wahren
     {
         public static StringBuilder Append(this StringBuilder buffer, in TextFile file, Span span)
         => buffer.Append(file.Lines[span.Line] + span.Column, span.Length);
-        public static StringBuilder Append(this StringBuilder buffer, in ScriptLoadReturnValue script, Span span)
-        => buffer.Append(script.Files[span.File], span);
+        public static StringBuilder Append(this StringBuilder buffer, in AST.ScriptAnalyzeDataManager script, Span span)
+        => buffer.Append(script[span.File], span);
         public static StringBuilder Append(this StringBuilder buffer, TextFile* files, Span span)
         => buffer.Append(files[span.File], span);
 
@@ -104,7 +104,7 @@ namespace pcysl5edgo.Wahren
             return buffer.Append("\n}");
         }
 
-        public static StringBuilder Append(this StringBuilder buffer, in TryInterpretReturnValue value, in ScriptLoadReturnValue script)
+        public static StringBuilder Append(this StringBuilder buffer, in TryInterpretReturnValue value, AST.ScriptAnalyzeDataManager script)
         {
             if (value.Status == InterpreterStatus.Error)
             {
