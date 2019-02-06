@@ -50,7 +50,16 @@
             SubdData0 = SubdData1 = 0;
         }
 
-        public static TryInterpretReturnValue CreatePending(Span span, AST.PendingLocation location, AST.PendingReason reason, long subData0 = 0, long subData1 = 0) => new TryInterpretReturnValue
+        public static TryInterpretReturnValue CreateSuccessDetectStructType(in Caret caret, int length, AST.Location location) => new TryInterpretReturnValue
+        {
+            Span = new Span(caret, length),
+            DataIndex = SuccessSentence.StructKindInterpretSuccess,
+            SubDataIndex = (int)location,
+            SubdData0 = 0,
+            SubdData1 = 0,
+        };
+
+        public static TryInterpretReturnValue CreatePending(Span span, AST.Location location, AST.PendingReason reason, long subData0 = 0, long subData1 = 0) => new TryInterpretReturnValue
         {
             Span = span,
             DataIndex = ((byte)location << 24) | (byte)reason,

@@ -388,7 +388,7 @@ namespace pcysl5edgo.Wahren
             {
                 return new TryInterpretReturnValue(span, SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Success);
             }
-            return TryInterpretReturnValue.CreatePending(span, AST.PendingLocation.None, AST.PendingReason.IdentifierNumberPairListCapacityShortage, tmpList.Length);
+            return TryInterpretReturnValue.CreatePending(span, AST.Location.None, AST.PendingReason.IdentifierNumberPairListCapacityShortage, tmpList.Length);
         ERROR:
             start = 0;
             length = 0;
