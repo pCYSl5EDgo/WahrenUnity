@@ -6,7 +6,6 @@
     }
     public struct TryInterpretReturnValue
     {
-        private static readonly System.Text.StringBuilder buffer = new System.Text.StringBuilder(4096);
         public Span Span;
         public int DataIndex;
         public int SubDataIndex;
@@ -18,7 +17,6 @@
         public bool IsError => Status == InterpreterStatus.Error;
         public bool IsPending => Status == InterpreterStatus.Pending;
 
-        public string ToString(in ScriptLoadReturnValue script) => buffer.Clear().Append(this, script).ToString();
         public TryInterpretReturnValue(Caret start, int dataIndex, InterpreterStatus status)
         {
             this.Span = new Span { Start = start, Length = 0 };

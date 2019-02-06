@@ -16,9 +16,7 @@ public class TestManager : MonoBehaviour
     int stage;
     int frame;
     NativeList<Unity.Jobs.JobHandle> deleteCommentJobs;
-    RaceParserTempData raceParserTempData;
-    IdentifierNumberPairList identifierNumberPairList;
-    ASTValueTypePairList astValueTypePairList;
+    ScriptAnalyzeDataManager scriptAnalyzeDataManager;
 
     StringBuilder buffer;
     void Start()
@@ -29,24 +27,19 @@ public class TestManager : MonoBehaviour
         scriptLoadReturnValue = new ScriptLoadReturnValue(ref rawScriptLoadReturnValue);
         // UnityEngine.Debug.Log("COUNT : " + rawScriptLoadReturnValue.Files.Length);
         deleteCommentJobs = new Unity.Collections.NativeList<Unity.Jobs.JobHandle>(rawScriptLoadReturnValue.Files.Length, Unity.Collections.Allocator.Persistent);
-        raceParserTempData = new RaceParserTempData(16);
         for (int i = 0; i < rawScriptLoadReturnValue.FullPaths.Length; i++)
         {
             // UnityEngine.Debug.Log(i + " -> " + rawScriptLoadReturnValue.FullPaths[i] + "\n Length : " + rawScriptLoadReturnValue.Files[i].Length);
         }
         buffer = new StringBuilder(1024);
-        identifierNumberPairList = new IdentifierNumberPairList(1024);
-        astValueTypePairList = new ASTValueTypePairList(1024);
     }
 
     void OnDestroy()
     {
+        scriptAnalyzeDataManager.Dispose();
         scriptLoadReturnValue.Dispose();
-        raceParserTempData.Dispose();
-        identifierNumberPairList.Dispose();
-        astValueTypePairList.Dispose();
     }
-    void Update()
+    unsafe void Update()
     {
         switch (stage)
         {
@@ -56,33 +49,34 @@ public class TestManager : MonoBehaviour
                 break;
             case 1:
                 UnityEngine.Debug.Log("Done!");
-                for (int i = 0; i < scriptLoadReturnValue.FullPaths.Length; i++)
+                scriptAnalyzeDataManager = ScriptAnalyzeDataManager.Create(ref scriptLoadReturnValue);
+                stage = 2;
+                break;
+            case 2:
+                for (int i = 0; i < scriptAnalyzeDataManager.Length; i++)
                 {
                     if (i == 5)
                         Debug(i);
                 }
-                stage = 2;
+                stage = 3;
                 break;
         }
     }
     private unsafe void Debug(int index)
     {
-        var file = scriptLoadReturnValue.Files[index];
+        var file = scriptAnalyzeDataManager[index];
         var value0 = file.TryGetFirstStructLocation(default);
         TryInterpretReturnValue nameResult, parentNameResult, value3, value4;
         nameResult = parentNameResult = value3 = value4 = new TryInterpretReturnValue { Span = new Span { File = index } };
-        buffer.Clear().AppendLine(value0.ToString(scriptLoadReturnValue));
         Caret caret = value0.Span.CaretNextToEndOfThisSpan;
         file.SkipWhiteSpace(ref caret);
         if (StructAnalyzer.IsStructKindWithName(value0.SubDataIndex))
         {
             nameResult = file.TryGetStructName(caret);
-            buffer.AppendLine(nameResult.ToString(scriptLoadReturnValue));
             caret = nameResult.Span.CaretNextToEndOfThisSpan;
             file.SkipWhiteSpace(ref caret);
             if (file.TryGetParentStructName(caret, out parentNameResult))
             {
-                buffer.AppendLine(parentNameResult.ToString(scriptLoadReturnValue));
                 caret = parentNameResult.Span.CaretNextToEndOfThisSpan;
                 file.SkipWhiteSpace(ref caret);
             }
@@ -93,19 +87,20 @@ public class TestManager : MonoBehaviour
         switch (value0.SubDataIndex)
         {
             case 2:
-                value4 = file.TryParseRaceStructMultiThread(ref raceParserTempData, ref identifierNumberPairList, ref astValueTypePairList, nameResult.Span, parentNameResult.Span, caret, out var nextToRightBrace, out int raceTreeIndex);
-                var raceTree = raceParserTempData.Values[raceTreeIndex];
+                value4 = file.TryParseRaceStructMultiThread(ref scriptAnalyzeDataManager.RaceParserTempData, ref scriptAnalyzeDataManager.IdentifierNumberPairList, ref scriptAnalyzeDataManager.ASTValueTypePairList, nameResult.Span, parentNameResult.Span, caret, out var nextToRightBrace, out int raceTreeIndex);
+                var raceTree = scriptAnalyzeDataManager.RaceParserTempData.Values[raceTreeIndex];
                 if (value4.IsSuccess)
                 {
-                    buffer.Append(raceTree, (TextFile*)scriptLoadReturnValue.Files.GetUnsafePtr(), raceParserTempData, identifierNumberPairList, astValueTypePairList);
+                    buffer.Append(raceTree, scriptAnalyzeDataManager.Files, scriptAnalyzeDataManager.RaceParserTempData, scriptAnalyzeDataManager.IdentifierNumberPairList, scriptAnalyzeDataManager.ASTValueTypePairList);
+                    file.SkipWhiteSpace(ref nextToRightBrace);
                 }
                 else if (value4.IsPending)
                 {
-                    buffer.Append("Pending").Append(value4.ToString(scriptLoadReturnValue));
+                    buffer.Append("Pending");
                 }
                 else if (value4.IsError)
                 {
-                    buffer.Append(value4.ToString(scriptLoadReturnValue));
+                    buffer.Append(value4, scriptAnalyzeDataManager);
                 }
                 break;
             default:
