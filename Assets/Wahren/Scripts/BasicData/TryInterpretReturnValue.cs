@@ -67,5 +67,7 @@
             SubdData1 = subData1,
             Status = InterpreterStatus.Pending,
         };
+
+        public static implicit operator bool(in TryInterpretReturnValue value) => value.Status == InterpreterStatus.Success;
     }
 }
