@@ -128,7 +128,7 @@ namespace pcysl5edgo.Wahren.AST
                 }
             }
 
-            private void StartRead(FileInfo[] infos)
+            public void StartLoad(FileInfo[] infos, string[] fullPaths)
             {
                 _currentStage = Stage.ReadAsync;
                 for (int i = 0; i < Length; i++)
@@ -140,27 +140,26 @@ namespace pcysl5edgo.Wahren.AST
                         Buffer = RawFiles[i].Contents,
                         Offset = _isUtf16,
                     };
-                    ReadHandles[i] = AsyncReadManager.Read(infos[i].FullName, ReadCommands + i, 1);
+                    ReadHandles[i] = AsyncReadManager.Read(fullPaths[i], ReadCommands + i, 1);
                 }
             }
 
-            public static InitialReadTempData Create(FileInfo[] infos, int fileLength, TextFile** filesPtr, bool isUtf16, bool isDebug)
+            public static InitialReadTempData* CreatePtr(FileInfo[] infos, int fileLength, TextFile** filesPtr, bool isUtf16, bool isDebug)
             {
-                var answer = new InitialReadTempData
+                var ptr = (InitialReadTempData*)UnsafeUtility.Malloc(sizeof(InitialReadTempData), 4, Allocator.Persistent);
+                *ptr = new InitialReadTempData
                 {
                     _isDebug = isDebug ? 1 : 0,
                     _isUtf16 = isUtf16 ? 2 : 0,
                     _currentStage = Stage.None,
                     Length = fileLength,
-                    RawFiles = (RawTextFile*)UnsafeUtility.Malloc(sizeof(RawTextFile*) * fileLength, 4, Allocator.Persistent),
+                    RawFiles = (RawTextFile*)UnsafeUtility.Malloc(sizeof(RawTextFile) * fileLength, 4, Allocator.Persistent),
                     FilesPtr = filesPtr,
-                    ReadHandles = (ReadHandle*)UnsafeUtility.Malloc(sizeof(ReadHandle*) * fileLength, 4, Allocator.Persistent),
-                    ReadCommands = (ReadCommand*)UnsafeUtility.Malloc(sizeof(ReadCommand*) * fileLength, 4, Allocator.Persistent),
-                    DeleteCommentJobHandles = (JobHandle*)UnsafeUtility.Malloc(sizeof(JobHandle*) * fileLength, 4, Allocator.Persistent),
+                    ReadHandles = (ReadHandle*)UnsafeUtility.Malloc(sizeof(ReadHandle) * fileLength, 4, Allocator.Persistent),
+                    ReadCommands = (ReadCommand*)UnsafeUtility.Malloc(sizeof(ReadCommand) * fileLength, 4, Allocator.Persistent),
+                    DeleteCommentJobHandles = (JobHandle*)UnsafeUtility.Malloc(sizeof(JobHandle) * fileLength, 4, Allocator.Persistent),
                 };
-                answer.FilesPtr[0] = (TextFile*)UnsafeUtility.Malloc(sizeof(TextFile*) * fileLength, 4, Allocator.Persistent);
-                answer.StartRead(infos);
-                return answer;
+                return ptr;
             }
 
             public void Dispose()

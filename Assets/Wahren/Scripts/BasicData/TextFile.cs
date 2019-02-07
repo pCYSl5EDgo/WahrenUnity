@@ -18,10 +18,17 @@ namespace pcysl5edgo.Wahren
         {
             FilePathId = filePathId;
             Length = length;
-            Contents = (ushort*)UnsafeUtility.Malloc(sizeof(char) * length, 1, Allocator.Persistent);
             Lines = null;
             LineLengths = null;
             LineCount = 0;
+            if (length == 0)
+            {
+                Contents = null;
+            }
+            else
+            {
+                Contents = (ushort*)UnsafeUtility.Malloc(sizeof(char) * length, 1, Allocator.Persistent);
+            }
         }
 
         public static TextFile CreateEmptyFile(int filePathId) => new TextFile
@@ -55,7 +62,7 @@ namespace pcysl5edgo.Wahren
 
         internal void Split()
         {
-            if (!IsCreated) return;
+            if (Length == 0) return;
             LineCount = 1;
             for (int i = 0; i < Length; i++)
             {
@@ -66,7 +73,7 @@ namespace pcysl5edgo.Wahren
                         break;
                 }
             }
-            Lines = (ushort**)UnsafeUtility.Malloc(sizeof(IntPtr) * LineCount, 4, Allocator.Persistent);
+            Lines = (ushort**)UnsafeUtility.Malloc(sizeof(ushort*) * LineCount, 4, Allocator.Persistent);
             Lines[0] = Contents;
             LineLengths = (int*)UnsafeUtility.Malloc(sizeof(int) * LineCount, 4, Allocator.Persistent);
             UnsafeUtility.MemClear(LineLengths, sizeof(int) * LineCount);
@@ -86,19 +93,15 @@ namespace pcysl5edgo.Wahren
             }
         }
 
-        public bool IsCreated => Contents != null;
-
         public void Dispose()
         {
-            if (IsCreated)
-            {
+            if (Contents != null)
                 UnsafeUtility.Free(Contents, Allocator.Persistent);
-                if (LineLengths != null)
-                    UnsafeUtility.Free(LineLengths, Allocator.Persistent);
-                if (Lines != null)
-                    UnsafeUtility.Free(Lines, Allocator.Persistent);
-                this = default;
-            }
+            if (LineLengths != null)
+                UnsafeUtility.Free(LineLengths, Allocator.Persistent);
+            if (Lines != null)
+                UnsafeUtility.Free(Lines, Allocator.Persistent);
+            this = default;
         }
     }
 }

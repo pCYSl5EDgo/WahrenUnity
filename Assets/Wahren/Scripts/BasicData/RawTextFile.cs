@@ -16,7 +16,14 @@ namespace pcysl5edgo.Wahren
         {
             FilePathId = filePathId;
             Length = length;
-            Contents = (byte*)UnsafeUtility.Malloc(Length, 1, Allocator.Persistent);
+            if (length == 0)
+            {
+                Contents = null;
+            }
+            else
+            {
+                Contents = (byte*)UnsafeUtility.Malloc(Length, 1, Allocator.Persistent);
+            }
         }
 
         public static RawTextFile CreateEmptyFile(int filePathId) => new RawTextFile

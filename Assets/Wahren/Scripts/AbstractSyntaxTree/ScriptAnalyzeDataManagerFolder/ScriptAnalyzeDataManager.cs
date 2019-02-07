@@ -6,7 +6,7 @@ using System;
 
 namespace pcysl5edgo.Wahren.AST
 {
-    public unsafe sealed partial class ScriptAnalyzeDataManager : System.IDisposable
+    public unsafe sealed partial class ScriptAnalyzeDataManager// : System.IDisposable
     {
         private System.Text.StringBuilder buffer = new System.Text.StringBuilder(4096);
         private InitialReadTempData* InitialReadTempDataPtr;
@@ -17,19 +17,9 @@ namespace pcysl5edgo.Wahren.AST
         private int OldASTValueTypePairListLength;
         private int OldIdentifierNumberPairListLength;
 
-        public string[] FullPaths, Names;
         private NativeList<JobHandle> handles;
         private NativeList<ParseJob> jobs;
         private Stage currentStage;
-
-        private void ParseStart()
-        {
-            for (int i = 0; i < ScriptPtr->FileLength; i++)
-            {
-                CreateNewParseJob(ScriptPtr->Files[i]);
-            }
-            ScheduleParsing();
-        }
 
         private void ScheduleParsing()
         {
@@ -53,8 +43,7 @@ namespace pcysl5edgo.Wahren.AST
                     InitialReadTempDataPtr->Dispose();
                     UnsafeUtility.Free(InitialReadTempDataPtr, Allocator.Persistent);
                     InitialReadTempDataPtr = null;
-                    currentStage = Stage.Parsing;
-                    ParseStart();
+                    currentStage = Stage.PreParsing;
                     break;
                 default:
                     InitialReadTempDataPtr->Update();

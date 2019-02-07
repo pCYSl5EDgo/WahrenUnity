@@ -1,80 +1,77 @@
-﻿using System;
+﻿using System.IO;
 using System.Text;
 
 using UnityEngine;
-using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
 
 using pcysl5edgo.Wahren;
 using pcysl5edgo.Wahren.AST;
 
 public class TestManager : MonoBehaviour
 {
-    RawScriptLoadReturnValue rawScriptLoadReturnValue;
-    ScriptLoadReturnValue scriptLoadReturnValue;
     [SerializeField] public string ScriptDirectoryFullPath;
-    int stage;
     int frame;
-    NativeList<Unity.Jobs.JobHandle> deleteCommentJobs;
-    ScriptAnalyzeDataManager scriptAnalyzeDataManager;
-
+    ScriptAnalyzeDataManager scriptManager;
+    bool firstFrameDone = true;
     StringBuilder buffer;
     void Start()
     {
-        stage = 0;
         frame = 0;
-        rawScriptLoadReturnValue = new System.IO.DirectoryInfo(ScriptDirectoryFullPath).LoadFileToMemoryAsync(System.Text.Encoding.Unicode);
-        scriptLoadReturnValue = new ScriptLoadReturnValue(ref rawScriptLoadReturnValue);
-        // UnityEngine.Debug.Log("COUNT : " + rawScriptLoadReturnValue.Files.Length);
-        deleteCommentJobs = new Unity.Collections.NativeList<Unity.Jobs.JobHandle>(rawScriptLoadReturnValue.Files.Length, Unity.Collections.Allocator.Persistent);
-        for (int i = 0; i < rawScriptLoadReturnValue.FullPaths.Length; i++)
-        {
-            // UnityEngine.Debug.Log(i + " -> " + rawScriptLoadReturnValue.FullPaths[i] + "\n Length : " + rawScriptLoadReturnValue.Files[i].Length);
-        }
         buffer = new StringBuilder(1024);
     }
 
     void OnDestroy()
     {
-        scriptAnalyzeDataManager.Dispose();
-        scriptLoadReturnValue.Dispose();
+        if (!(scriptManager is null))
+        {
+            scriptManager.Dispose();
+            scriptManager = null;
+        }
     }
     unsafe void Update()
     {
-        switch (stage)
+        if (scriptManager is null)
         {
-            case 0:
-                stage = ScriptFileLoader.TryConvertUnicodeAsync(ref rawScriptLoadReturnValue, ref scriptLoadReturnValue, ref deleteCommentJobs, false) ? 1 : 0;
-                UnityEngine.Debug.Log("Frame : " + frame++);
+            scriptManager = new ScriptAnalyzeDataManager(new DirectoryInfo(ScriptDirectoryFullPath).GetFiles("*.dat", SearchOption.AllDirectories), true, false);
+            return;
+        }
+        switch (scriptManager.CurrentStage)
+        {
+            case ScriptAnalyzeDataManager.Stage.None:
                 break;
-            case 1:
-                UnityEngine.Debug.Log("Frame : " + frame++);
-                UnityEngine.Debug.Log("Done!");
-                scriptAnalyzeDataManager = ScriptAnalyzeDataManager.Create(ref scriptLoadReturnValue);
-                scriptAnalyzeDataManager.ParseStart();
-                stage = 2;
+            case ScriptAnalyzeDataManager.Stage.PreLoading:
+                UnityEngine.Debug.Log("Frame : " + frame++ + "\nNow PreLoading");
+                scriptManager.StartLoad();
                 break;
-            case 2:
-                UnityEngine.Debug.Log("Frame : " + frame++);
-                scriptAnalyzeDataManager.Update();
-                if (scriptAnalyzeDataManager.CurrentStage == 3)
-                    stage = 3;
+            case ScriptAnalyzeDataManager.Stage.Loading:
+                UnityEngine.Debug.Log("Frame : " + frame++ + "\nNow Loading");
+                scriptManager.Update();
                 break;
-            case 3:
-                UnityEngine.Debug.Log("Frame : " + frame++);
-                var d = scriptAnalyzeDataManager.RaceParserTempData;
-                UnityEngine.Debug.Log(d.Length);
-                for (int i = 0; i < d.Length; i++)
+            case ScriptAnalyzeDataManager.Stage.PreParsing:
+                UnityEngine.Debug.Log("Frame : " + frame++ + "\nNow PreParsing");
+                scriptManager.StartParse();
+                break;
+            case ScriptAnalyzeDataManager.Stage.Parsing:
+                UnityEngine.Debug.Log("Frame : " + frame++ + "\nNow Parsing");
+                scriptManager.Update();
+                break;
+            case ScriptAnalyzeDataManager.Stage.GarbageCollecting:
+                UnityEngine.Debug.Log("Frame : " + frame++ + "\nNow Garbage Collecting");
+                scriptManager.Update();
+                break;
+            case ScriptAnalyzeDataManager.Stage.Done:
+                if (firstFrameDone)
                 {
-                    buffer.Clear().Append(d.Values[i], scriptAnalyzeDataManager.Files, scriptAnalyzeDataManager.RaceParserTempData, scriptAnalyzeDataManager.IdentifierNumberPairList, scriptAnalyzeDataManager.ASTValueTypePairList).AppendLine();
+                    UnityEngine.Debug.Log("Frame : " + frame++ + "\nDone!");
+                    firstFrameDone = false;
+                    for (int i = 0; i < scriptManager.RaceParserTempData.Length; i++)
+                    {
+                        if (i != 0)
+                            buffer.AppendLine();
+                        buffer.Append(scriptManager.RaceParserTempData.Values[i], scriptManager.Files, scriptManager.RaceParserTempData, scriptManager.IdentifierNumberPairList, scriptManager.ASTValueTypePairList);
+                    }
                     UnityEngine.Debug.Log(buffer.ToString());
                 }
-                stage = 4;
                 break;
         }
-    }
-    private unsafe void Debug(int index)
-    {
-        UnityEngine.Debug.Log(buffer.ToString());
     }
 }

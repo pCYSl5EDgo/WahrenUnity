@@ -3,7 +3,7 @@ using Unity.Collections.LowLevel.Unsafe;
 
 namespace pcysl5edgo.Wahren.AST
 {
-    internal unsafe struct ScriptAnalyzeDataManager_Internal : System.IDisposable
+    internal unsafe struct ScriptAnalyzeDataManager_Internal// : System.IDisposable
     {
         public TextFile* Files;
         public int FileLength;
@@ -11,37 +11,39 @@ namespace pcysl5edgo.Wahren.AST
         public IdentifierNumberPairList IdentifierNumberPairList;
         public ASTValueTypePairList ASTValueTypePairList;
 
-        public static ScriptAnalyzeDataManager_Internal Create(int fileLength)
-        => new ScriptAnalyzeDataManager_Internal
+        public static ScriptAnalyzeDataManager_Internal* CreatePtr(int length)
         {
-            FileLength = fileLength,
-            RaceParserTempData = new RaceParserTempData(16),
-            IdentifierNumberPairList = new IdentifierNumberPairList(256),
-            ASTValueTypePairList = new ASTValueTypePairList(1024),
-        };
-
-        public static ScriptAnalyzeDataManager_Internal Copy(TextFile* files, int fileLength)
-        {
-            var answer = new ScriptAnalyzeDataManager_Internal
-            {
-                FileLength = fileLength,
-                RaceParserTempData = new RaceParserTempData(16),
-                IdentifierNumberPairList = new IdentifierNumberPairList(256),
-                ASTValueTypePairList = new ASTValueTypePairList(1024),
-            };
-            answer.Files = (TextFile*)UnsafeUtility.Malloc(sizeof(TextFile) * fileLength, 4, Allocator.Persistent);
-            UnsafeUtility.MemCpy(answer.Files, files, sizeof(TextFile) * fileLength);
+            var answer = (ScriptAnalyzeDataManager_Internal*)UnsafeUtility.Malloc(sizeof(ScriptAnalyzeDataManager_Internal), 4, Allocator.Persistent);
+            answer[0] = new ScriptAnalyzeDataManager_Internal(length);
             return answer;
         }
+        private ScriptAnalyzeDataManager_Internal(int length)
+        {
+            FileLength = length;
+            long size = sizeof(TextFile) * FileLength;
+            Files = (TextFile*)UnsafeUtility.Malloc(size, 4, Allocator.Persistent);
+            UnsafeUtility.MemClear(Files, size);
+            RaceParserTempData = new RaceParserTempData(16);
+            IdentifierNumberPairList = new IdentifierNumberPairList(256);
+            ASTValueTypePairList = new ASTValueTypePairList(1024);
+        }
+
         public void Dispose()
         {
             if (FileLength != 0)
             {
                 for (int i = 0; i < FileLength; i++)
                 {
-                    Files[i].Dispose();
+                    if (Files + i != null)
+                    {
+                        Files[i].Dispose();
+                    }
                 }
-                UnsafeUtility.Free(Files, Allocator.Persistent);
+                if (Files != null)
+                {
+                    UnsafeUtility.Free(Files, Allocator.Persistent);
+                    Files = null;
+                }
             }
             RaceParserTempData.Dispose();
             IdentifierNumberPairList.Dispose();
