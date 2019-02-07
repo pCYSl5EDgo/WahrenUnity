@@ -9,8 +9,9 @@ namespace pcysl5edgo.Wahren.AST
     public unsafe sealed partial class ScriptAnalyzeDataManager : System.IDisposable
     {
         private System.Text.StringBuilder buffer = new System.Text.StringBuilder(4096);
-        internal InterpreterStatus* Status;
-        internal ScriptAnalyzeDataManager_Internal* ScriptPtr;
+        private InitialReadTempData* InitialReadTempDataPtr;
+        private InterpreterStatus* Status;
+        private ScriptAnalyzeDataManager_Internal* ScriptPtr;
 
         private RaceParserTempData.OldLengths* RaceOldLengths;
         private int OldASTValueTypePairListLength;
@@ -19,53 +20,49 @@ namespace pcysl5edgo.Wahren.AST
         public string[] FullPaths, Names;
         private NativeList<JobHandle> handles;
         private NativeList<ParseJob> jobs;
-        internal int currentStage;
+        private Stage currentStage;
 
-        public int CurrentStage => currentStage;
-        public int CurrentJobLength => jobs.Length;
-
-        public bool IsParsing => currentStage == 1;
-
-        public void ParseStart()
+        private void ParseStart()
         {
             for (int i = 0; i < ScriptPtr->FileLength; i++)
             {
                 CreateNewParseJob(ScriptPtr->Files[i]);
             }
-            Schedule();
+            ScheduleParsing();
         }
 
-        private void Schedule()
+        private void ScheduleParsing()
         {
             for (int i = 0; i < jobs.Length; i++)
             {
                 handles.Add(jobs[i].Schedule());
             }
-            currentStage = 1;
+            currentStage = Stage.Parsing;
             UnsafeUtility.MemCpy(RaceOldLengths, &ScriptPtr->RaceParserTempData, sizeof(RaceParserTempData.OldLengths));
             OldASTValueTypePairListLength = ScriptPtr->ASTValueTypePairList.Length;
             OldIdentifierNumberPairListLength = ScriptPtr->IdentifierNumberPairList.Length;
             *Status = InterpreterStatus.None;
         }
 
-        public void Update()
+        private void LoadingUpdate()
         {
-            switch (currentStage)
+            if (InitialReadTempDataPtr == null) return;
+            switch (InitialReadTempDataPtr->CurrentStage)
             {
-                case 0:
-                    return;
-                case 1:
-                    Case1();
+                case InitialReadTempData.Stage.Done:
+                    InitialReadTempDataPtr->Dispose();
+                    UnsafeUtility.Free(InitialReadTempDataPtr, Allocator.Persistent);
+                    InitialReadTempDataPtr = null;
+                    currentStage = Stage.Parsing;
+                    ParseStart();
                     break;
-                case 2:
-                    Case2();
-                    break;
-                case 3:
+                default:
+                    InitialReadTempDataPtr->Update();
                     break;
             }
         }
 
-        private void Case2()
+        private void GCUpdate()
         {
             bool isAnyFail = false;
             for (int i = handles.Length; --i >= 0;)
@@ -82,10 +79,10 @@ namespace pcysl5edgo.Wahren.AST
                 }
             }
             if (isAnyFail) return;
-            Schedule();
+            ScheduleParsing();
         }
 
-        private void Case1()
+        private void ParseUpdate()
         {
             bool isAnyFail = false;
             for (int i = handles.Length; --i >= 0;)
@@ -131,12 +128,12 @@ namespace pcysl5edgo.Wahren.AST
                     }
                 }
             }
-            currentStage = 3;
+            currentStage = Stage.Done;
         }
 
         private void GarbageCollection()
         {
-            currentStage = 2;
+            currentStage = Stage.GarbageCollecting;
             if (handles.Length != 0)
                 handles.Clear();
             handles.Add(new GCJob
@@ -198,99 +195,6 @@ namespace pcysl5edgo.Wahren.AST
             job.LastNameSpan.Length = job.LastParentNameSpan.Length = 0;
             job.Result = new TryInterpretReturnValue(job.LastNameSpan, 0, InterpreterStatus.None);
             jobs.Add(job);
-        }
-
-        public static ScriptAnalyzeDataManager Create(ref ScriptLoadReturnValue disposableScript)
-        {
-            if (!disposableScript.IsCreated) throw new System.ArgumentNullException();
-            var answer = new ScriptAnalyzeDataManager(disposableScript.FullPaths, disposableScript.Names);
-            *answer.ScriptPtr = ScriptAnalyzeDataManager_Internal.Copy((TextFile*)disposableScript.Files.GetUnsafePtr(), disposableScript.Files.Length);
-            disposableScript.Files.Dispose();
-            disposableScript = default;
-            return answer;
-        }
-        private ScriptAnalyzeDataManager(string[] fullPaths, string[] names)
-        {
-            Names = names;
-            FullPaths = fullPaths;
-            ScriptPtr = (ScriptAnalyzeDataManager_Internal*)UnsafeUtility.Malloc(sizeof(ScriptAnalyzeDataManager_Internal), 4, Allocator.Persistent);
-            Status = (InterpreterStatus*)UnsafeUtility.Malloc(sizeof(InterpreterStatus), 4, Allocator.Persistent);
-            handles = new NativeList<JobHandle>(Allocator.Persistent);
-            jobs = new NativeList<ParseJob>(Allocator.Persistent);
-            RaceOldLengths = (RaceParserTempData.OldLengths*)UnsafeUtility.Malloc(sizeof(RaceParserTempData.OldLengths), 4, Allocator.Persistent);
-        }
-        public void Dispose()
-        {
-            if (ScriptPtr != null)
-            {
-                ScriptPtr->Dispose();
-                UnsafeUtility.Free(ScriptPtr, Allocator.Persistent);
-                ScriptPtr = null;
-            }
-            if (handles.IsCreated)
-                handles.Dispose();
-            if (jobs.IsCreated)
-                jobs.Dispose();
-            if (Status != null)
-                UnsafeUtility.Free(Status, Allocator.Persistent);
-            if (RaceOldLengths != null)
-                UnsafeUtility.Free(RaceOldLengths, Allocator.Persistent);
-            FullPaths = null;
-            Names = null;
-        }
-
-        public ref RaceParserTempData RaceParserTempData => ref ScriptPtr->RaceParserTempData;
-        public ref TextFile this[int index] => ref ScriptPtr->Files[index];
-        public ref int Length => ref ScriptPtr->FileLength;
-        public ref TextFile* Files => ref ScriptPtr->Files;
-        public ref IdentifierNumberPairList IdentifierNumberPairList => ref ScriptPtr->IdentifierNumberPairList;
-        public ref ASTValueTypePairList ASTValueTypePairList => ref ScriptPtr->ASTValueTypePairList;
-    }
-
-    internal unsafe struct ScriptAnalyzeDataManager_Internal : System.IDisposable
-    {
-        internal TextFile* Files;
-        internal int FileLength;
-        internal RaceParserTempData RaceParserTempData;
-        internal IdentifierNumberPairList IdentifierNumberPairList;
-        internal ASTValueTypePairList ASTValueTypePairList;
-
-        public ScriptAnalyzeDataManager_Internal(TextFile* files, int fileLength)
-        {
-            Files = files;
-            FileLength = fileLength;
-            RaceParserTempData = new RaceParserTempData(16);
-            IdentifierNumberPairList = new IdentifierNumberPairList(256);
-            ASTValueTypePairList = new ASTValueTypePairList(1024);
-        }
-
-        public static ScriptAnalyzeDataManager_Internal Copy(TextFile* files, int fileLength)
-        {
-            var answer = new ScriptAnalyzeDataManager_Internal
-            {
-                FileLength = fileLength,
-                RaceParserTempData = new RaceParserTempData(16),
-                IdentifierNumberPairList = new IdentifierNumberPairList(256),
-                ASTValueTypePairList = new ASTValueTypePairList(1024),
-            };
-            answer.Files = (TextFile*)UnsafeUtility.Malloc(sizeof(TextFile) * fileLength, 4, Allocator.Persistent);
-            UnsafeUtility.MemCpy(answer.Files, files, sizeof(TextFile) * fileLength);
-            return answer;
-        }
-        public void Dispose()
-        {
-            if (FileLength != 0)
-            {
-                for (int i = 0; i < FileLength; i++)
-                {
-                    Files[i].Dispose();
-                }
-                UnsafeUtility.Free(Files, Allocator.Persistent);
-            }
-            RaceParserTempData.Dispose();
-            IdentifierNumberPairList.Dispose();
-            ASTValueTypePairList.Dispose();
-            this = default;
         }
     }
 }
