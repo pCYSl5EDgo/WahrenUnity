@@ -24,9 +24,7 @@ namespace pcysl5edgo.Wahren
                             handle.Dispose();
                             scriptLoadReturnValue.Files[i] = TextFile.FromRawTextFileUtf16(rawScriptLoadReturnValue.Files[i]);
                             invalidCounter++;
-                            var (boolean, job) = DeleteCommentJob.Schedule(scriptLoadReturnValue.Files[i], isDebg);
-                            if (boolean)
-                                deleteCommentJobsFinnalyDeallocated.Add(job);
+                            deleteCommentJobsFinnalyDeallocated.Add(DeleteCommentJob.Schedule((TextFile*)scriptLoadReturnValue.Files.GetUnsafePtr() + i, isDebg));
                             break;
                         case ReadStatus.InProgress:
                             continue;
@@ -67,9 +65,7 @@ namespace pcysl5edgo.Wahren
                             handle.Dispose();
                             invalidCounter++;
                             scriptLoadReturnValue.Files[i] = TextFile.FromRawTextFileOtherEncoding(rawScriptLoadReturnValue.Files[i], cp932);
-                            var (boolean, job) = DeleteCommentJob.Schedule(scriptLoadReturnValue.Files[i], isDebug);
-                            if (boolean)
-                                deleteCommentJobs.Add(job);
+                            deleteCommentJobs.Add(DeleteCommentJob.Schedule((TextFile*)scriptLoadReturnValue.Files.GetUnsafePtr() + i, isDebug));
                             break;
                         case ReadStatus.InProgress:
                             continue;

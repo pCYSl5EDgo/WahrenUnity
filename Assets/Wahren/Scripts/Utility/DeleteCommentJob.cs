@@ -8,21 +8,22 @@ namespace pcysl5edgo.Wahren
     public unsafe struct DeleteCommentJob : IJob
     {
         public byte isDebug;
-        public int LineCount;
+        [NativeDisableUnsafePtrRestriction] public int* LineCountPtr;
         [NativeDisableUnsafePtrRestriction] public ushort** Lines;
         [NativeDisableUnsafePtrRestriction] public int* LineLengths;
 
-        public static (bool, JobHandle) Schedule(TextFile file, bool isDebug) => file.Length == 0 ? (false, default) : (true, new DeleteCommentJob(file, isDebug).Schedule());
+        public static JobHandle Schedule(TextFile* filePtr, bool isDebug)
+        => new DeleteCommentJob(filePtr, isDebug).Schedule();
 
-        public DeleteCommentJob(TextFile file, bool isDebug)
+        public DeleteCommentJob(TextFile* filePtr, bool isDebug)
         {
-            this.Lines = (ushort**)file.Lines;
-            this.LineLengths = file.LineLengths;
+            this.Lines = filePtr->Lines;
+            this.LineLengths = filePtr->LineLengths;
             if (isDebug)
                 this.isDebug = 1;
             else
                 this.isDebug = 0;
-            this.LineCount = file.LineCount;
+            this.LineCountPtr = &filePtr->LineCount;
         }
 
         public void Execute()
@@ -32,7 +33,7 @@ namespace pcysl5edgo.Wahren
             // 1 /一文字受付
             // 2 /* マルチラインコメント！
             // 3 /* *次はなんだよ……
-            for (int raw = 0, state = 0; raw < LineCount; raw++)
+            for (int raw = 0, state = 0, lineCount = *LineCountPtr; raw < lineCount; raw++)
             {
                 ushort* cptr = Lines[raw];
                 int thisLineLength = LineLengths[raw];
@@ -85,6 +86,13 @@ namespace pcysl5edgo.Wahren
                     if (Lines[raw][i] != '\t' && Lines[raw][i] != ' ')
                         break;
                 }
+            }
+            while (*LineCountPtr >= 0)
+            {
+                // 最終行が空行なら行数減らして？（はぁと）
+                if (LineLengths[*LineCountPtr - 1] != 0)
+                    return;
+                *LineCountPtr -= 1;
             }
         }
     }
