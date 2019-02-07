@@ -32,7 +32,7 @@ namespace pcysl5edgo.Wahren
                     switch (state)
                     {
                         case 0: // Seek for the first char of the identifier.
-                            switch (file.Lines[raw][column])
+                            switch ((file.Contents + file.LineStarts[raw])[column])
                             {
                                 #region Alphabet
                                 case (ushort)'a':
@@ -125,7 +125,7 @@ namespace pcysl5edgo.Wahren
                             }
                             break;
                         case 1: // Seek for the rest chars of the identifier.
-                            switch (file.Lines[raw][column])
+                            switch ((file.Contents + file.LineStarts[raw])[column])
                             {
                                 #region Alphabet
                                 case (ushort)'a':
@@ -227,7 +227,7 @@ namespace pcysl5edgo.Wahren
                             }
                             break;
                         case 2: // Seek for '*'.
-                            switch (file.Lines[raw][column])
+                            switch ((file.Contents + file.LineStarts[raw])[column])
                             {
                                 case (ushort)' ':
                                 case (ushort)'\t':
@@ -249,7 +249,7 @@ namespace pcysl5edgo.Wahren
                             }
                             break;
                         case 3: // Seek for the first digit or '-' of the number.
-                            switch (file.Lines[raw][column])
+                            switch ((file.Contents + file.LineStarts[raw])[column])
                             {
                                 #region Digit
                                 case (ushort)'0':
@@ -264,7 +264,7 @@ namespace pcysl5edgo.Wahren
                                 case (ushort)'9':
                                     #endregion
                                     state = 4;
-                                    number = file.Lines[raw][column] - '0';
+                                    number = (file.Contents + file.LineStarts[raw])[column] - '0';
                                     numberSpan.Start = current;
                                     numberSpan.Length = 1;
                                     break;
@@ -281,7 +281,7 @@ namespace pcysl5edgo.Wahren
                             }
                             break;
                         case 4: // Seek for the rest digit of the number.
-                            switch (file.Lines[raw][column])
+                            switch ((file.Contents + file.LineStarts[raw])[column])
                             {
                                 #region Digit
                                 case (ushort)'0':
@@ -296,7 +296,7 @@ namespace pcysl5edgo.Wahren
                                 case (ushort)'9':
                                     #endregion
                                     number *= 10;
-                                    number += file.Lines[raw][column] - '0';
+                                    number += (file.Contents + file.LineStarts[raw])[column] - '0';
                                     numberSpan.Length++;
                                     break;
                                 case (ushort)' ':
@@ -317,7 +317,7 @@ namespace pcysl5edgo.Wahren
                             }
                             break;
                         case 5: // Seek for the rest digit of the minus number.
-                            switch (file.Lines[raw][column])
+                            switch ((file.Contents + file.LineStarts[raw])[column])
                             {
                                 #region Digit
                                 case (ushort)'1':
@@ -330,7 +330,7 @@ namespace pcysl5edgo.Wahren
                                 case (ushort)'8':
                                 case (ushort)'9':
                                     #endregion
-                                    number = -file.Lines[raw][column] + '0';
+                                    number = -(file.Contents + file.LineStarts[raw])[column] + '0';
                                     state = 4;
                                     numberSpan.Length++;
                                     break;
@@ -339,7 +339,7 @@ namespace pcysl5edgo.Wahren
                             }
                             break;
                         case 6: // Seek for ','
-                            switch (file.Lines[raw][column])
+                            switch ((file.Contents + file.LineStarts[raw])[column])
                             {
                                 case (ushort)',':
                                     state = 0;
@@ -394,14 +394,13 @@ namespace pcysl5edgo.Wahren
             length = 0;
             return new TryInterpretReturnValue(current, ErrorSentence.NotExpectedCharacterError, InterpreterStatus.Error);
         }
-        public static TryInterpretReturnValue TryReadIdentifierNotEmpty(this ref TextFile file, Caret current)
+        public static TryInterpretReturnValue TryReadIdentifierNotEmpty(ushort* lineCharPointer, int thisLineLength, int filePathId, int line, int column)
         {
-            var cptr = file.CurrentCharPointer(current);
-            Span span = new Span(current, 0);
+            Span span = new Span(filePathId, line, column, 0);
             bool onlyDigit = true;
-            for (int i = current.Column, thisLineLength = file.CurrentLineLength(current); i < thisLineLength; i++, cptr++)
+            for (int i = column; i < thisLineLength; i++)
             {
-                switch (*cptr)
+                switch (lineCharPointer[i])
                 {
                     #region Alphabet
                     case (ushort)'a':
@@ -476,14 +475,9 @@ namespace pcysl5edgo.Wahren
                         span.Length++;
                         break;
                     case (ushort)'@':
-                        if (span.Length++ != 0 || i != thisLineLength - 1)
-                        {
-                            span.Length = thisLineLength - current.Column;
-                            return new TryInterpretReturnValue(span, ErrorSentence.InvalidIdentifierError, InterpreterStatus.Error);
-                        }
-                        return new TryInterpretReturnValue(new Span(file.FilePathId, current.Line, i, 1), SuccessSentence.IdentifierInterpretSuccess, InterpreterStatus.Success);
+                        return new TryInterpretReturnValue(new Span(filePathId, line, i, 1), SuccessSentence.IdentifierInterpretSuccess, InterpreterStatus.Success);
                     default:
-                        return new TryInterpretReturnValue(new Span(file.FilePathId, current.Line, i, 1), ErrorSentence.NotNumberError, InterpreterStatus.Error);
+                        return new TryInterpretReturnValue(new Span(filePathId, line, i, 1), ErrorSentence.NotNumberError, InterpreterStatus.Error);
                 }
             }
             if (onlyDigit)

@@ -23,11 +23,11 @@ namespace pcysl5edgo.Wahren.AST
             {
                 for (int lineLength = file.LineLengths[raw]; column < lineLength; column++)
                 {
-                    switch (file.Lines[raw][column])
+                    switch ((file.Contents + file.LineStarts[raw])[column])
                     {
                         case '}':
                             nextToRightBrace.Column++;
-                            (tree.Start, tree.Length) = astValueTypePairList.TryAddBulkMultiThread(list);
+                            tree.Start = astValueTypePairList.TryAddBulkMultiThread(list, out tree.Length);
                             if (tree.Start == -1)
                             {
                                 raceTreeIndex = -1;
@@ -150,7 +150,7 @@ namespace pcysl5edgo.Wahren.AST
             }
             current.Column++;
             file.SkipWhiteSpace(ref current);
-            answer = file.TryReadIdentifierNotEmpty(current);
+            answer = ReadUtility.TryReadIdentifierNotEmpty(file.Contents + file.LineStarts[current.Line], file.CurrentLineLength(current), current.File, current.Line, current.Column);
             if (!answer.IsSuccess)
                 goto RETURN;
             answer.DataIndex = SuccessSentence.AssignmentInterpretationSuccess;

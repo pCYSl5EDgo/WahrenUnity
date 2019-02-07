@@ -22,19 +22,26 @@ namespace pcysl5edgo.Wahren.AST
             Length = 0;
             Values = (ASTValueTypePair*)UnsafeUtility.Malloc(sizeof(ASTValueTypePair) * capacity, 4, Allocator.Persistent);
         }
-        public (int start, int length) TryAddBulkMultiThread(in ASTValueTypePairList list)
+        public int TryAddBulkMultiThread(in ASTValueTypePairList list, out int length)
         {
             if (list.Length == 0)
-                return (0, 0);
-            (int start, int length) p = (-1, list.Length);
+            {
+                length = 0;
+                return 0;
+            }
+            int start = -1;
+            length = list.Length;
             do
             {
-                p.start = Length;
-                if (p.start + p.length > Capacity)
-                    return (-1, 0);
-            } while (p.start != Interlocked.CompareExchange(ref Length, p.start + p.length, p.start));
-            UnsafeUtility.MemCpy(Values + p.start, list.Values, sizeof(ASTValueTypePair) * p.length);
-            return p;
+                start = Length;
+                if (start + length > Capacity)
+                {
+                    length = 0;
+                    return -1;
+                }
+            } while (start != Interlocked.CompareExchange(ref Length, start + length, start));
+            UnsafeUtility.MemCpy(Values + start, list.Values, sizeof(ASTValueTypePair) * length);
+            return start;
         }
 
         public void Dispose()

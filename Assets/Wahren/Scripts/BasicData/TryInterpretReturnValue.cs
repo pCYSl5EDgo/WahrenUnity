@@ -47,17 +47,10 @@
             this.Status = status;
             this.DataIndex = dataIndex;
             this.SubDataIndex = subDataIndex;
-            SubdData0 = SubdData1 = 0;
+            this.SubdData0 = this.SubdData1 = 0;
         }
 
-        public static TryInterpretReturnValue CreateSuccessDetectStructType(in Caret caret, int length, AST.Location location) => new TryInterpretReturnValue
-        {
-            Span = new Span(caret, length),
-            DataIndex = SuccessSentence.StructKindInterpretSuccess,
-            SubDataIndex = (int)location,
-            SubdData0 = 0,
-            SubdData1 = 0,
-        };
+        public static TryInterpretReturnValue CreateSuccessDetectStructType(in Caret caret, int length, AST.Location location) => new TryInterpretReturnValue(new Span(caret, length), SuccessSentence.StructKindInterpretSuccess, (int)location, InterpreterStatus.Success);
 
         public static TryInterpretReturnValue CreatePending(Span span, AST.Location location, AST.PendingReason reason, int subDataIndex = 0, long subData0 = 0, long subData1 = 0) => new TryInterpretReturnValue
         {

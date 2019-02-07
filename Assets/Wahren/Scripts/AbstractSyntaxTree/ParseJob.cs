@@ -23,7 +23,8 @@ namespace pcysl5edgo.Wahren.AST
             {
                 // 少なくとも構造体の種類を確定させ、その名前と親は詳らかにせよ
                 // そして{までを読み終えた状態になるまでは他スレがメモリ不足で爆死しようとも作業するべし。
-                Result = StructAnalyzer.TryGetFirstStructLocation(ref File, Caret);
+                File.SkipWhiteSpace(ref Caret);
+                Result = StructAnalyzer.TryGetFirstStructLocation(File.CurrentCharPointer(Caret), File.LineLengths[Caret.Line], Caret, Caret.Column);
                 if (Result.IsError)
                 {
                     return;
@@ -40,7 +41,7 @@ namespace pcysl5edgo.Wahren.AST
                     LastNameSpan = Result.Span;
                     currentCaret = LastNameSpan.CaretNextToEndOfThisSpan;
                     File.SkipWhiteSpace(ref currentCaret);
-                    if (!(Result = StructWithNameAnalyzer.TryGetParentStructName(ref File, currentCaret)))
+                    if (!(Result = StructWithNameAnalyzer.TryGetParentStructName(File, currentCaret)))
                     {
                         return;
                     }
@@ -48,7 +49,7 @@ namespace pcysl5edgo.Wahren.AST
                     currentCaret = LastParentNameSpan.CaretNextToEndOfThisSpan;
                     File.SkipWhiteSpace(ref currentCaret);
                 }
-                if (!(Result = File.IsCurrentCharEquals(currentCaret, '{')))
+                if (!(Result = currentCaret.IsCurrentCharEquals((File.Contents + File.LineStarts[currentCaret.Line])[currentCaret.Column], '{')))
                 {
                     return;
                 }

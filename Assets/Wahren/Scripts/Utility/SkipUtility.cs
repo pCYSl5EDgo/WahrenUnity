@@ -14,7 +14,7 @@ namespace pcysl5edgo.Wahren
             ref int column = ref caret.Column;
             for (ushort* currentLine; raw < file.LineCount; raw++, column = 0)
             {
-                currentLine = file.Lines[raw];
+                currentLine = file.Contents + file.LineStarts[raw];
                 for (int thisLineLength = file.LineLengths[raw]; column < thisLineLength; column++)
                 {
                     switch (currentLine[column])

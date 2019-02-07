@@ -9,7 +9,8 @@ namespace pcysl5edgo.Wahren
     {
         public byte isDebug;
         [NativeDisableUnsafePtrRestriction] public int* LineCountPtr;
-        [NativeDisableUnsafePtrRestriction] public ushort** Lines;
+        [NativeDisableUnsafePtrRestriction] public ushort* Contents;
+        [NativeDisableUnsafePtrRestriction] public int* LineStarts;
         [NativeDisableUnsafePtrRestriction] public int* LineLengths;
 
         public static JobHandle Schedule(TextFile* filePtr, bool isDebug)
@@ -17,7 +18,8 @@ namespace pcysl5edgo.Wahren
 
         public DeleteCommentJob(TextFile* filePtr, bool isDebug)
         {
-            this.Lines = filePtr->Lines;
+            this.Contents = filePtr->Contents;
+            this.LineStarts = filePtr->LineStarts;
             this.LineLengths = filePtr->LineLengths;
             if (isDebug)
                 this.isDebug = 1;
@@ -35,7 +37,7 @@ namespace pcysl5edgo.Wahren
             // 3 /* *次はなんだよ……
             for (int raw = 0, state = 0, lineCount = *LineCountPtr; raw < lineCount; raw++)
             {
-                ushort* cptr = Lines[raw];
+                var cptr = Contents + LineStarts[raw];
                 int thisLineLength = LineLengths[raw];
                 for (int i = 0; i < thisLineLength; ++i, ++cptr)
                 {
@@ -83,7 +85,8 @@ namespace pcysl5edgo.Wahren
             ENDOFLINE:
                 for (int i = LineLengths[raw]; --i >= 0; --LineLengths[raw])
                 {
-                    if (Lines[raw][i] != '\t' && Lines[raw][i] != ' ')
+                    ushort p = (Contents + LineStarts[raw])[i];
+                    if (p != '\t' && p != ' ')
                         break;
                 }
             }

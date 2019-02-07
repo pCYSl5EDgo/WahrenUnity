@@ -5,34 +5,20 @@ using Unity.Collections.LowLevel.Unsafe;
 
 namespace pcysl5edgo.Wahren
 {
-    public unsafe struct BurstFile
-    {
-        public int FilePathId;
-        [NativeDisableUnsafePtrRestriction] public IntPtr Lines;
-        [NativeDisableUnsafePtrRestriction] public int* LineLengths;
-        public int LineCount;
-        public static implicit operator BurstFile(in TextFile file) => new BurstFile
-        {
-            FilePathId = file.FilePathId,
-            LineCount = file.LineCount,
-            Lines = (IntPtr)file.Lines,
-            LineLengths = file.LineLengths,
-        };
-    }
     public unsafe struct TextFile : IDisposable
     {
         public int FilePathId;
         public int Length;
         [NativeDisableUnsafePtrRestriction] public ushort* Contents;
-        [NativeDisableUnsafePtrRestriction] public ushort** Lines;
         [NativeDisableUnsafePtrRestriction] public int* LineLengths;
+        [NativeDisableUnsafePtrRestriction] public int* LineStarts;
         public int LineCount;
 
         public TextFile(int filePathId, int length)
         {
             FilePathId = filePathId;
             Length = length;
-            Lines = null;
+            LineStarts = null;
             LineLengths = null;
             LineCount = 0;
             if (length == 0)
@@ -87,10 +73,11 @@ namespace pcysl5edgo.Wahren
                         break;
                 }
             }
-            Lines = (ushort**)UnsafeUtility.Malloc(sizeof(ushort*) * LineCount, 4, Allocator.Persistent);
-            Lines[0] = Contents;
-            LineLengths = (int*)UnsafeUtility.Malloc(sizeof(int) * LineCount, 4, Allocator.Persistent);
-            UnsafeUtility.MemClear(LineLengths, sizeof(int) * LineCount);
+            int size = sizeof(int) * 2 * LineCount;
+            LineStarts = (int*)UnsafeUtility.Malloc(size, 4, Allocator.Persistent);
+            LineStarts[0] = 0;
+            LineLengths = LineStarts + LineCount;
+            UnsafeUtility.MemClear(LineStarts, size);
             for (int i = 0, lineIndex = 0; i < Length; i++)
             {
                 switch (Contents[i])
@@ -98,7 +85,7 @@ namespace pcysl5edgo.Wahren
                     case '\r':
                         break;
                     case '\n':
-                        Lines[++lineIndex] = Contents + i + 1;
+                        LineStarts[++lineIndex] = i + 1;
                         break;
                     default:
                         ++LineLengths[lineIndex];
@@ -111,10 +98,8 @@ namespace pcysl5edgo.Wahren
         {
             if (Contents != null)
                 UnsafeUtility.Free(Contents, Allocator.Persistent);
-            if (LineLengths != null)
-                UnsafeUtility.Free(LineLengths, Allocator.Persistent);
-            if (Lines != null)
-                UnsafeUtility.Free(Lines, Allocator.Persistent);
+            if (LineStarts != null)
+                UnsafeUtility.Free(LineStarts, Allocator.Persistent);
             this = default;
         }
     }

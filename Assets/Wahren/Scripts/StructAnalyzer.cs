@@ -62,90 +62,73 @@ namespace pcysl5edgo.Wahren.AST
             }
         }
 
-        public static TryInterpretReturnValue TryGetFirstStructLocation(this ref TextFile file, Caret start)
+        public static TryInterpretReturnValue TryGetFirstStructLocation(ushort* ccp, int lineLength, Caret start, int column)
         {
-            file.SkipWhiteSpace(ref start);
-            var answer = new TryInterpretReturnValue(start, ErrorSentence.StructKindNotFoundError, InterpreterStatus.Error);
-            switch (file.Lines[answer.Span.Line][answer.Span.Column])
+            switch (*ccp)
             {
                 case 'p': // power
-                    answer.PowerDetect(answer.Span.Column, file.LineLengths[answer.Span.Line], file.Lines[answer.Span.Line] + answer.Span.Column);
-                    goto RETURN;
+                    return start.PowerDetect(column, lineLength, ccp);
                 case 'u': // unit
-                    answer.UnitDetect(answer.Span.Column, file.LineLengths[answer.Span.Line], file.Lines[answer.Span.Line] + answer.Span.Column);
-                    goto RETURN;
+                    return start.UnitDetect(column, lineLength, ccp);
                 case 'r': // race
-                    answer.RaceDetect(answer.Span.Column, file.LineLengths[answer.Span.Line], file.Lines[answer.Span.Line] + answer.Span.Column);
-                    goto RETURN;
+                    return start.RaceDetect(column, lineLength, ccp);
                 case 'a': // attribute
-                    answer.AttributeDetect(answer.Span.Column, file.LineLengths[answer.Span.Line], file.Lines[answer.Span.Line] + answer.Span.Column);
-                    goto RETURN;
+                    return start.AttributeDetect(column, lineLength, ccp);
                 case 'f': // field
-                    answer.FieldDetect(answer.Span.Column, file.LineLengths[answer.Span.Line], file.Lines[answer.Span.Line] + answer.Span.Column);
-                    goto RETURN;
+                    return start.FieldDetect(column, lineLength, ccp);
                 case 'o': // object
-                    answer.ObjectDetect(answer.Span.Column, file.LineLengths[answer.Span.Line], file.Lines[answer.Span.Line] + answer.Span.Column);
-                    goto RETURN;
+                    return start.ObjectDetect(column, lineLength, ccp);
                 case 'm': // movetype
-                    answer.MoveTypeDetect(answer.Span.Column, file.LineLengths[answer.Span.Line], file.Lines[answer.Span.Line] + answer.Span.Column);
-                    goto RETURN;
+                    return start.MoveTypeDetect(column, lineLength, ccp);
                 case 'e': // event
-                    answer.EventDetect(answer.Span.Column, file.LineLengths[answer.Span.Line], file.Lines[answer.Span.Line] + answer.Span.Column);
-                    goto RETURN;
+                    return start.EventDetect(column, lineLength, ccp);
                 case 'd': // dungeon, detail
-                    answer.DungeonOrDetailDetect(answer.Span.Column, file.LineLengths[answer.Span.Line], file.Lines[answer.Span.Line] + answer.Span.Column);
-                    goto RETURN;
+                    return start.DungeonOrDetailDetect(column, lineLength, ccp);
                 case 'c': // class, context
-                    answer.ClassOrContextDetect(answer.Span.Column, file.LineLengths[answer.Span.Line], file.Lines[answer.Span.Line] + answer.Span.Column);
-                    goto RETURN;
+                    return start.ClassOrContextDetect(column, lineLength, ccp);
                 case 's': // scenario, skill, skillset, sound, story
-                    answer.SDetect(answer.Span.Column, file.LineLengths[answer.Span.Line], file.Lines[answer.Span.Line] + answer.Span.Column);
-                    goto RETURN;
+                    return start.SDetect(column, lineLength, ccp);
                 case 'w': // workspace
-                    answer.WorkspaceDetect(answer.Span.Column, file.LineLengths[answer.Span.Line], file.Lines[answer.Span.Line] + answer.Span.Column);
-                    goto RETURN;
+                    return start.WorkspaceDetect(column, lineLength, ccp);
                 case 'v': // voice
-                    answer.VoiceDetect(answer.Span.Column, file.LineLengths[answer.Span.Line], file.Lines[answer.Span.Line] + answer.Span.Column);
-                    goto RETURN;
+                    return start.VoiceDetect(column, lineLength, ccp);
                 default:
-                    goto RETURN;
+                    return new TryInterpretReturnValue(start, ErrorSentence.StructKindNotFoundError, InterpreterStatus.Error);
             }
-        RETURN:
-            return answer;
         }
 
-        private static void WorkspaceDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, ushort* ccp)
+        private static TryInterpretReturnValue WorkspaceDetect(this Caret start, int column, int thisLineLength, ushort* ccp)
         {
             const int _length = 9;
             const int _len1 = _length - 1;
             if (column + _len1 < thisLineLength && *++ccp == 'o' && *++ccp == 'r' && *++ccp == 'k' && *++ccp == 's' && *++ccp == 'p' && *++ccp == 'a' && *++ccp == 'c' && *++ccp == 'e' && IsNextEndOfLineOrSpace(ccp, column + _len1, thisLineLength))
             {
-                answer = TryInterpretReturnValue.CreateSuccessDetectStructType(answer.Span.Start, _length, Location.WorkSpace);
+                return TryInterpretReturnValue.CreateSuccessDetectStructType(start, _length, Location.WorkSpace);
             }
             else
             {
-                answer.Fail(23);
+                return start.Fail(23);
             }
         }
 
-        private static void VoiceDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, ushort* ccp)
+        private static TryInterpretReturnValue VoiceDetect(this Caret start, int column, int thisLineLength, ushort* ccp)
         {
             const int _length = 5;
             const int _len1 = _length - 1;
             if (column + _len1 < thisLineLength && *++ccp == 'o' && *++ccp == 'i' && *++ccp == 'c' && *++ccp == 'e' && IsNextEndOfLineOrSpace(ccp, column + _len1, thisLineLength))
             {
-                answer = TryInterpretReturnValue.CreateSuccessDetectStructType(answer.Span.Start, _length, Location.Voice);
+                return TryInterpretReturnValue.CreateSuccessDetectStructType(start, _length, Location.Voice);
             }
             else
             {
-                answer.Fail(22);
+                return start.Fail(22);
             }
         }
 
-        private static void SDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, ushort* ccp)
+        private static TryInterpretReturnValue SDetect(this Caret start, int column, int thisLineLength, ushort* ccp)
         {
             if (column + 3 >= thisLineLength)
-                answer.Fail(20);
+                return start.Fail(20);
             else switch (*++ccp)
                 {
                     case 'k':
@@ -153,254 +136,230 @@ namespace pcysl5edgo.Wahren.AST
                         {
                             if (IsNextEndOfLineOrSpace(ccp, column + 4, thisLineLength))
                             {
-                                answer = TryInterpretReturnValue.CreateSuccessDetectStructType(answer.Span.Start, 5, Location.Skill);
+                                return TryInterpretReturnValue.CreateSuccessDetectStructType(start, 5, Location.Skill);
                             }
                             else if (*++ccp == 's' && column + 7 < thisLineLength && *++ccp == 'e' && *++ccp == 't' && IsNextEndOfLineOrSpace(ccp, column + 7, thisLineLength))
                             {
-                                answer = TryInterpretReturnValue.CreateSuccessDetectStructType(answer.Span.Start, 8, Location.SkillSet);
+                                return TryInterpretReturnValue.CreateSuccessDetectStructType(start, 8, Location.SkillSet);
                             }
                             else
                             {
-                                answer.Fail(15);
+                                return start.Fail(15);
                             }
                         }
                         else
                         {
-                            answer.Fail(16);
+                            return start.Fail(16);
                         }
-                        break;
                     case 'o':
                         if (column + 4 < thisLineLength && *++ccp == 'u' && *++ccp == 'n' && *++ccp == 'd' && IsNextEndOfLineOrSpaceOrLeftBrace(ccp, column + 4, thisLineLength))
                         {
-                            answer = TryInterpretReturnValue.CreateSuccessDetectStructType(answer.Span.Start, 5, Location.Sound);
+                            return TryInterpretReturnValue.CreateSuccessDetectStructType(start, 5, Location.Sound);
                         }
                         else
                         {
-                            answer.Fail(17);
+                            return start.Fail(17);
                         }
-                        break;
                     case 't':
                         if (column + 4 < thisLineLength && *++ccp == 'o' && *++ccp == 'r' && *++ccp == 'y' && IsNextEndOfLineOrSpace(ccp, column + 4, thisLineLength))
                         {
-                            answer = TryInterpretReturnValue.CreateSuccessDetectStructType(answer.Span.Start, 5, Location.Story);
+                            return TryInterpretReturnValue.CreateSuccessDetectStructType(start, 5, Location.Story);
                         }
                         else
                         {
-                            answer.Fail(18);
+                            return start.Fail(18);
                         }
-                        break;
                     case 'c':
                         if (column + 7 < thisLineLength && *++ccp == 'e' && *++ccp == 'n' && *++ccp == 'a' && *++ccp == 'r' && *++ccp == 'i' && *++ccp == 'o' && IsNextEndOfLineOrSpace(ccp, column + 7, thisLineLength))
                         {
-                            answer = TryInterpretReturnValue.CreateSuccessDetectStructType(answer.Span.Start, 8, Location.Scenario);
+                            return TryInterpretReturnValue.CreateSuccessDetectStructType(start, 8, Location.Scenario);
                         }
                         else
                         {
-                            answer.Fail(19);
+                            return start.Fail(19);
                         }
-                        break;
                     case 'p':
                         if (*++ccp == 'o' && *++ccp == 't' && IsNextEndOfLineOrSpace(ccp, column + 3, thisLineLength))
                         {
-                            answer = TryInterpretReturnValue.CreateSuccessDetectStructType(answer.Span.Start, 4, Location.Spot);
+                            return TryInterpretReturnValue.CreateSuccessDetectStructType(start, 4, Location.Spot);
                         }
                         else
                         {
-                            answer.Fail(21);
+                            return start.Fail(21);
                         }
-                        break;
                     default:
-                        answer.Fail(20);
-                        break;
+                        return start.Fail(20);
                 }
         }
 
-        private static void ClassOrContextDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, ushort* ccp)
+        private static TryInterpretReturnValue ClassOrContextDetect(this Caret start, int column, int thisLineLength, ushort* ccp)
         {
             if (column + 4 >= thisLineLength)
-                answer.Fail(13);
+                return start.Fail(13);
             else switch (*++ccp)
                 {
                     case 'o':
                         if (column + 6 < thisLineLength && *++ccp == 'n' && *++ccp == 't' && *++ccp == 'e' && *++ccp == 'x' && *++ccp == 't' && IsNextEndOfLineOrSpaceOrLeftBrace(ccp, column + 6, thisLineLength))
                         {
-                            answer = TryInterpretReturnValue.CreateSuccessDetectStructType(answer.Span.Start, 7, Location.Context);
+                            return TryInterpretReturnValue.CreateSuccessDetectStructType(start, 7, Location.Context);
                         }
                         else
                         {
-                            answer.Fail(12);
+                            return start.Fail(12);
                         }
-                        break;
                     case 'l':
                         if (*++ccp == 'a' && *++ccp == 's' && *++ccp == 's' && IsNextEndOfLineOrSpace(ccp, column + 4, thisLineLength))
                         {
-                            answer = TryInterpretReturnValue.CreateSuccessDetectStructType(answer.Span.Start, 5, Location.Class);
+                            return TryInterpretReturnValue.CreateSuccessDetectStructType(start, 5, Location.Class);
                         }
                         else
                         {
-                            answer.Fail(11);
+                            return start.Fail(11);
                         }
-                        break;
                     default:
-                        answer.Fail(13);
-                        break;
+                        return start.Fail(13);
                 }
         }
 
-        private static void DungeonOrDetailDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, ushort* ccp)
+        private static TryInterpretReturnValue DungeonOrDetailDetect(this Caret start, int column, int thisLineLength, ushort* ccp)
         {
             if (column + 5 >= thisLineLength)
-                answer.Fail(10);
+                return start.Fail(10);
             else switch (*++ccp)
                 {
                     case 'u':
                         if (column + 6 < thisLineLength && *++ccp == 'n' && *++ccp == 'g' && *++ccp == 'e' && *++ccp == 'o' && *++ccp == 'n' && IsNextEndOfLineOrSpace(ccp, column + 6, thisLineLength))
                         {
-                            answer = TryInterpretReturnValue.CreateSuccessDetectStructType(answer.Span.Start, 7, Location.Dungeon);
+                            return TryInterpretReturnValue.CreateSuccessDetectStructType(start, 7, Location.Dungeon);
                         }
                         else
                         {
-                            answer.Fail(8);
+                            return start.Fail(8);
                         }
-                        break;
                     case 'e':
                         if (*++ccp == 't' && *++ccp == 'a' && *++ccp == 'i' && *++ccp == 'l' && IsNextEndOfLineOrSpace(ccp, column + 5, thisLineLength))
                         {
-                            answer = TryInterpretReturnValue.CreateSuccessDetectStructType(answer.Span.Start, 6, Location.Detail);
+                            return TryInterpretReturnValue.CreateSuccessDetectStructType(start, 6, Location.Detail);
                         }
                         else
                         {
-                            answer.Fail(9);
+                            return start.Fail(9);
                         }
-                        break;
                     default:
-                        answer.Fail(10);
-                        break;
+                        return start.Fail(10);
                 }
         }
 
-        private static void EventDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, ushort* ccp)
+        private static TryInterpretReturnValue EventDetect(this Caret start, int column, int thisLineLength, ushort* ccp)
         {
             const int _length = 5;
             const int _len1 = _length - 1;
             if (column + _len1 < thisLineLength && *++ccp == 'v' && *++ccp == 'e' && *++ccp == 'n' && *++ccp == 't' && IsNextEndOfLineOrSpace(ccp, column + _len1, thisLineLength))
             {
-                answer = TryInterpretReturnValue.CreateSuccessDetectStructType(answer.Span.Start, _length, Location.Event);
+                return TryInterpretReturnValue.CreateSuccessDetectStructType(start, _length, Location.Event);
             }
             else
             {
-                answer.Fail(7);
+                return start.Fail(7);
             }
         }
 
-        private static void MoveTypeDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, ushort* ccp)
+        private static TryInterpretReturnValue MoveTypeDetect(this Caret start, int column, int thisLineLength, ushort* ccp)
         {
             const int _length = 8;
             const int _len1 = _length - 1;
             if (column + _len1 < thisLineLength && *++ccp == 'o' && *++ccp == 'v' && *++ccp == 'e' && *++ccp == 't' && *++ccp == 'y' && *++ccp == 'p' && *++ccp == 'e' && IsNextEndOfLineOrSpace(ccp, column + _len1, thisLineLength))
             {
-                answer = TryInterpretReturnValue.CreateSuccessDetectStructType(answer.Span.Start, _length, Location.Movetype);
+                return TryInterpretReturnValue.CreateSuccessDetectStructType(start, _length, Location.Movetype);
             }
             else
             {
-                answer.Fail(6);
+                return start.Fail(6);
             }
         }
 
-        private static void ObjectDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, ushort* ccp)
+        private static TryInterpretReturnValue ObjectDetect(this Caret start, int column, int thisLineLength, ushort* ccp)
         {
             const int _length = 6;
             const int _len1 = _length - 1;
             if (column + _len1 < thisLineLength && *++ccp == 'b' && *++ccp == 'j' && *++ccp == 'e' && *++ccp == 'c' && *++ccp == 't' && IsNextEndOfLineOrSpace(ccp, column + _len1, thisLineLength))
             {
-                answer = TryInterpretReturnValue.CreateSuccessDetectStructType(answer.Span.Start, _length, Location.Object);
+                return TryInterpretReturnValue.CreateSuccessDetectStructType(start, _length, Location.Object);
             }
             else
             {
-                answer.Fail(5);
+                return start.Fail(5);
             }
         }
 
-        private static void FieldDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, ushort* ccp)
+        private static TryInterpretReturnValue FieldDetect(this Caret start, int column, int thisLineLength, ushort* ccp)
         {
             const int _length = 5;
             const int _len1 = _length - 1;
             if (column + _len1 < thisLineLength && *++ccp == 'i' && *++ccp == 'e' && *++ccp == 'l' && *++ccp == 'd' && IsNextEndOfLineOrSpace(ccp, column + _len1, thisLineLength))
             {
-                answer = TryInterpretReturnValue.CreateSuccessDetectStructType(answer.Span.Start, _length, Location.Field);
+                return TryInterpretReturnValue.CreateSuccessDetectStructType(start, _length, Location.Field);
             }
             else
             {
-                answer.Fail(4);
+                return start.Fail(4);
             }
         }
 
-        private static void AttributeDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, ushort* ccp)
+        private static TryInterpretReturnValue AttributeDetect(this Caret start, int column, int thisLineLength, ushort* ccp)
         {
             const int _length = 9;
             if (column + _length - 1 < thisLineLength && *++ccp == 't' && *++ccp == 't' && *++ccp == 'r' && *++ccp == 'i' && *++ccp == 'b' && *++ccp == 'u' && *++ccp == 't' && *++ccp == 'e' && IsNextEndOfLineOrSpace(ccp, column + _length - 1, thisLineLength))
             {
-                answer = TryInterpretReturnValue.CreateSuccessDetectStructType(answer.Span.Start, _length, Location.Attribute);
+                return TryInterpretReturnValue.CreateSuccessDetectStructType(start, _length, Location.Attribute);
             }
             else
             {
-                answer.Fail(3);
+                return start.Fail(3);
             }
         }
 
-        private static void RaceDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, ushort* ccp)
+        private static TryInterpretReturnValue RaceDetect(this Caret start, int column, int thisLineLength, ushort* ccp)
         {
             const int _length = 4;
             if (column + _length - 1 < thisLineLength && *++ccp == 'a' && *++ccp == 'c' && *++ccp == 'e' && IsNextEndOfLineOrSpace(ccp, column + _length - 1, thisLineLength))
             {
-                answer = TryInterpretReturnValue.CreateSuccessDetectStructType(answer.Span.Start, _length, Location.Race);
+                return TryInterpretReturnValue.CreateSuccessDetectStructType(start, _length, Location.Race);
             }
             else
             {
-                answer.Fail(2);
+                return start.Fail(2);
             }
         }
 
-        private static void UnitDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, ushort* ccp)
+        private static TryInterpretReturnValue UnitDetect(this Caret start, int column, int thisLineLength, ushort* ccp)
         {
             const int _length = 4;
             if (column + _length - 1 < thisLineLength && *++ccp == 'n' && *++ccp == 'i' && *++ccp == 't' && IsNextEndOfLineOrSpace(ccp, column + _length - 1, thisLineLength))
             {
-                answer.Success(1, _length);
-                answer = TryInterpretReturnValue.CreateSuccessDetectStructType(answer.Span.Start, _length, Location.Unit);
+                return TryInterpretReturnValue.CreateSuccessDetectStructType(start, _length, Location.Unit);
             }
             else
             {
-                answer.Fail(1);
+                return start.Fail(1);
             }
         }
 
-        private static void PowerDetect(this ref TryInterpretReturnValue answer, int column, int thisLineLength, ushort* ccp)
+        private static TryInterpretReturnValue PowerDetect(this Caret start, int column, int thisLineLength, ushort* ccp)
         {
             const int _length = 5;
             if (column + _length - 1 < thisLineLength && *++ccp == 'o' && *++ccp == 'w' && *++ccp == 'e' && *++ccp == 'r' && IsNextEndOfLineOrSpace(ccp, column + _length - 1, thisLineLength))
             {
-                answer = TryInterpretReturnValue.CreateSuccessDetectStructType(answer.Span.Start, _length, Location.Power);
+                return TryInterpretReturnValue.CreateSuccessDetectStructType(start, _length, Location.Power);
             }
             else
             {
-                answer.Fail(0);
+                return start.Fail(0);
             }
         }
 
-        private static void Fail(this ref TryInterpretReturnValue answer, byte errorSubData)
-        {
-            answer.Status = 0;
-            answer.DataIndex = ErrorSentence.StructKindInterpretError;
-            answer.SubDataIndex = errorSubData;
-        }
+        private static TryInterpretReturnValue Fail(this Caret start, byte errorSubData) => new TryInterpretReturnValue(start, ErrorSentence.StructKindInterpretError, errorSubData, InterpreterStatus.Error);
 
-        private static void Success(this ref TryInterpretReturnValue answer, byte successSubData, int length)
-        {
-            answer.Status = InterpreterStatus.Success;
-            answer.DataIndex = SuccessSentence.StructKindInterpretSuccess;
-            answer.SubDataIndex = successSubData;
-            answer.Span.Length = length;
-        }
+        private static TryInterpretReturnValue Success(this Caret start, byte successSubData, int length) => new TryInterpretReturnValue(new Span(start, length), SuccessSentence.StructKindInterpretSuccess, successSubData, InterpreterStatus.Success);
     }
 }

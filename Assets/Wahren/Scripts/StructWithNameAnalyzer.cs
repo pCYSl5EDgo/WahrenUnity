@@ -11,7 +11,7 @@ namespace pcysl5edgo.Wahren
             ref var span = ref answer.Span;
             ref int length = ref span.Length;
             length = 0;
-            var currentLine = file.Lines[span.Line];
+            var currentLine = file.Contents + file.LineStarts[span.Line];
             bool onlyDigit = true;
             for (int thisLineLength = file.LineLengths[span.Line], column = span.Column; column < thisLineLength; column++)
             {
@@ -118,16 +118,16 @@ namespace pcysl5edgo.Wahren
             return answer;
         }
 
-        public static TryInterpretReturnValue TryGetParentStructName(this ref TextFile file, Caret start)
+        public static TryInterpretReturnValue TryGetParentStructName(TextFile file, Caret start)
         {
             file.SkipWhiteSpace(ref start);
             ref var column = ref start.Column;
-            switch (file.Lines[start.Line][column])
+            switch ((file.Contents + file.LineStarts[start.Line])[column])
             {
                 case (ushort)':':
                     column++;
                     file.SkipWhiteSpace(ref start);
-                    return GetParentStructNameInternal(ref file, start);
+                    return GetParentStructNameInternal(file.Contents + file.LineStarts[start.Line], file.LineLengths[start.Line] - start.Column, start);
                 case (ushort)'{':
                     return new TryInterpretReturnValue(start, 0, InterpreterStatus.Success); ;
                 default:
@@ -135,18 +135,17 @@ namespace pcysl5edgo.Wahren
             }
         }
 
-        private static TryInterpretReturnValue GetParentStructNameInternal(ref TextFile file, Caret caret)
+        private static TryInterpretReturnValue GetParentStructNameInternal(ushort* start, int restLength, Caret caret)
         {
-            var currentLine = file.Lines[caret.Line];
             bool onlyDigit = true;
             Span span = new Span
             {
                 Start = caret,
                 Length = 0,
             };
-            for (int thisLineLength = file.LineLengths[span.Line], column = span.Column; column < thisLineLength; column++)
+            for (int i = 0; i < restLength; i++)
             {
-                switch (currentLine[column])
+                switch (start[i])
                 {
                     #region Alphabet
                     case (ushort)'a':

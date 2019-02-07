@@ -6,10 +6,10 @@ namespace pcysl5edgo.Wahren
 {
     public static unsafe class VerifyUtility
     {
-        public static TryInterpretReturnValue IsCurrentCharEquals(this ref TextFile file, Caret caret, ushort c)
+        public static TryInterpretReturnValue IsCurrentCharEquals(this Caret caret, ushort cLeft, ushort cRight)
         {
 
-            if (file.CurrentChar(caret) == c)
+            if (cLeft == cRight)
             {
                 return new TryInterpretReturnValue(new Span(caret, 1), SuccessSentence.LeftBraceConfirmationSuccess, InterpreterStatus.Success);
             }
