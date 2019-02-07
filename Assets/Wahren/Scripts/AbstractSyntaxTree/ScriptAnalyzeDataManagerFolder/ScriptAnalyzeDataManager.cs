@@ -2,10 +2,11 @@
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
+using System;
 
 namespace pcysl5edgo.Wahren.AST
 {
-    public unsafe sealed class ScriptAnalyzeDataManager : System.IDisposable
+    public unsafe sealed partial class ScriptAnalyzeDataManager : System.IDisposable
     {
         private System.Text.StringBuilder buffer = new System.Text.StringBuilder(4096);
         internal InterpreterStatus* Status;
