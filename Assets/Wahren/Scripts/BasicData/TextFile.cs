@@ -5,6 +5,20 @@ using Unity.Collections.LowLevel.Unsafe;
 
 namespace pcysl5edgo.Wahren
 {
+    public unsafe struct BurstFile
+    {
+        public int FilePathId;
+        [NativeDisableUnsafePtrRestriction] public IntPtr Lines;
+        [NativeDisableUnsafePtrRestriction] public int* LineLengths;
+        public int LineCount;
+        public static implicit operator BurstFile(in TextFile file) => new BurstFile
+        {
+            FilePathId = file.FilePathId,
+            LineCount = file.LineCount,
+            Lines = (IntPtr)file.Lines,
+            LineLengths = file.LineLengths,
+        };
+    }
     public unsafe struct TextFile : IDisposable
     {
         public int FilePathId;

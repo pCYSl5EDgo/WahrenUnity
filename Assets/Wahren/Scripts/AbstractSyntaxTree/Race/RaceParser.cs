@@ -88,7 +88,7 @@ namespace pcysl5edgo.Wahren.AST
 
         private static TryInterpretReturnValue NameDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref ASTValueTypePairList list)
         {
-            char* cs = file.CurrentCharPointer(current);
+            var cs = file.CurrentCharPointer(current);
             var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, 0, InterpreterStatus.Error);
             int thisLineLength = file.CurrentLineLength(current);
             if (current.Column + 3 >= thisLineLength || *++cs != 'a' || *++cs != 'm' || *++cs != 'e')
@@ -128,7 +128,7 @@ namespace pcysl5edgo.Wahren.AST
 
         private static TryInterpretReturnValue MoveTypeDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref ASTValueTypePairList listTemp)
         {
-            char* cs = file.CurrentCharPointer(current);
+            var cs = file.CurrentCharPointer(current);
             var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, InterpreterStatus.Error);
             int thisLineLength = file.CurrentLineLength(current);
             if (current.Column + 7 >= thisLineLength || *++cs != 'o' || *++cs != 'v' || *++cs != 'e' || *++cs != 't' || *++cs != 'y' || *++cs != 'p' || *++cs != 'e')
@@ -170,7 +170,7 @@ namespace pcysl5edgo.Wahren.AST
 
         private static TryInterpretReturnValue ConstiDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref ASTValueTypePairList listTemp, ref IdentifierNumberPairList pairList)
         {
-            char* cs = file.CurrentCharPointer(current);
+            var cs = file.CurrentCharPointer(current);
             var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, InterpreterStatus.Error);
             int thisLineLength = file.CurrentLineLength(current);
             if (current.Column + 5 >= thisLineLength || *++cs != 'o' || *++cs != 'n' || *++cs != 's' || *++cs != 't' || *++cs != 'i')
@@ -229,7 +229,7 @@ namespace pcysl5edgo.Wahren.AST
 
         private static TryInterpretReturnValue BraveDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref ASTValueTypePairList listTemp)
         {
-            char* cs = file.CurrentCharPointer(current);
+            var cs = file.CurrentCharPointer(current);
             var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, InterpreterStatus.Error);
             int thisLineLength = file.CurrentLineLength(current);
             if (current.Column + 4 >= thisLineLength || *++cs != 'r' || *++cs != 'a' || *++cs != 'v' || *++cs != 'e')
@@ -270,7 +270,7 @@ namespace pcysl5edgo.Wahren.AST
 
         private static TryInterpretReturnValue AlignDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref ASTValueTypePairList listTemp)
         {
-            char* cs = file.CurrentCharPointer(current);
+            var cs = file.CurrentCharPointer(current);
             var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, InterpreterStatus.Error);
             int thisLineLength = file.CurrentLineLength(current);
             if (current.Column + 4 >= thisLineLength || *++cs != 'l' || *++cs != 'i' || *++cs != 'g' || *++cs != 'n')

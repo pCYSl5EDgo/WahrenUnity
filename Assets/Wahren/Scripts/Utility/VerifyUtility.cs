@@ -6,7 +6,7 @@ namespace pcysl5edgo.Wahren
 {
     public static unsafe class VerifyUtility
     {
-        public static TryInterpretReturnValue IsCurrentCharEquals(this ref TextFile file, Caret caret, char c)
+        public static TryInterpretReturnValue IsCurrentCharEquals(this ref TextFile file, Caret caret, ushort c)
         {
 
             if (file.CurrentChar(caret) == c)

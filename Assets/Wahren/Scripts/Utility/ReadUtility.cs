@@ -35,60 +35,60 @@ namespace pcysl5edgo.Wahren
                             switch (file.Lines[raw][column])
                             {
                                 #region Alphabet
-                                case 'a':
-                                case 'b':
-                                case 'c':
-                                case 'd':
-                                case 'e':
-                                case 'f':
-                                case 'g':
-                                case 'h':
-                                case 'i':
-                                case 'j':
-                                case 'k':
-                                case 'l':
-                                case 'm':
-                                case 'n':
-                                case 'o':
-                                case 'p':
-                                case 'q':
-                                case 'r':
-                                case 's':
-                                case 't':
-                                case 'u':
-                                case 'v':
-                                case 'w':
-                                case 'x':
-                                case 'y':
-                                case 'z':
-                                case 'A':
-                                case 'B':
-                                case 'C':
-                                case 'D':
-                                case 'E':
-                                case 'F':
-                                case 'G':
-                                case 'H':
-                                case 'I':
-                                case 'J':
-                                case 'K':
-                                case 'L':
-                                case 'M':
-                                case 'N':
-                                case 'O':
-                                case 'P':
-                                case 'Q':
-                                case 'R':
-                                case 'S':
-                                case 'T':
-                                case 'U':
-                                case 'V':
-                                case 'W':
-                                case 'X':
-                                case 'Y':
-                                case 'Z':
+                                case (ushort)'a':
+                                case (ushort)'b':
+                                case (ushort)'c':
+                                case (ushort)'d':
+                                case (ushort)'e':
+                                case (ushort)'f':
+                                case (ushort)'g':
+                                case (ushort)'h':
+                                case (ushort)'i':
+                                case (ushort)'j':
+                                case (ushort)'k':
+                                case (ushort)'l':
+                                case (ushort)'m':
+                                case (ushort)'n':
+                                case (ushort)'o':
+                                case (ushort)'p':
+                                case (ushort)'q':
+                                case (ushort)'r':
+                                case (ushort)'s':
+                                case (ushort)'t':
+                                case (ushort)'u':
+                                case (ushort)'v':
+                                case (ushort)'w':
+                                case (ushort)'x':
+                                case (ushort)'y':
+                                case (ushort)'z':
+                                case (ushort)'A':
+                                case (ushort)'B':
+                                case (ushort)'C':
+                                case (ushort)'D':
+                                case (ushort)'E':
+                                case (ushort)'F':
+                                case (ushort)'G':
+                                case (ushort)'H':
+                                case (ushort)'I':
+                                case (ushort)'J':
+                                case (ushort)'K':
+                                case (ushort)'L':
+                                case (ushort)'M':
+                                case (ushort)'N':
+                                case (ushort)'O':
+                                case (ushort)'P':
+                                case (ushort)'Q':
+                                case (ushort)'R':
+                                case (ushort)'S':
+                                case (ushort)'T':
+                                case (ushort)'U':
+                                case (ushort)'V':
+                                case (ushort)'W':
+                                case (ushort)'X':
+                                case (ushort)'Y':
+                                case (ushort)'Z':
                                 #endregion
-                                case '_':
+                                case (ushort)'_':
                                     state = 1;
                                     span = new Span(current, 1);
                                     isOnlyDigit = false;
@@ -98,16 +98,16 @@ namespace pcysl5edgo.Wahren
                                     }
                                     break;
                                 #region Digit
-                                case '0':
-                                case '1':
-                                case '2':
-                                case '3':
-                                case '4':
-                                case '5':
-                                case '6':
-                                case '7':
-                                case '8':
-                                case '9':
+                                case (ushort)'0':
+                                case (ushort)'1':
+                                case (ushort)'2':
+                                case (ushort)'3':
+                                case (ushort)'4':
+                                case (ushort)'5':
+                                case (ushort)'6':
+                                case (ushort)'7':
+                                case (ushort)'8':
+                                case (ushort)'9':
                                     #endregion
                                     state = 1;
                                     isOnlyDigit = true;
@@ -117,8 +117,8 @@ namespace pcysl5edgo.Wahren
                                         tmpList.Lengthen(Allocator.Temp);
                                     }
                                     break;
-                                case ' ':
-                                case '\t':
+                                case (ushort)' ':
+                                case (ushort)'\t':
                                     break;
                                 default:
                                     goto ERROR;
@@ -128,83 +128,83 @@ namespace pcysl5edgo.Wahren
                             switch (file.Lines[raw][column])
                             {
                                 #region Alphabet
-                                case 'a':
-                                case 'b':
-                                case 'c':
-                                case 'd':
-                                case 'e':
-                                case 'f':
-                                case 'g':
-                                case 'h':
-                                case 'i':
-                                case 'j':
-                                case 'k':
-                                case 'l':
-                                case 'm':
-                                case 'n':
-                                case 'o':
-                                case 'p':
-                                case 'q':
-                                case 'r':
-                                case 's':
-                                case 't':
-                                case 'u':
-                                case 'v':
-                                case 'w':
-                                case 'x':
-                                case 'y':
-                                case 'z':
-                                case 'A':
-                                case 'B':
-                                case 'C':
-                                case 'D':
-                                case 'E':
-                                case 'F':
-                                case 'G':
-                                case 'H':
-                                case 'I':
-                                case 'J':
-                                case 'K':
-                                case 'L':
-                                case 'M':
-                                case 'N':
-                                case 'O':
-                                case 'P':
-                                case 'Q':
-                                case 'R':
-                                case 'S':
-                                case 'T':
-                                case 'U':
-                                case 'V':
-                                case 'W':
-                                case 'X':
-                                case 'Y':
-                                case 'Z':
+                                case (ushort)'a':
+                                case (ushort)'b':
+                                case (ushort)'c':
+                                case (ushort)'d':
+                                case (ushort)'e':
+                                case (ushort)'f':
+                                case (ushort)'g':
+                                case (ushort)'h':
+                                case (ushort)'i':
+                                case (ushort)'j':
+                                case (ushort)'k':
+                                case (ushort)'l':
+                                case (ushort)'m':
+                                case (ushort)'n':
+                                case (ushort)'o':
+                                case (ushort)'p':
+                                case (ushort)'q':
+                                case (ushort)'r':
+                                case (ushort)'s':
+                                case (ushort)'t':
+                                case (ushort)'u':
+                                case (ushort)'v':
+                                case (ushort)'w':
+                                case (ushort)'x':
+                                case (ushort)'y':
+                                case (ushort)'z':
+                                case (ushort)'A':
+                                case (ushort)'B':
+                                case (ushort)'C':
+                                case (ushort)'D':
+                                case (ushort)'E':
+                                case (ushort)'F':
+                                case (ushort)'G':
+                                case (ushort)'H':
+                                case (ushort)'I':
+                                case (ushort)'J':
+                                case (ushort)'K':
+                                case (ushort)'L':
+                                case (ushort)'M':
+                                case (ushort)'N':
+                                case (ushort)'O':
+                                case (ushort)'P':
+                                case (ushort)'Q':
+                                case (ushort)'R':
+                                case (ushort)'S':
+                                case (ushort)'T':
+                                case (ushort)'U':
+                                case (ushort)'V':
+                                case (ushort)'W':
+                                case (ushort)'X':
+                                case (ushort)'Y':
+                                case (ushort)'Z':
                                 #endregion
-                                case '_':
+                                case (ushort)'_':
                                     span.Length++;
                                     isOnlyDigit = false;
                                     break;
                                 #region Digit
-                                case '0':
-                                case '1':
-                                case '2':
-                                case '3':
-                                case '4':
-                                case '5':
-                                case '6':
-                                case '7':
-                                case '8':
-                                case '9':
+                                case (ushort)'0':
+                                case (ushort)'1':
+                                case (ushort)'2':
+                                case (ushort)'3':
+                                case (ushort)'4':
+                                case (ushort)'5':
+                                case (ushort)'6':
+                                case (ushort)'7':
+                                case (ushort)'8':
+                                case (ushort)'9':
                                     #endregion
                                     span.Length++;
                                     break;
-                                case ' ':
-                                case '\t':
+                                case (ushort)' ':
+                                case (ushort)'\t':
                                     tmpList.Values[tmpList.Length - 1].Span = span;
                                     state = 2;
                                     break;
-                                case '*':
+                                case (ushort)'*':
                                     tmpList.Values[tmpList.Length - 1].Span = span;
                                     state = 3;
                                     if (isOnlyDigit)
@@ -216,7 +216,7 @@ namespace pcysl5edgo.Wahren
                                     column++;
                                     file.SkipWhiteSpace(ref current);
                                     goto PARSE;
-                                case ',':
+                                case (ushort)',':
                                     tmpList.Values[tmpList.Length - 1] = new IdentifierNumberPair(span, 0, numberSpan);
                                     state = 0;
                                     column++;
@@ -229,15 +229,15 @@ namespace pcysl5edgo.Wahren
                         case 2: // Seek for '*'.
                             switch (file.Lines[raw][column])
                             {
-                                case ' ':
-                                case '\t':
+                                case (ushort)' ':
+                                case (ushort)'\t':
                                     break;
-                                case '*':
+                                case (ushort)'*':
                                     state = 3;
                                     column++;
                                     file.SkipWhiteSpace(ref current);
                                     goto PARSE;
-                                case ',':
+                                case (ushort)',':
                                     tmpList.Values[tmpList.Length - 1].Number = 0;
                                     tmpList.Values[tmpList.Length - 1].NumberSpan = new Span { Start = current, Length = 0 };
                                     state = 0;
@@ -252,29 +252,29 @@ namespace pcysl5edgo.Wahren
                             switch (file.Lines[raw][column])
                             {
                                 #region Digit
-                                case '0':
-                                case '1':
-                                case '2':
-                                case '3':
-                                case '4':
-                                case '5':
-                                case '6':
-                                case '7':
-                                case '8':
-                                case '9':
+                                case (ushort)'0':
+                                case (ushort)'1':
+                                case (ushort)'2':
+                                case (ushort)'3':
+                                case (ushort)'4':
+                                case (ushort)'5':
+                                case (ushort)'6':
+                                case (ushort)'7':
+                                case (ushort)'8':
+                                case (ushort)'9':
                                     #endregion
                                     state = 4;
                                     number = file.Lines[raw][column] - '0';
                                     numberSpan.Start = current;
                                     numberSpan.Length = 1;
                                     break;
-                                case '-':
+                                case (ushort)'-':
                                     state = 5;
                                     numberSpan.Start = current;
                                     numberSpan.Length = 1;
                                     break;
-                                case ' ':
-                                case '\t':
+                                case (ushort)' ':
+                                case (ushort)'\t':
                                     break;
                                 default:
                                     goto ERROR;
@@ -284,28 +284,28 @@ namespace pcysl5edgo.Wahren
                             switch (file.Lines[raw][column])
                             {
                                 #region Digit
-                                case '0':
-                                case '1':
-                                case '2':
-                                case '3':
-                                case '4':
-                                case '5':
-                                case '6':
-                                case '7':
-                                case '8':
-                                case '9':
+                                case (ushort)'0':
+                                case (ushort)'1':
+                                case (ushort)'2':
+                                case (ushort)'3':
+                                case (ushort)'4':
+                                case (ushort)'5':
+                                case (ushort)'6':
+                                case (ushort)'7':
+                                case (ushort)'8':
+                                case (ushort)'9':
                                     #endregion
                                     number *= 10;
                                     number += file.Lines[raw][column] - '0';
                                     numberSpan.Length++;
                                     break;
-                                case ' ':
-                                case '\t':
+                                case (ushort)' ':
+                                case (ushort)'\t':
                                     state = 6;
                                     tmpList.Values[tmpList.Length - 1].Number = number;
                                     tmpList.Values[tmpList.Length - 1].NumberSpan = numberSpan;
                                     break;
-                                case ',':
+                                case (ushort)',':
                                     tmpList.Values[tmpList.Length - 1].Number = number;
                                     state = 0;
                                     column++;
@@ -320,15 +320,15 @@ namespace pcysl5edgo.Wahren
                             switch (file.Lines[raw][column])
                             {
                                 #region Digit
-                                case '1':
-                                case '2':
-                                case '3':
-                                case '4':
-                                case '5':
-                                case '6':
-                                case '7':
-                                case '8':
-                                case '9':
+                                case (ushort)'1':
+                                case (ushort)'2':
+                                case (ushort)'3':
+                                case (ushort)'4':
+                                case (ushort)'5':
+                                case (ushort)'6':
+                                case (ushort)'7':
+                                case (ushort)'8':
+                                case (ushort)'9':
                                     #endregion
                                     number = -file.Lines[raw][column] + '0';
                                     state = 4;
@@ -341,7 +341,7 @@ namespace pcysl5edgo.Wahren
                         case 6: // Seek for ','
                             switch (file.Lines[raw][column])
                             {
-                                case ',':
+                                case (ushort)',':
                                     state = 0;
                                     number = defaultValue;
                                     span = new Span { Start = current, Length = 0 };
@@ -349,8 +349,8 @@ namespace pcysl5edgo.Wahren
                                     column++;
                                     file.SkipWhiteSpace(ref current);
                                     goto PARSE;
-                                case ' ':
-                                case '\t':
+                                case (ushort)' ':
+                                case (ushort)'\t':
                                     break;
                                 default:
                                     goto ERROR;
@@ -396,7 +396,7 @@ namespace pcysl5edgo.Wahren
         }
         public static TryInterpretReturnValue TryReadIdentifierNotEmpty(this ref TextFile file, Caret current)
         {
-            var cptr = (ushort*)file.CurrentCharPointer(current);
+            var cptr = file.CurrentCharPointer(current);
             Span span = new Span(current, 0);
             bool onlyDigit = true;
             for (int i = current.Column, thisLineLength = file.CurrentLineLength(current); i < thisLineLength; i++, cptr++)
@@ -404,78 +404,78 @@ namespace pcysl5edgo.Wahren
                 switch (*cptr)
                 {
                     #region Alphabet
-                    case 'a':
-                    case 'b':
-                    case 'c':
-                    case 'd':
-                    case 'e':
-                    case 'f':
-                    case 'g':
-                    case 'h':
-                    case 'i':
-                    case 'j':
-                    case 'k':
-                    case 'l':
-                    case 'm':
-                    case 'n':
-                    case 'o':
-                    case 'p':
-                    case 'q':
-                    case 'r':
-                    case 's':
-                    case 't':
-                    case 'u':
-                    case 'v':
-                    case 'w':
-                    case 'x':
-                    case 'y':
-                    case 'z':
-                    case 'A':
-                    case 'B':
-                    case 'C':
-                    case 'D':
-                    case 'E':
-                    case 'F':
-                    case 'G':
-                    case 'H':
-                    case 'I':
-                    case 'J':
-                    case 'K':
-                    case 'L':
-                    case 'M':
-                    case 'N':
-                    case 'O':
-                    case 'P':
-                    case 'Q':
-                    case 'R':
-                    case 'S':
-                    case 'T':
-                    case 'U':
-                    case 'V':
-                    case 'W':
-                    case 'X':
-                    case 'Y':
-                    case 'Z':
+                    case (ushort)'a':
+                    case (ushort)'b':
+                    case (ushort)'c':
+                    case (ushort)'d':
+                    case (ushort)'e':
+                    case (ushort)'f':
+                    case (ushort)'g':
+                    case (ushort)'h':
+                    case (ushort)'i':
+                    case (ushort)'j':
+                    case (ushort)'k':
+                    case (ushort)'l':
+                    case (ushort)'m':
+                    case (ushort)'n':
+                    case (ushort)'o':
+                    case (ushort)'p':
+                    case (ushort)'q':
+                    case (ushort)'r':
+                    case (ushort)'s':
+                    case (ushort)'t':
+                    case (ushort)'u':
+                    case (ushort)'v':
+                    case (ushort)'w':
+                    case (ushort)'x':
+                    case (ushort)'y':
+                    case (ushort)'z':
+                    case (ushort)'A':
+                    case (ushort)'B':
+                    case (ushort)'C':
+                    case (ushort)'D':
+                    case (ushort)'E':
+                    case (ushort)'F':
+                    case (ushort)'G':
+                    case (ushort)'H':
+                    case (ushort)'I':
+                    case (ushort)'J':
+                    case (ushort)'K':
+                    case (ushort)'L':
+                    case (ushort)'M':
+                    case (ushort)'N':
+                    case (ushort)'O':
+                    case (ushort)'P':
+                    case (ushort)'Q':
+                    case (ushort)'R':
+                    case (ushort)'S':
+                    case (ushort)'T':
+                    case (ushort)'U':
+                    case (ushort)'V':
+                    case (ushort)'W':
+                    case (ushort)'X':
+                    case (ushort)'Y':
+                    case (ushort)'Z':
                     #endregion
-                    case '_':
+                    case (ushort)'_':
                         onlyDigit = false;
                         span.Length++;
                         break;
                     #region Digit
-                    case '0':
-                    case '1':
-                    case '2':
-                    case '3':
-                    case '4':
-                    case '5':
-                    case '6':
-                    case '7':
-                    case '8':
-                    case '9':
+                    case (ushort)'0':
+                    case (ushort)'1':
+                    case (ushort)'2':
+                    case (ushort)'3':
+                    case (ushort)'4':
+                    case (ushort)'5':
+                    case (ushort)'6':
+                    case (ushort)'7':
+                    case (ushort)'8':
+                    case (ushort)'9':
                         #endregion
                         span.Length++;
                         break;
-                    case '@':
+                    case (ushort)'@':
                         if (span.Length++ != 0 || i != thisLineLength - 1)
                         {
                             span.Length = thisLineLength - current.Column;
@@ -493,22 +493,22 @@ namespace pcysl5edgo.Wahren
         public static TryInterpretReturnValue TryReadNumber(this ref TextFile file, Caret current, out long value)
         {
             value = 0;
-            var cptr = (ushort*)file.CurrentCharPointer(current);
+            var cptr = file.CurrentCharPointer(current);
             Span span = new Span(current, 0);
             for (int i = current.Column, thisLineLength = file.CurrentLineLength(current); i < thisLineLength; i++, cptr++)
             {
                 switch (*cptr)
                 {
-                    case '0':
-                    case '1':
-                    case '2':
-                    case '3':
-                    case '4':
-                    case '5':
-                    case '6':
-                    case '7':
-                    case '8':
-                    case '9':
+                    case (ushort)'0':
+                    case (ushort)'1':
+                    case (ushort)'2':
+                    case (ushort)'3':
+                    case (ushort)'4':
+                    case (ushort)'5':
+                    case (ushort)'6':
+                    case (ushort)'7':
+                    case (ushort)'8':
+                    case (ushort)'9':
                         value *= 10;
                         value += cptr[0] - '0';
                         span.Length++;
