@@ -489,26 +489,80 @@ namespace pcysl5edgo.Wahren
             value = 0;
             var cptr = file.CurrentCharPointer(current);
             Span span = new Span(current, 0);
+            int state = 0;
             for (int i = current.Column, thisLineLength = file.CurrentLineLength(current); i < thisLineLength; i++, cptr++)
             {
-                switch (*cptr)
+                switch (state)
                 {
-                    case (ushort)'0':
-                    case (ushort)'1':
-                    case (ushort)'2':
-                    case (ushort)'3':
-                    case (ushort)'4':
-                    case (ushort)'5':
-                    case (ushort)'6':
-                    case (ushort)'7':
-                    case (ushort)'8':
-                    case (ushort)'9':
-                        value *= 10;
-                        value += cptr[0] - '0';
-                        span.Length++;
+                    case 0:
+                        switch (*cptr)
+                        {
+                            case (ushort)'0':
+                            case (ushort)'1':
+                            case (ushort)'2':
+                            case (ushort)'3':
+                            case (ushort)'4':
+                            case (ushort)'5':
+                            case (ushort)'6':
+                            case (ushort)'7':
+                            case (ushort)'8':
+                            case (ushort)'9':
+                                state = 1;
+                                value = *cptr - '0';
+                                span.Length++;
+                                span.Column = i;
+                                break;
+                            case (ushort)'-':
+                                state = 2;
+                                span.Length++;
+                                span.Column = i;
+                                break;
+                            default:
+                                return new TryInterpretReturnValue(new Span(file.FilePathId, current.Line, i, 1), ErrorSentence.NotNumberError, InterpreterStatus.Error);
+                        }
                         break;
-                    default:
-                        return new TryInterpretReturnValue(new Span(file.FilePathId, current.Line, i, 1), ErrorSentence.NotNumberError, InterpreterStatus.Error);
+                    case 1:
+                        switch (*cptr)
+                        {
+                            case (ushort)'0':
+                            case (ushort)'1':
+                            case (ushort)'2':
+                            case (ushort)'3':
+                            case (ushort)'4':
+                            case (ushort)'5':
+                            case (ushort)'6':
+                            case (ushort)'7':
+                            case (ushort)'8':
+                            case (ushort)'9':
+                                span.Length++;
+                                value *= 10;
+                                value += *cptr - '0';
+                                break;
+                            default:
+                                return new TryInterpretReturnValue(new Span(file.FilePathId, current.Line, i, 1), ErrorSentence.NotNumberError, InterpreterStatus.Error);
+                        }
+                        break;
+                    case 2:
+                        switch (*cptr)
+                        {
+                            case (ushort)'0':
+                            case (ushort)'1':
+                            case (ushort)'2':
+                            case (ushort)'3':
+                            case (ushort)'4':
+                            case (ushort)'5':
+                            case (ushort)'6':
+                            case (ushort)'7':
+                            case (ushort)'8':
+                            case (ushort)'9':
+                                span.Length++;
+                                value *= 10;
+                                value -= *cptr - '0';
+                                break;
+                            default:
+                                return new TryInterpretReturnValue(new Span(file.FilePathId, current.Line, i, 1), ErrorSentence.NotNumberError, InterpreterStatus.Error);
+                        }
+                        break;
                 }
             }
             return new TryInterpretReturnValue(span, SuccessSentence.NumberInterpretSuccess, InterpreterStatus.Success);
