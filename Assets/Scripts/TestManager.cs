@@ -9,6 +9,8 @@ using pcysl5edgo.Wahren.AST;
 public class TestManager : MonoBehaviour
 {
     [SerializeField] public string ScriptDirectoryFullPath;
+    [SerializeField] public bool IsDebug;
+    [SerializeField] public bool IsUtf16;
     int frame;
     ScriptAnalyzeDataManager scriptManager;
     bool firstFrameDone = true;
@@ -31,7 +33,7 @@ public class TestManager : MonoBehaviour
     {
         if (scriptManager is null)
         {
-            scriptManager = new ScriptAnalyzeDataManager(new DirectoryInfo(ScriptDirectoryFullPath).GetFiles("*.dat", SearchOption.AllDirectories), true, false);
+            scriptManager = new ScriptAnalyzeDataManager(new DirectoryInfo(ScriptDirectoryFullPath).GetFiles("*.dat", SearchOption.AllDirectories), IsUtf16, IsDebug);
             return;
         }
         switch (scriptManager.CurrentStage)

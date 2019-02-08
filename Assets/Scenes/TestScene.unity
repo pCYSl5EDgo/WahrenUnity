@@ -217,7 +217,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac39d1e7ae42543429bc9444ae1eadfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ScriptDirectoryFullPath: C:\Users\I\Saved Games\kinotake_war\kinotake\script
+  ScriptDirectoryFullPath: C:\Users\I\Saved Games\Vahren\a_default\script
+  IsDebug: 0
+  IsUtf16: 0
 --- !u!1 &1437702831
 GameObject:
   m_ObjectHideFlags: 0
