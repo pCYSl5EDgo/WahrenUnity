@@ -66,7 +66,6 @@ namespace pcysl5edgo.Wahren.AST
                 }
                 _currentStage = Stage.Done;
             }
-            private static readonly Encoding encoding = Encoding.GetEncoding(932);
 
             private void ReadAsyncUpdate()
             {
@@ -86,7 +85,7 @@ namespace pcysl5edgo.Wahren.AST
                             }
                             else
                             {
-                                FilesPtr[0][i] = TextFile.FromRawTextFileOtherEncoding(RawFiles[i], encoding);
+                                FilesPtr[0][i] = TextFile.FromRawTextFileCp932(RawFiles[i]);
                                 DeleteCommentJobHandles[i] = DeleteCommentJob.Schedule(FilesPtr[0] + i, IsDebug);
                             }
                             break;

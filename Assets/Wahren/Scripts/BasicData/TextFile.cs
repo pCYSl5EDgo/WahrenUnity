@@ -48,12 +48,13 @@ namespace pcysl5edgo.Wahren
             return answer;
         }
 
-        public static TextFile FromRawTextFileOtherEncoding(RawTextFile file, Encoding encoding)
+        public static TextFile FromRawTextFileCp932(RawTextFile file)
         {
             if (file.IsCreated)
             {
-                var answer = new TextFile(file.FilePathId, encoding.GetCharCount(file.Contents, (int)file.Length));
-                encoding.GetChars(file.Contents, (int)file.Length, (char*)answer.Contents, answer.Length);
+                var rawFileLength = (ulong)file.Length;
+                var answer = new TextFile(file.FilePathId, (int)pcysl5edgo.BurstEncoding.Cp932Decoder.GetCharCount(file.Contents, rawFileLength));
+                BurstEncoding.Cp932Decoder.GetChars(file.Contents, rawFileLength, answer.Contents);
                 answer.Split();
                 return answer;
             }

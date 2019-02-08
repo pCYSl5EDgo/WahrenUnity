@@ -107,6 +107,7 @@ namespace pcysl5edgo.Wahren.AST
                 }
                 if (result.IsPending)
                 {
+                    UnityEngine.Debug.Log("PENDING");
                     switch ((Location)(result.DataIndex >> 24))
                     {
                         case Location.Race:

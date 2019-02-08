@@ -10,6 +10,7 @@
     "com.unity.render-pipelines.lightweight": "5.2.3",
     "com.unity.textmeshpro": "1.3.0",
     "com.unity.timeline": "1.0.0",
+    "jp.pcysl5edgo.burstdecodercp932": "https://github.com/pCYSl5EDgo/StaticDecoderCp932.git",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.animation": "1.0.0",
     "com.unity.modules.assetbundle": "1.0.0",
@@ -40,5 +41,11 @@
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0"
+  },
+  "lock": {
+    "jp.pcysl5edgo.burstdecodercp932": {
+      "hash": "89c7af9577f810e5699f83dd3b83d483610f38a3",
+      "revision": "HEAD"
+    }
   }
 }
