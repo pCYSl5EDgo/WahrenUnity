@@ -76,7 +76,7 @@ namespace pcysl5edgo.Wahren
             }
             else
             {
-                buffer.Append('@').Append(files, tree.ParentName).Append("\n{");
+                buffer.Append(" : ").Append(files, tree.ParentName).Append("\n{");
             }
             for (int i = tree.Start, end = tree.Start + tree.Length; i < end; i++)
             {
