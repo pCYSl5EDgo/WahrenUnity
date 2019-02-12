@@ -74,6 +74,7 @@ namespace pcysl5edgo.Wahren.AST
 
         private void ParseUpdate()
         {
+            // 発行されているJob全てを調べ全てが完了しているならば次の処理へ、終わっていなければ次のフレームに投げる
             bool isAnyFail = false;
             for (int i = handles.Length; --i >= 0;)
             {
@@ -92,6 +93,7 @@ namespace pcysl5edgo.Wahren.AST
             {
                 return;
             }
+            // ParseJobを読み解き、Pending状態があるならそれを解消して再びJobを発行する
             bool isNonePending = true;
             for (int i = jobs.Length; --i >= 0;)
             {
