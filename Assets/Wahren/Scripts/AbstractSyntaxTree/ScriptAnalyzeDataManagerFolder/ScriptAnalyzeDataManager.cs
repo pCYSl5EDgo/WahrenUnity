@@ -18,7 +18,8 @@ namespace pcysl5edgo.Wahren.AST
         private int OldIdentifierNumberPairListLength;
 
         private NativeList<JobHandle> handles;
-        private NativeList<ParseJob> jobs;
+        private NativeArray<ParseJob> jobs;
+        private NativeArray<ParseJob.CommonData> commonDatas;
         private Stage currentStage;
 
         private void ScheduleParsing()
@@ -91,34 +92,49 @@ namespace pcysl5edgo.Wahren.AST
             {
                 return;
             }
+            bool isNonePending = true;
             for (int i = jobs.Length; --i >= 0;)
             {
-                var job = jobs[i];
-                ref var result = ref job.Result;
+                ref var job = ref ((ParseJob*)jobs.GetUnsafePtr())[i];
+                if (job.CommonPtr == null)
+                {
+                    continue;
+                }
+                var result = job.CommonPtr->Result;
                 if (result.IsSuccess)
                 {
-                    jobs.RemoveAtSwapBack(i);
-                    continue;
+                    job = default;
                 }
                 else if (result.IsError)
                 {
-                    jobs.RemoveAtSwapBack(i);
-                    continue;
+                    job = default;
                 }
-                if (result.IsPending)
+                else if (result.IsPending)
                 {
-                    UnityEngine.Debug.Log("PENDING");
-                    switch ((Location)(result.DataIndex >> 24))
-                    {
-                        case Location.Race:
-                            LengthenRace(result);
-                            break;
-                        default:
-                            throw new System.NotImplementedException();
-                    }
+                    ReSchedule(ref job, job.CommonPtr);
+                    isNonePending = false;
                 }
             }
-            currentStage = Stage.Done;
+            if (isNonePending)
+            {
+                currentStage = Stage.Done;
+            }
+        }
+
+        private void ReSchedule(ref ParseJob job, ParseJob.CommonData* common)
+        {
+            ref var result = ref common->Result;
+            switch ((Location)(result.DataIndex >> 24))
+            {
+                case Location.Race:
+                    LengthenRace(result);
+                    break;
+                default:
+                    throw new System.NotImplementedException(this.FullPaths[result.Span.File] + "  " + ((Location)(result.DataIndex >> 24)).ToString() + " " + result.Span.ToString());
+            }
+            *Status = InterpreterStatus.None;
+            result = new TryInterpretReturnValue(common->LastNameSpan, 0, InterpreterStatus.None);
+            handles.Add(job.Schedule());
         }
 
         private void GarbageCollection()
@@ -140,32 +156,40 @@ namespace pcysl5edgo.Wahren.AST
             switch ((PendingReason)(result.DataIndex & 0xff))
             {
                 case PendingReason.ASTValueTypePairListCapacityShortage:
+                    UnityEngine.Debug.Log("race ast value type pair lengthen");
                     ListUtility.Lengthen(ref ASTValueTypePairList.Values, ref ASTValueTypePairList.Capacity);
                     break;
                 case PendingReason.IdentifierNumberPairListCapacityShortage:
+                    UnityEngine.Debug.Log("race identifier number pair lengthen");
                     ListUtility.Lengthen(ref RaceParserTempData.Constis, ref RaceParserTempData.ConstiCapacity);
                     break;
                 case PendingReason.SectionListCapacityShortage:
                     switch (result.SubDataIndex)
                     {
                         case 1: // name
+                            UnityEngine.Debug.Log("race name lengthen");
                             ListUtility.Lengthen(ref RaceParserTempData.Names, ref RaceParserTempData.NameCapacity);
                             break;
                         case 2: // align
+                            UnityEngine.Debug.Log("race align lengthen");
                             ListUtility.Lengthen(ref RaceParserTempData.Aligns, ref RaceParserTempData.AlignCapacity);
                             break;
                         case 3: // brave
+                            UnityEngine.Debug.Log("race brave lengthen");
                             ListUtility.Lengthen(ref RaceParserTempData.Braves, ref RaceParserTempData.BraveCapacity);
                             break;
                         case 4: //consti
+                            UnityEngine.Debug.Log("race consti lengthen");
                             ListUtility.Lengthen(ref RaceParserTempData.Constis, ref RaceParserTempData.ConstiCapacity);
                             break;
                         case 5: // movetype
+                            UnityEngine.Debug.Log("race movetype lengthen");
                             ListUtility.Lengthen(ref RaceParserTempData.MoveTypes, ref RaceParserTempData.MoveTypeCapacity);
                             break;
                     }
                     break;
                 case PendingReason.TreeListCapacityShortage:
+                    UnityEngine.Debug.Log("race lengthen");
                     ListUtility.Lengthen(ref RaceParserTempData.Values, ref RaceParserTempData.Capacity);
                     break;
             }
@@ -173,18 +197,18 @@ namespace pcysl5edgo.Wahren.AST
 
         private void CreateNewParseJob(TextFile file)
         {
-            var job = new ParseJob
+            var cdata = (ParseJob.CommonData*)commonDatas.GetUnsafePtr() + file.FilePathId;
+            cdata->LastStructKind = Location.None;
+            cdata->Caret = new Caret { File = file.FilePathId, Line = 0, Column = 0 };
+            cdata->LastNameSpan = new Span(cdata->Caret, 0);
+            cdata->Result = new TryInterpretReturnValue(cdata->LastNameSpan, 0, InterpreterStatus.None);
+            jobs[file.FilePathId] = new ParseJob
             {
                 File = file,
                 CancellationTokenPtr = Status,
-                Caret = new Caret { File = file.FilePathId, Line = 0, Column = 0 },
-                LastStructKind = Location.None,
                 ScriptPtr = ScriptPtr,
+                CommonPtr = cdata,
             };
-            job.LastNameSpan.Start = job.LastParentNameSpan.Start = job.Caret;
-            job.LastNameSpan.Length = job.LastParentNameSpan.Length = 0;
-            job.Result = new TryInterpretReturnValue(job.LastNameSpan, 0, InterpreterStatus.None);
-            jobs.Add(job);
         }
     }
 }
