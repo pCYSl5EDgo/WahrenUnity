@@ -26,8 +26,9 @@ namespace pcysl5edgo.Wahren.AST
                     switch ((file.Contents + file.LineStarts[raw])[column])
                     {
                         case '}':
-                            nextToRightBrace.Column++;
+                            column++;
                             tree.Start = astValueTypePairList.TryAddBulkMultiThread(list, out tree.Length);
+                            ASTValueTypePairList.FreeTemp(ref list);
                             if (tree.Start == -1)
                             {
                                 raceTreeIndex = -1;
@@ -195,14 +196,11 @@ namespace pcysl5edgo.Wahren.AST
             answer = file.TryReadIdentifierNumberPairs(ref pairList, current, out expression.Start, out expression.Length);
             if (!answer.IsSuccess)
                 goto RETURN;
-#if UNITY_EDITOR
+            current = answer.Span.CaretNextToEndOfThisSpan;
+            file.SkipWhiteSpace(ref current);
             answer = VerifyConsti(expression, pairList, answer.Span);
             if (answer.IsError)
                 goto RETURN;
-#else
-            if (!VerifyConsti(expression, pairList))
-                return new TryInterpretReturnValue(current, ErrorSentence.OutOfRangeError, InterpreterStatus.Error);
-#endif
             var ast = new ASTValueTypePair(RaceTree.consti);
             if (ast.TryAddAST(tempData.Constis, expression, tempData.ConstiCapacity, ref tempData.ConstiLength))
             {
