@@ -150,6 +150,8 @@ namespace pcysl5edgo.Wahren.AST
 
         private void LengthenRace(in TryInterpretReturnValue result)
         {
+            ref var raceParserTempData = ref ScriptPtr->RaceParserTempData;
+            ref var identifierNumberPairs = ref raceParserTempData.IdentifierNumberPairs;
             switch ((PendingReason)(result.DataIndex & 0xff))
             {
                 case PendingReason.ASTValueTypePairListCapacityShortage:
@@ -162,7 +164,7 @@ namespace pcysl5edgo.Wahren.AST
 #if UNITY_EDITOR
                     UnityEngine.Debug.Log("race identifier number pair lengthen");
 #endif
-                    RaceParserTempData.IdentifierNumberPairs.Lengthen();
+                    identifierNumberPairs.Lengthen();
                     break;
                 case PendingReason.SectionListCapacityShortage:
                     switch (result.SubDataIndex)
@@ -171,31 +173,31 @@ namespace pcysl5edgo.Wahren.AST
 #if UNITY_EDITOR
                             UnityEngine.Debug.Log("race name lengthen");
 #endif
-                            ListUtility.Lengthen(ref RaceParserTempData.Names, ref RaceParserTempData.NameCapacity);
+                            ListUtility.Lengthen(ref raceParserTempData.Names, ref raceParserTempData.NameCapacity);
                             break;
                         case 2: // align
 #if UNITY_EDITOR
                             UnityEngine.Debug.Log("race align lengthen");
 #endif
-                            ListUtility.Lengthen(ref RaceParserTempData.Aligns, ref RaceParserTempData.AlignCapacity);
+                            ListUtility.Lengthen(ref raceParserTempData.Aligns, ref raceParserTempData.AlignCapacity);
                             break;
                         case 3: // brave
 #if UNITY_EDITOR
                             UnityEngine.Debug.Log("race brave lengthen");
 #endif
-                            ListUtility.Lengthen(ref RaceParserTempData.Braves, ref RaceParserTempData.BraveCapacity);
+                            ListUtility.Lengthen(ref raceParserTempData.Braves, ref raceParserTempData.BraveCapacity);
                             break;
                         case 4: //consti
 #if UNITY_EDITOR
                             UnityEngine.Debug.Log("race consti lengthen");
 #endif
-                            ListUtility.Lengthen(ref RaceParserTempData.Constis, ref RaceParserTempData.ConstiCapacity);
+                            ListUtility.Lengthen(ref raceParserTempData.Constis, ref raceParserTempData.ConstiCapacity);
                             break;
                         case 5: // movetype
 #if UNITY_EDITOR
                             UnityEngine.Debug.Log("race movetype lengthen");
 #endif
-                            ListUtility.Lengthen(ref RaceParserTempData.MoveTypes, ref RaceParserTempData.MoveTypeCapacity);
+                            ListUtility.Lengthen(ref raceParserTempData.MoveTypes, ref raceParserTempData.MoveTypeCapacity);
                             break;
                     }
                     break;
@@ -203,9 +205,41 @@ namespace pcysl5edgo.Wahren.AST
 #if UNITY_EDITOR
                     UnityEngine.Debug.Log("race lengthen");
 #endif
-                    ListUtility.Lengthen(ref RaceParserTempData.Values, ref RaceParserTempData.Capacity);
+                    ListUtility.Lengthen(ref raceParserTempData.Values, ref raceParserTempData.Capacity);
                     break;
             }
+            // if (ScriptPtr->ASTValueTypePairList.Capacity == ScriptPtr->ASTValueTypePairList.Length)
+            // {
+            //     ListUtility.Lengthen(ref ScriptPtr->ASTValueTypePairList.Values, ref ScriptPtr->ASTValueTypePairList.Capacity);
+            // }
+            // if (identifierNumberPairs.Length == identifierNumberPairs.Capacity)
+            // {
+            //     identifierNumberPairs.Lengthen();
+            // }
+            // if (raceParserTempData.NameCapacity == raceParserTempData.NameLength)
+            // {
+            //     ListUtility.Lengthen(ref raceParserTempData.Names, ref raceParserTempData.NameCapacity);
+            // }
+            // if (raceParserTempData.AlignCapacity == raceParserTempData.AlignLength)
+            // {
+            //     ListUtility.Lengthen(ref raceParserTempData.Aligns, ref raceParserTempData.AlignCapacity);
+            // }
+            // if (raceParserTempData.BraveCapacity == raceParserTempData.BraveLength)
+            // {
+            //     ListUtility.Lengthen(ref raceParserTempData.Braves, ref raceParserTempData.BraveCapacity);
+            // }
+            // if (raceParserTempData.ConstiCapacity == raceParserTempData.ConstiLength)
+            // {
+            //     ListUtility.Lengthen(ref raceParserTempData.Constis, ref raceParserTempData.ConstiCapacity);
+            // }
+            // if (raceParserTempData.MoveTypeCapacity == raceParserTempData.MoveTypeLength)
+            // {
+            //     ListUtility.Lengthen(ref raceParserTempData.MoveTypes, ref raceParserTempData.MoveTypeCapacity);
+            // }
+            // if (raceParserTempData.Capacity == raceParserTempData.Length)
+            // {
+            //     ListUtility.Lengthen(ref raceParserTempData.Values, ref raceParserTempData.Capacity);
+            // }
         }
 
         private void CreateNewParseJob(TextFile file)
