@@ -21,6 +21,8 @@ namespace pcysl5edgo.Wahren.AST
                 Values = (IdentifierNumberPair*)UnsafeUtility.Malloc(sizeof(IdentifierNumberPair) * capacity, 4, Allocator.Persistent);
         }
 
+        public override string ToString() => "capacity : " + Capacity + "\nlength : " + Length;
+
         public bool TryAddMultiThread(IdentifierNumberPair* pairs, int length, out int start)
         {
             do
