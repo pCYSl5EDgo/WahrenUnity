@@ -8,19 +8,19 @@ namespace pcysl5edgo.Wahren.AST
 {
     public static unsafe class StringBuilderExtensionUtility
     {
-        public static StringBuilder Append(this StringBuilder buffer, in TextFile file, Span span)
+        private static StringBuilder AppendPrimitive(this StringBuilder buffer, in TextFile file, Span span)
         => buffer.Append((char*)file.Contents + file.LineStarts[span.Line] + span.Column, span.Length);
-        public static StringBuilder Append(this StringBuilder buffer, in ScriptAnalyzeDataManager script, Span span)
-        => buffer.Append(script[span.File], span);
-        public static StringBuilder Append(this StringBuilder buffer, TextFile* files, Span span)
-        => buffer.Append(files[span.File], span);
+        private static StringBuilder AppendPrimitive(this StringBuilder buffer, in ScriptAnalyzeDataManager script, Span span)
+        => buffer.AppendPrimitive(script[span.File], span);
+        private static StringBuilder AppendPrimitive(this StringBuilder buffer, TextFile* files, Span span)
+        => buffer.AppendPrimitive(files[span.File], span);
 
         private static StringBuilder AppendExtension(this StringBuilder buffer, TextFile* files, string sectionName, Span scenarioVariant, Span value)
         {
             buffer.Append(sectionName);
             if (scenarioVariant.Length != 0)
             {
-                buffer.Append('@').Append(files, scenarioVariant);
+                buffer.Append('@').AppendPrimitive(files, scenarioVariant);
             }
             buffer.Append(" = ");
             if (value.Length == 0)
@@ -29,7 +29,7 @@ namespace pcysl5edgo.Wahren.AST
             }
             else
             {
-                buffer.Append(value);
+                buffer.AppendPrimitive(files, value);
             }
             return buffer;
         }
@@ -39,7 +39,7 @@ namespace pcysl5edgo.Wahren.AST
             buffer.Append(sectionName);
             if (scenarioVariant.Length != 0)
             {
-                buffer.Append('@').Append(files, scenarioVariant);
+                buffer.Append('@').AppendPrimitive(files, scenarioVariant);
             }
             return buffer.Append(" = ").Append(value);
         }
@@ -48,26 +48,26 @@ namespace pcysl5edgo.Wahren.AST
         {
             buffer.Append(sectionName);
             if (scenarioVariant.Length != 0)
-                buffer.Append('@').Append(files, scenarioVariant);
+                buffer.Append('@').AppendPrimitive(files, scenarioVariant);
             buffer.Append(" = ");
             if (length == 0)
                 return buffer.Append('@');
-            buffer.Append(files, list.Values[0].Span).Append('*').Append(list.Values[0].Number);
+            buffer.AppendPrimitive(files, list.Values[0].Span).Append('*').Append(list.Values[0].Number);
             for (int i = start + 1, end = start + length; i < end; i++)
-                buffer.Append(", ").Append(files, list.Values[i].Span).Append('*').Append(list.Values[i].Number);
+                buffer.Append(", ").AppendPrimitive(files, list.Values[i].Span).Append('*').Append(list.Values[i].Number);
             return buffer;
         }
 
         private static StringBuilder AppendHeader(this StringBuilder buffer, TextFile* files, string structKind, Span structName, Span structParentName)
         {
-            buffer.Append(structKind).Append(' ').Append(files, structName);
+            buffer.Append(structKind).Append(' ').AppendPrimitive(files, structName);
             if (structParentName.Length == 0)
             {
                 return buffer.Append("\n{");
             }
             else
             {
-                return buffer.Append(" : ").Append(files, structParentName).Append("\n{");
+                return buffer.Append(" : ").AppendPrimitive(files, structParentName).Append("\n{");
             }
         }
 
@@ -86,7 +86,7 @@ namespace pcysl5edgo.Wahren.AST
         private static StringBuilder Append(this StringBuilder buffer, TextFile* files, in RaceTree.ConstiAssignExpression expression, in IdentifierNumberPairList list)
         => buffer.AppendExtension(files, "consti", expression.ScenarioVariant, list, expression.Start, expression.Length);
 
-        public static StringBuilder Append(this StringBuilder buffer, in RaceTree tree, TextFile* files, in RaceParserTempData tempData, in ASTValueTypePairList astValueTypePairList)
+        public static StringBuilder AppendEx(this StringBuilder buffer, in RaceTree tree, TextFile* files, in RaceParserTempData tempData, in ASTValueTypePairList astValueTypePairList)
         {
             buffer.AppendHeader(files, "race", tree.Name, tree.ParentName);
             for (int i = tree.Start, end = tree.Start + tree.Length; i < end; i++)
@@ -124,7 +124,7 @@ namespace pcysl5edgo.Wahren.AST
         private static StringBuilder Append(this StringBuilder buffer, TextFile* files, MoveTypeTree.ConstiAssignExpression expression, in IdentifierNumberPairList list)
         => buffer.AppendExtension(files, "consti", expression.ScenarioVariant, list, expression.Start, expression.Length);
 
-        public static StringBuilder Append(this StringBuilder buffer, in MoveTypeTree tree, TextFile* files, in MoveTypeParserTempData tempData, in ASTValueTypePairList astValueTypePairList)
+        public static StringBuilder AppendEx(this StringBuilder buffer, in MoveTypeTree tree, TextFile* files, in MovetypeParserTempData tempData, in ASTValueTypePairList astValueTypePairList)
         {
             buffer.AppendHeader(files, "movetype", tree.Name, tree.ParentName);
             for (int i = tree.Start, end = tree.Start + tree.Length; i < end; i++)
@@ -144,7 +144,7 @@ namespace pcysl5edgo.Wahren.AST
                         break;
                 }
             }
-            return buffer;
+            return buffer.Append("\n}");
         }
 
         public static StringBuilder Append(this StringBuilder buffer, in TryInterpretReturnValue value, ScriptAnalyzeDataManager script)
@@ -152,8 +152,9 @@ namespace pcysl5edgo.Wahren.AST
             if (value.Status == InterpreterStatus.Error)
             {
                 buffer.Append("Error - ").AppendLine(ErrorSentence.Contents[value.DataIndex]);
-                if (ErrorSentence.SubContents[value.DataIndex] != null && ErrorSentence.SubContents[value.DataIndex].Length != 0)
-                    buffer.AppendLine(ErrorSentence.SubContents[value.DataIndex][value.SubDataIndex]);
+                var subs = ErrorSentence.SubContents[value.DataIndex];
+                if (subs != null && subs.Length != 0)
+                    buffer.AppendLine(subs[value.SubDataIndex]);
             }
             else if (value.Status == InterpreterStatus.Pending)
             {
@@ -162,7 +163,7 @@ namespace pcysl5edgo.Wahren.AST
             buffer.Append("at (").Append(script.FullPaths[value.Span.File]).Append(':').Append(value.Span.Line + 1).Append('(').Append(value.Span.Column + 1);
             if (value.Span.Length > 1)
                 buffer.Append('-').Append(value.Span.Column + 1 + value.Span.Length);
-            return buffer.Append(")\n").Append(script, value.Span);
+            return buffer.Append(")\n").AppendPrimitive(script, value.Span);
         }
     }
 }
