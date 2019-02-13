@@ -8,6 +8,7 @@ namespace pcysl5edgo.Wahren.AST
         public TextFile* Files;
         public int FileLength;
         public RaceParserTempData RaceParserTempData;
+        public MoveTypeParserTempData MoveTypeParserTempData;
         public ASTValueTypePairList ASTValueTypePairList;
 
         public static ScriptAnalyzeDataManager_Internal* CreatePtr(int length)
@@ -23,6 +24,7 @@ namespace pcysl5edgo.Wahren.AST
             Files = (TextFile*)UnsafeUtility.Malloc(size, 4, Allocator.Persistent);
             UnsafeUtility.MemClear(Files, size);
             RaceParserTempData = new RaceParserTempData(16);
+            MoveTypeParserTempData = new MoveTypeParserTempData(16);
             ASTValueTypePairList = new ASTValueTypePairList(1024);
         }
 
@@ -44,6 +46,7 @@ namespace pcysl5edgo.Wahren.AST
                 }
             }
             RaceParserTempData.Dispose();
+            MoveTypeParserTempData.Dispose();
             ASTValueTypePairList.Dispose();
             this = default;
         }
