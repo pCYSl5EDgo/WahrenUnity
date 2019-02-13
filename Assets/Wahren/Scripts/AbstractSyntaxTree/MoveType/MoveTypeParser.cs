@@ -2,7 +2,7 @@
 {
     public static unsafe class MoveTypeParser
     {
-        public static TryInterpretReturnValue TryParseMultiThread(this ref TextFile file, ref MoveTypeParserTempData tempData, ref ASTValueTypePairList astValueTypePairList, Span name, Span parentName, Caret nextToLeftBrace, out Caret nextToRightBrace, out int raceTreeIndex)
+        public static TryInterpretReturnValue TryParseMovetypeStructMultiThread(this ref TextFile file, ref MovetypeParserTempData tempData, ref ASTValueTypePairList astValueTypePairList, Span name, Span parentName, Caret nextToLeftBrace, out Caret nextToRightBrace, out int raceTreeIndex)
         {
             nextToRightBrace = nextToLeftBrace;
             file.SkipWhiteSpace(ref nextToRightBrace);
@@ -80,7 +80,7 @@
             }
         }
 
-        private static TryInterpretReturnValue HelpDetect(ref TextFile file, ref MoveTypeParserTempData tempData, ref Caret current, ref ASTValueTypePairList list)
+        private static TryInterpretReturnValue HelpDetect(ref TextFile file, ref MovetypeParserTempData tempData, ref Caret current, ref ASTValueTypePairList list)
         {
             var cs = file.CurrentCharPointer(current);
             var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, 0, InterpreterStatus.Error);
@@ -107,7 +107,7 @@
             file.SkipWhiteSpace(ref current);
             answer = new TryInterpretReturnValue(file.ReadLine(current), SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Success);
             expression.Value = answer.Span;
-            var ast = new ASTValueTypePair(MoveTypeTree.name);
+            var ast = new ASTValueTypePair(MoveTypeTree.help);
             if (ast.TryAddAST(tempData.Helps, expression, tempData.HelpCapacity, ref tempData.HelpLength))
             {
                 ast.AddToTempJob(ref list.Values, ref list.Capacity, ref list.Length, out _);
@@ -119,7 +119,7 @@
         RETURN:
             return answer;
         }
-        private static TryInterpretReturnValue NameDetect(ref TextFile file, ref MoveTypeParserTempData tempData, ref Caret current, ref ASTValueTypePairList list)
+        private static TryInterpretReturnValue NameDetect(ref TextFile file, ref MovetypeParserTempData tempData, ref Caret current, ref ASTValueTypePairList list)
         {
             var cs = file.CurrentCharPointer(current);
             var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, 0, InterpreterStatus.Error);
@@ -159,7 +159,7 @@
             return answer;
         }
 
-        private static TryInterpretReturnValue ConstiDetect(ref TextFile file, ref MoveTypeParserTempData tempData, ref Caret current, ref ASTValueTypePairList listTemp)
+        private static TryInterpretReturnValue ConstiDetect(ref TextFile file, ref MovetypeParserTempData tempData, ref Caret current, ref ASTValueTypePairList listTemp)
         {
             var cs = file.CurrentCharPointer(current);
             var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, InterpreterStatus.Error);
@@ -183,7 +183,7 @@
             }
             current.Column++;
             file.SkipWhiteSpace(ref current);
-            answer = file.TryReadIdentifierNumberPairs(ref tempData.IdentifierNumberPairs, current, out expression.Start, out expression.Length);
+            answer = file.TryReadIdentifierNumberPairs(Location.MoveType, ref tempData.IdentifierNumberPairs, current, out expression.Start, out expression.Length);
             if (!answer)
                 goto RETURN;
             current = answer.Span.CaretNextToEndOfThisSpan;

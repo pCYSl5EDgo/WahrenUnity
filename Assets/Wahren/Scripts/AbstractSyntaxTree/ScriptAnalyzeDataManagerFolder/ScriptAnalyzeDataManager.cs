@@ -134,7 +134,7 @@ namespace pcysl5edgo.Wahren.AST
                         LengthenMoveType(result);
                         break;
                     default:
-                        throw new System.NotImplementedException(this.FullPaths[result.Span.File] + "  " + ((Location)(result.DataIndex >> 24)).ToString() + " " + result.Span.ToString());
+                        throw new System.NotImplementedException(this.FullPaths[result.Span.File] + "  " + location.ToString() + " : " + reason.ToString() + " " + result.Span.ToString());
                 }
             }
             *Status = InterpreterStatus.None;

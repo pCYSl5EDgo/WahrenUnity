@@ -111,7 +111,7 @@ namespace pcysl5edgo.Wahren.AST
         }
 
         public ref RaceParserTempData RaceParserTempData => ref ScriptPtr->RaceParserTempData;
-        public ref MoveTypeParserTempData MoveTypeParserTempData => ref ScriptPtr->MoveTypeParserTempData;
+        public ref MovetypeParserTempData MoveTypeParserTempData => ref ScriptPtr->MoveTypeParserTempData;
         public ref TextFile this[int index] => ref ScriptPtr->Files[index];
         public ref int Length => ref ScriptPtr->FileLength;
         public ref TextFile* Files => ref ScriptPtr->Files;

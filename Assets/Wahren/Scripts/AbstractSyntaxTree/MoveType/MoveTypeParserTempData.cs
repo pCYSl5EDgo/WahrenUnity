@@ -3,7 +3,7 @@ using Unity.Collections.LowLevel.Unsafe;
 
 namespace pcysl5edgo.Wahren.AST
 {
-    public unsafe struct MoveTypeParserTempData : System.IDisposable
+    public unsafe struct MovetypeParserTempData : System.IDisposable
     {
         internal struct OldLengths
         {
@@ -14,7 +14,7 @@ namespace pcysl5edgo.Wahren.AST
             public int ConstiLength;
 #pragma warning restore
 
-            public static bool IsChanged(OldLengths* left, MoveTypeParserTempData* right)
+            public static bool IsChanged(OldLengths* left, MovetypeParserTempData* right)
             => UnsafeUtility.MemCmp(left, right, sizeof(OldLengths)) == 0;
         }
         public int Length;
@@ -33,7 +33,7 @@ namespace pcysl5edgo.Wahren.AST
         public MoveTypeTree.ConstiAssignExpression* Constis;
         public IdentifierNumberPairList IdentifierNumberPairs;
 
-        public MoveTypeParserTempData(int capacity)
+        public MovetypeParserTempData(int capacity)
         {
             Length = NameLength = HelpLength = ConstiLength = 0;
             Capacity = NameCapacity = HelpCapacity = ConstiCapacity = capacity;
