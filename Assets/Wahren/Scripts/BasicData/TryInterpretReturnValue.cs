@@ -50,9 +50,9 @@
             this.SubdData0 = this.SubdData1 = 0;
         }
 
-        public static TryInterpretReturnValue CreateSuccessDetectStructType(in Caret caret, int length, AST.Location location) => new TryInterpretReturnValue(new Span(caret, length), SuccessSentence.StructKindInterpretSuccess, (int)location, InterpreterStatus.Success);
+        public static TryInterpretReturnValue CreateSuccessDetectStructType(in Caret caret, int length, Location location) => new TryInterpretReturnValue(new Span(caret, length), SuccessSentence.StructKindInterpretSuccess, (int)location, InterpreterStatus.Success);
 
-        public static TryInterpretReturnValue CreatePending(Span span, AST.Location location, AST.PendingReason reason, int subDataIndex = 0, long subData0 = 0, long subData1 = 0) => new TryInterpretReturnValue
+        public static TryInterpretReturnValue CreatePending(Span span, Location location, PendingReason reason, int subDataIndex = 0, long subData0 = 0, long subData1 = 0) => new TryInterpretReturnValue
         {
             Span = span,
             DataIndex = ((byte)location << 24) | (byte)reason,
@@ -61,6 +61,12 @@
             SubdData1 = subData1,
             Status = InterpreterStatus.Pending,
         };
+
+        public void Deconstruct(out Location location, out PendingReason reason)
+        {
+            location = (Location)(DataIndex >> 24);
+            reason = (PendingReason)(DataIndex & 0xff);
+        }
 
         public static implicit operator bool(in TryInterpretReturnValue value) => value.Status == InterpreterStatus.Success;
 
