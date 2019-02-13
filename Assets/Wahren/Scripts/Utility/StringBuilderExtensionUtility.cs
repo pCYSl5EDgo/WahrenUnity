@@ -10,93 +10,104 @@ namespace pcysl5edgo.Wahren.AST
     {
         public static StringBuilder Append(this StringBuilder buffer, in TextFile file, Span span)
         => buffer.Append((char*)file.Contents + file.LineStarts[span.Line] + span.Column, span.Length);
-        public static StringBuilder Append(this StringBuilder buffer, in AST.ScriptAnalyzeDataManager script, Span span)
+        public static StringBuilder Append(this StringBuilder buffer, in ScriptAnalyzeDataManager script, Span span)
         => buffer.Append(script[span.File], span);
         public static StringBuilder Append(this StringBuilder buffer, TextFile* files, Span span)
         => buffer.Append(files[span.File], span);
 
-        public static StringBuilder Append(this StringBuilder buffer, TextFile* files, in AST.RaceTree.AlignAssignExpression expression)
+        private static StringBuilder AppendExtension(this StringBuilder buffer, TextFile* files, string sectionName, Span scenarioVariant, Span value)
         {
-            buffer.Append("align");
-            if (expression.ScenarioVariant.Length != 0)
-                buffer.Append('@').Append(files, expression.ScenarioVariant);
-            return buffer.Append(" = ").Append(expression.Value);
-        }
-
-        public static StringBuilder Append(this StringBuilder buffer, TextFile* files, in AST.RaceTree.BraveAssignExpression expression)
-        {
-            buffer.Append("brave");
-            if (expression.ScenarioVariant.Length != 0)
-                buffer.Append('@').Append(files, expression.ScenarioVariant);
-            return buffer.Append(" = ").Append(expression.Value);
-        }
-
-        public static StringBuilder Append(this StringBuilder buffer, TextFile* files, in AST.RaceTree.MoveTypeAssignExpression expression)
-        {
-            buffer.Append("movetype");
-            if (expression.ScenarioVariant.Length != 0)
-                buffer.Append('@').Append(files, expression.ScenarioVariant);
+            buffer.Append(sectionName);
+            if (scenarioVariant.Length != 0)
+            {
+                buffer.Append('@').Append(files, scenarioVariant);
+            }
             buffer.Append(" = ");
-            if (expression.Value.Length == 0)
-                return buffer.Append('@');
-            return buffer.Append(files, expression.Value);
+            if (value.Length == 0)
+            {
+                buffer.Append('@');
+            }
+            else
+            {
+                buffer.Append(value);
+            }
+            return buffer;
         }
 
-        public static StringBuilder Append(this StringBuilder buffer, TextFile* files, in AST.RaceTree.NameAssignExpression expression)
+        private static StringBuilder AppendExtension(this StringBuilder buffer, TextFile* files, string sectionName, Span scenarioVariant, long value)
         {
-            buffer.Append("name");
-            if (expression.ScenarioVariant.Length != 0)
-                buffer.Append('@').Append(files, expression.ScenarioVariant);
-            buffer.Append(" = ");
-            if (expression.Value.Length == 0)
-                return buffer.Append('@');
-            return buffer.Append(files, expression.Value);
+            buffer.Append(sectionName);
+            if (scenarioVariant.Length != 0)
+            {
+                buffer.Append('@').Append(files, scenarioVariant);
+            }
+            return buffer.Append(" = ").Append(value);
         }
 
-        public static StringBuilder Append(this StringBuilder buffer, TextFile* files, in AST.RaceTree.ConstiAssignExpression expression, in IdentifierNumberPairList list)
+        private static StringBuilder AppendExtension(this StringBuilder buffer, TextFile* files, string sectionName, Span scenarioVariant, in IdentifierNumberPairList list, int start, int length)
         {
-            buffer.Append("consti");
-            if (expression.ScenarioVariant.Length != 0)
-                buffer.Append('@').Append(files, expression.ScenarioVariant);
+            buffer.Append(sectionName);
+            if (scenarioVariant.Length != 0)
+                buffer.Append('@').Append(files, scenarioVariant);
             buffer.Append(" = ");
-            if (expression.Length == 0)
+            if (length == 0)
                 return buffer.Append('@');
             buffer.Append(files, list.Values[0].Span).Append('*').Append(list.Values[0].Number);
-            for (int i = expression.Start + 1, end = expression.Start + expression.Length; i < end; i++)
+            for (int i = start + 1, end = start + length; i < end; i++)
                 buffer.Append(", ").Append(files, list.Values[i].Span).Append('*').Append(list.Values[i].Number);
             return buffer;
         }
 
-        public static unsafe StringBuilder Append(this StringBuilder buffer, in AST.RaceTree tree, TextFile* files, in AST.RaceParserTempData tempData, in AST.ASTValueTypePairList astValueTypePairList)
+        private static StringBuilder AppendHeader(this StringBuilder buffer, TextFile* files, string structKind, Span structName, Span structParentName)
         {
-            buffer.Append("race ").Append(files, tree.Name);
-            if (tree.ParentName.Length == 0)
+            buffer.Append(structKind).Append(' ').Append(files, structName);
+            if (structParentName.Length == 0)
             {
-                buffer.Append("\n{");
+                return buffer.Append("\n{");
             }
             else
             {
-                buffer.Append(" : ").Append(files, tree.ParentName).Append("\n{");
+                return buffer.Append(" : ").Append(files, structParentName).Append("\n{");
             }
+        }
+
+        private static StringBuilder Append(this StringBuilder buffer, TextFile* files, in RaceTree.AlignAssignExpression expression)
+        => buffer.AppendExtension(files, "align", expression.ScenarioVariant, expression.Value);
+
+        private static StringBuilder Append(this StringBuilder buffer, TextFile* files, in RaceTree.BraveAssignExpression expression)
+        => buffer.AppendExtension(files, "brave", expression.ScenarioVariant, expression.Value);
+
+        private static StringBuilder Append(this StringBuilder buffer, TextFile* files, in RaceTree.MoveTypeAssignExpression expression)
+        => buffer.AppendExtension(files, "movetype", expression.ScenarioVariant, expression.Value);
+
+        private static StringBuilder Append(this StringBuilder buffer, TextFile* files, in RaceTree.NameAssignExpression expression)
+        => buffer.AppendExtension(files, "name", expression.ScenarioVariant, expression.Value);
+
+        private static StringBuilder Append(this StringBuilder buffer, TextFile* files, in RaceTree.ConstiAssignExpression expression, in IdentifierNumberPairList list)
+        => buffer.AppendExtension(files, "consti", expression.ScenarioVariant, list, expression.Start, expression.Length);
+
+        public static StringBuilder Append(this StringBuilder buffer, in RaceTree tree, TextFile* files, in RaceParserTempData tempData, in ASTValueTypePairList astValueTypePairList)
+        {
+            buffer.AppendHeader(files, "race", tree.Name, tree.ParentName);
             for (int i = tree.Start, end = tree.Start + tree.Length; i < end; i++)
             {
                 var pair = astValueTypePairList.Values[i];
                 buffer.Append("\n  ");
                 switch (pair.Type)
                 {
-                    case AST.RaceTree.name:
+                    case RaceTree.name:
                         buffer.Append(files, tempData.Names[pair.Value]);
                         break;
-                    case AST.RaceTree.align:
+                    case RaceTree.align:
                         buffer.Append(files, tempData.Aligns[pair.Value]);
                         break;
-                    case AST.RaceTree.brave:
+                    case RaceTree.brave:
                         buffer.Append(files, tempData.Braves[pair.Value]);
                         break;
-                    case AST.RaceTree.consti:
+                    case RaceTree.consti:
                         buffer.Append(files, tempData.Constis[pair.Value], tempData.IdentifierNumberPairs);
                         break;
-                    case AST.RaceTree.movetype:
+                    case RaceTree.movetype:
                         buffer.Append(files, tempData.MoveTypes[pair.Value]);
                         break;
                 }
@@ -104,7 +115,39 @@ namespace pcysl5edgo.Wahren.AST
             return buffer.Append("\n}");
         }
 
-        public static StringBuilder Append(this StringBuilder buffer, in TryInterpretReturnValue value, AST.ScriptAnalyzeDataManager script)
+        private static StringBuilder Append(this StringBuilder buffer, TextFile* files, MoveTypeTree.NameAssignExpression expression)
+        => buffer.AppendExtension(files, "name", expression.ScenarioVariant, expression.Value);
+
+        private static StringBuilder Append(this StringBuilder buffer, TextFile* files, MoveTypeTree.HelpAssignExpression expression)
+        => buffer.AppendExtension(files, "help", expression.ScenarioVariant, expression.Value);
+
+        private static StringBuilder Append(this StringBuilder buffer, TextFile* files, MoveTypeTree.ConstiAssignExpression expression, in IdentifierNumberPairList list)
+        => buffer.AppendExtension(files, "consti", expression.ScenarioVariant, list, expression.Start, expression.Length);
+
+        public static StringBuilder Append(this StringBuilder buffer, in MoveTypeTree tree, TextFile* files, in MoveTypeParserTempData tempData, in ASTValueTypePairList astValueTypePairList)
+        {
+            buffer.AppendHeader(files, "movetype", tree.Name, tree.ParentName);
+            for (int i = tree.Start, end = tree.Start + tree.Length; i < end; i++)
+            {
+                var pair = astValueTypePairList.Values[i];
+                buffer.Append("\n  ");
+                switch (pair.Type)
+                {
+                    case MoveTypeTree.name:
+                        buffer.Append(files, tempData.Names[pair.Value]);
+                        break;
+                    case MoveTypeTree.consti:
+                        buffer.Append(files, tempData.Constis[pair.Value], tempData.IdentifierNumberPairs);
+                        break;
+                    case MoveTypeTree.help:
+                        buffer.Append(files, tempData.Helps[pair.Value]);
+                        break;
+                }
+            }
+            return buffer;
+        }
+
+        public static StringBuilder Append(this StringBuilder buffer, in TryInterpretReturnValue value, ScriptAnalyzeDataManager script)
         {
             if (value.Status == InterpreterStatus.Error)
             {
