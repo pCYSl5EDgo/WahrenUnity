@@ -69,7 +69,7 @@ public class TestManager : MonoBehaviour
                     {
                         if (i != 0)
                             buffer.AppendLine();
-                        buffer.Append(scriptManager.RaceParserTempData.Values[i], scriptManager.Files, scriptManager.RaceParserTempData, scriptManager.ASTValueTypePairList);
+                        buffer.AppendEx(scriptManager.RaceParserTempData.Values[i], scriptManager.Files, scriptManager.RaceParserTempData, scriptManager.ASTValueTypePairList);
                     }
                     UnityEngine.Debug.Log(buffer.ToString());
                     buffer.Clear();
@@ -77,7 +77,7 @@ public class TestManager : MonoBehaviour
                     {
                         if (i != 0)
                             buffer.AppendLine();
-                        buffer.Append(scriptManager.MoveTypeParserTempData.Values[i], scriptManager.Files, scriptManager.MoveTypeParserTempData, scriptManager.ASTValueTypePairList);
+                        buffer.AppendEx(scriptManager.MoveTypeParserTempData.Values[i], scriptManager.Files, scriptManager.MoveTypeParserTempData, scriptManager.ASTValueTypePairList);
                     }
                     UnityEngine.Debug.Log(buffer.ToString());
                 }

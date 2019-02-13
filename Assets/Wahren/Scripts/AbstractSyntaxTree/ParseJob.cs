@@ -75,21 +75,41 @@ namespace pcysl5edgo.Wahren.AST
                     case Location.Race:
                         if (CommonPtr->Result = File.TryParseRaceStructMultiThread(ref ScriptPtr->RaceParserTempData, ref ScriptPtr->ASTValueTypePairList, CommonPtr->LastNameSpan, CommonPtr->LastParentNameSpan, currentCaret, out currentCaret, out _))
                         {
-                            File.SkipWhiteSpace(ref currentCaret);
-                            CommonPtr->Caret = currentCaret;
-                            CommonPtr->LastStructKind = Location.None;
-                            CommonPtr->LastNameSpan = CommonPtr->LastParentNameSpan = default;
+                            SaveSuccess(ref currentCaret);
                             continue;
                         }
                         if (CommonPtr->Result.IsPending)
                         {
                             *CancellationTokenPtr = InterpreterStatus.Pending;
+                            return;
                         }
-                        return;
+                        break;
+                    case Location.MoveType:
+                        CommonPtr->Result = File.TryParseMovetypeStructMultiThread(ref ScriptPtr->MoveTypeParserTempData, ref ScriptPtr->ASTValueTypePairList, CommonPtr->LastNameSpan, CommonPtr->LastParentNameSpan, currentCaret, out currentCaret, out _);
+                        if (CommonPtr->Result)
+                        {
+                            SaveSuccess(ref currentCaret);
+                            continue;
+                        }
+                        if (CommonPtr->Result.IsPending)
+                        {
+                            *CancellationTokenPtr = InterpreterStatus.Pending;
+                            var (location, _) = CommonPtr->Result;
+                            return;
+                        }
+                        break;
                     default:
                         return;
                 }
             }
+        }
+
+        private void SaveSuccess(ref Caret currentCaret)
+        {
+            File.SkipWhiteSpace(ref currentCaret);
+            CommonPtr->Caret = currentCaret;
+            CommonPtr->LastStructKind = Location.None;
+            CommonPtr->LastNameSpan = CommonPtr->LastParentNameSpan = default;
         }
     }
 }

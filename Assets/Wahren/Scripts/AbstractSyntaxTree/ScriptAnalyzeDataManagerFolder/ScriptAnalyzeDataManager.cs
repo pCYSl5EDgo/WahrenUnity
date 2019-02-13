@@ -109,7 +109,7 @@ namespace pcysl5edgo.Wahren.AST
                 }
                 else if (result.IsPending)
                 {
-                    ReSchedule(ref job, job.CommonPtr);
+                    ReSchedule(ref job);
                     isNonePending = false;
                 }
             }
@@ -119,9 +119,9 @@ namespace pcysl5edgo.Wahren.AST
             }
         }
 
-        private void ReSchedule(ref ParseJob job, ParseJob.CommonData* common)
+        private void ReSchedule(ref ParseJob job)
         {
-            ref var result = ref common->Result;
+            ref var result = ref job.CommonPtr->Result;
             var (location, reason) = result;
             if (reason != PendingReason.Other)
             {
@@ -138,7 +138,7 @@ namespace pcysl5edgo.Wahren.AST
                 }
             }
             *Status = InterpreterStatus.None;
-            result = new TryInterpretReturnValue(common->LastNameSpan, 0, InterpreterStatus.None);
+            result = new TryInterpretReturnValue(job.CommonPtr->LastNameSpan, 0, InterpreterStatus.None);
             handles.Add(job.Schedule());
         }
 

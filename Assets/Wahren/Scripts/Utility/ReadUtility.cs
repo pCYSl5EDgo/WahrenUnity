@@ -6,7 +6,7 @@ namespace pcysl5edgo.Wahren.AST
     public static unsafe class ReadUtility
     {
         public static Span ReadLine(this ref TextFile file, Caret current) => new Span(current, file.CurrentLineLength(current) - current.Column);
-        public static TryInterpretReturnValue TryReadIdentifierNumberPairs(this ref TextFile file, ref IdentifierNumberPairList pairList, Caret current, out int start, out int length, long defaultValue = 0)
+        public static TryInterpretReturnValue TryReadIdentifierNumberPairs(this ref TextFile file, Location location, ref IdentifierNumberPairList pairList, Caret current, out int start, out int length, long defaultValue = 0)
         {
             file.SkipWhiteSpace(ref current);
             var preservedFirstLocation = current;
@@ -390,7 +390,7 @@ namespace pcysl5edgo.Wahren.AST
                 {
                     return new TryInterpretReturnValue(span, SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Success);
                 }
-                return TryInterpretReturnValue.CreatePending(span, AST.Location.Race, AST.PendingReason.IdentifierNumberPairListCapacityShortage, tmpList.Length);
+                return TryInterpretReturnValue.CreatePending(span, location, PendingReason.IdentifierNumberPairListCapacityShortage, tmpList.Length);
             ERROR:
                 start = 0;
                 length = 0;
