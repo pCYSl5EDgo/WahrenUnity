@@ -14,6 +14,7 @@ public static class SuccessSentence
     internal const int LeftBraceConfirmationSuccess = 7;
     internal const int NumberInterpretSuccess = 8;
     internal const int IdentifierInterpretSuccess = 9;
+    internal const int MoveTypeTreeInterpretSuccess = 10;
 
     static SuccessSentence()
     {
@@ -29,6 +30,7 @@ public static class SuccessSentence
             "'{' was Confirmed", // 7
             "Number Interpretation Success", // 8
             "Identifier Interpretation Success", // 9
+            "Struct 'movetype' Interpretation Success", //10
         };
         SubContents = new string[][]
         {
@@ -66,6 +68,7 @@ public static class SuccessSentence
             null, // 7
             null, // 8
             null, // 9
+            null, // 10
         };
     }
 }
