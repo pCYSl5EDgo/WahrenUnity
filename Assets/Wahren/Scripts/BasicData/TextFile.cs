@@ -3,7 +3,7 @@ using System.Text;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 
-namespace pcysl5edgo.Wahren
+namespace pcysl5edgo.Wahren.AST
 {
     public unsafe struct TextFile : IDisposable
     {

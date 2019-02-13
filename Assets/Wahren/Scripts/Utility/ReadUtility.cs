@@ -1,7 +1,7 @@
 ﻿using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 
-namespace pcysl5edgo.Wahren
+namespace pcysl5edgo.Wahren.AST
 {
     public static unsafe class ReadUtility
     {
@@ -388,7 +388,7 @@ namespace pcysl5edgo.Wahren
             {
                 return new TryInterpretReturnValue(span, SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Success);
             }
-            return TryInterpretReturnValue.CreatePending(span, AST.Location.None, AST.PendingReason.IdentifierNumberPairListCapacityShortage, tmpList.Length);
+            return TryInterpretReturnValue.CreatePending(span, AST.Location.Race, AST.PendingReason.IdentifierNumberPairListCapacityShortage, tmpList.Length);
         ERROR:
             start = 0;
             length = 0;

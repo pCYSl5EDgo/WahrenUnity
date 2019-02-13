@@ -2,7 +2,7 @@
 using Unity.Burst;
 using Unity.Collections.LowLevel.Unsafe;
 
-namespace pcysl5edgo.Wahren
+namespace pcysl5edgo.Wahren.AST
 {
     [BurstCompile]
     public unsafe struct DeleteCommentJob : IJob

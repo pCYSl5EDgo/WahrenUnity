@@ -1,5 +1,5 @@
 ﻿
-namespace pcysl5edgo.Wahren
+namespace pcysl5edgo.Wahren.AST
 {
     internal static class ErrorSentence
     {

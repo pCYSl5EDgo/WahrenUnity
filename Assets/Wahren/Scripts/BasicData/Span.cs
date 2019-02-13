@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace pcysl5edgo.Wahren
+namespace pcysl5edgo.Wahren.AST
 {
     [StructLayout(LayoutKind.Explicit)]
     public struct Span : IEquatable<Span>

@@ -1,4 +1,4 @@
-﻿namespace pcysl5edgo.Wahren
+﻿namespace pcysl5edgo.Wahren.AST
 {
     public unsafe struct IdentifierNumberPair
     {
