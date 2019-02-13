@@ -122,13 +122,20 @@ namespace pcysl5edgo.Wahren.AST
         private void ReSchedule(ref ParseJob job, ParseJob.CommonData* common)
         {
             ref var result = ref common->Result;
-            switch ((Location)(result.DataIndex >> 24))
+            var (location, reason) = result;
+            if (reason != PendingReason.Other)
             {
-                case Location.Race:
-                    LengthenRace(result);
-                    break;
-                default:
-                    throw new System.NotImplementedException(this.FullPaths[result.Span.File] + "  " + ((Location)(result.DataIndex >> 24)).ToString() + " " + result.Span.ToString());
+                switch (location)
+                {
+                    case Location.Race:
+                        LengthenRace(result);
+                        break;
+                    case Location.MoveType:
+                        LengthenMoveType(result);
+                        break;
+                    default:
+                        throw new System.NotImplementedException(this.FullPaths[result.Span.File] + "  " + ((Location)(result.DataIndex >> 24)).ToString() + " " + result.Span.ToString());
+                }
             }
             *Status = InterpreterStatus.None;
             result = new TryInterpretReturnValue(common->LastNameSpan, 0, InterpreterStatus.None);
@@ -148,54 +155,108 @@ namespace pcysl5edgo.Wahren.AST
             }.Schedule());
         }
 
-        private void LengthenRace(in TryInterpretReturnValue result)
+        private void LengthenMoveType(TryInterpretReturnValue result)
         {
-            ref var raceParserTempData = ref ScriptPtr->RaceParserTempData;
-            ref var identifierNumberPairs = ref raceParserTempData.IdentifierNumberPairs;
-            switch ((PendingReason)(result.DataIndex & 0xff))
+            ref var tmpData = ref ScriptPtr->MoveTypeParserTempData;
+            ref var identifierNumberPairs = ref tmpData.IdentifierNumberPairs;
+            (_, var reason) = result;
+            const string prefix = "movetype";
+            switch (reason)
             {
                 case PendingReason.ASTValueTypePairListCapacityShortage:
 #if UNITY_EDITOR
-                    UnityEngine.Debug.Log("race ast value type pair lengthen");
+                    UnityEngine.Debug.Log(prefix + " ast value type pair lengthen\n" + result.ToString());
 #endif
                     ListUtility.Lengthen(ref ASTValueTypePairList.Values, ref ASTValueTypePairList.Capacity);
                     break;
                 case PendingReason.IdentifierNumberPairListCapacityShortage:
 #if UNITY_EDITOR
-                    UnityEngine.Debug.Log("race identifier number pair lengthen");
+                    UnityEngine.Debug.Log(prefix + " identifier number pair lengthen\n" + result.ToString() + "\n" + identifierNumberPairs.Capacity);
 #endif
                     identifierNumberPairs.Lengthen();
                     break;
                 case PendingReason.SectionListCapacityShortage:
                     switch (result.SubDataIndex)
                     {
-                        case 1: // name
+                        case MoveTypeTree.name + 1: // name
 #if UNITY_EDITOR
-                            UnityEngine.Debug.Log("race name lengthen");
+                            UnityEngine.Debug.Log(prefix + " name lengthen\n" + result.ToString());
+#endif
+                            ListUtility.Lengthen(ref tmpData.Names, ref tmpData.NameCapacity);
+                            break;
+                        case MoveTypeTree.help + 1: // help
+#if UNITY_EDITOR
+                            UnityEngine.Debug.Log(prefix + " help lengthen\n" + result.ToString());
+#endif
+                            ListUtility.Lengthen(ref tmpData.Helps, ref tmpData.HelpCapacity);
+                            break;
+                        case MoveTypeTree.consti + 1: // consti
+#if UNITY_EDITOR
+                            UnityEngine.Debug.Log(prefix + " consti lengthen\n" + result.ToString());
+#endif
+                            ListUtility.Lengthen(ref tmpData.Constis, ref tmpData.ConstiCapacity);
+                            break;
+                    }
+                    break;
+                case PendingReason.TreeListCapacityShortage:
+#if UNITY_EDITOR
+                    UnityEngine.Debug.Log(prefix + " lengthen\n" + result.ToString());
+#endif
+                    ListUtility.Lengthen(ref tmpData.Values, ref tmpData.Capacity);
+                    break;
+            }
+        }
+
+        private void LengthenRace(in TryInterpretReturnValue result)
+        {
+            ref var raceParserTempData = ref ScriptPtr->RaceParserTempData;
+            ref var identifierNumberPairs = ref raceParserTempData.IdentifierNumberPairs;
+            (_, var reason) = result;
+            const string prefix = "race";
+            switch (reason)
+            {
+                case PendingReason.ASTValueTypePairListCapacityShortage:
+#if UNITY_EDITOR
+                    UnityEngine.Debug.Log(prefix + " ast value type pair lengthen\n" + result.ToString());
+#endif
+                    ListUtility.Lengthen(ref ASTValueTypePairList.Values, ref ASTValueTypePairList.Capacity);
+                    break;
+                case PendingReason.IdentifierNumberPairListCapacityShortage:
+#if UNITY_EDITOR
+                    UnityEngine.Debug.Log(prefix + " identifier number pair lengthen\n" + result.ToString() + "\nCapacity: " + identifierNumberPairs.Capacity + " , Length: " + identifierNumberPairs.Length);
+#endif
+                    identifierNumberPairs.Lengthen();
+                    break;
+                case PendingReason.SectionListCapacityShortage:
+                    switch (result.SubDataIndex)
+                    {
+                        case RaceTree.name + 1: // name
+#if UNITY_EDITOR
+                            UnityEngine.Debug.Log(prefix + " name lengthen\n" + result.ToString());
 #endif
                             ListUtility.Lengthen(ref raceParserTempData.Names, ref raceParserTempData.NameCapacity);
                             break;
-                        case 2: // align
+                        case RaceTree.align + 1: // align
 #if UNITY_EDITOR
-                            UnityEngine.Debug.Log("race align lengthen");
+                            UnityEngine.Debug.Log(prefix + " align lengthen\n" + result.ToString());
 #endif
                             ListUtility.Lengthen(ref raceParserTempData.Aligns, ref raceParserTempData.AlignCapacity);
                             break;
-                        case 3: // brave
+                        case RaceTree.brave + 1: // brave
 #if UNITY_EDITOR
-                            UnityEngine.Debug.Log("race brave lengthen");
+                            UnityEngine.Debug.Log(prefix + " brave lengthen\n" + result.ToString());
 #endif
                             ListUtility.Lengthen(ref raceParserTempData.Braves, ref raceParserTempData.BraveCapacity);
                             break;
-                        case 4: //consti
+                        case RaceTree.consti + 1: //consti
 #if UNITY_EDITOR
-                            UnityEngine.Debug.Log("race consti lengthen");
+                            UnityEngine.Debug.Log(prefix + " consti lengthen\n" + result.ToString());
 #endif
                             ListUtility.Lengthen(ref raceParserTempData.Constis, ref raceParserTempData.ConstiCapacity);
                             break;
-                        case 5: // movetype
+                        case RaceTree.movetype + 1: // movetype
 #if UNITY_EDITOR
-                            UnityEngine.Debug.Log("race movetype lengthen");
+                            UnityEngine.Debug.Log(prefix + " movetype lengthen\n" + result.ToString());
 #endif
                             ListUtility.Lengthen(ref raceParserTempData.MoveTypes, ref raceParserTempData.MoveTypeCapacity);
                             break;
@@ -203,7 +264,7 @@ namespace pcysl5edgo.Wahren.AST
                     break;
                 case PendingReason.TreeListCapacityShortage:
 #if UNITY_EDITOR
-                    UnityEngine.Debug.Log("race lengthen");
+                    UnityEngine.Debug.Log(prefix + " lengthen\n" + result.ToString());
 #endif
                     ListUtility.Lengthen(ref raceParserTempData.Values, ref raceParserTempData.Capacity);
                     break;
