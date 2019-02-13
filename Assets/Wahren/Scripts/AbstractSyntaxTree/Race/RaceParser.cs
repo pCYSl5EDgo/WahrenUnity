@@ -128,7 +128,7 @@
             }
             else
             {
-                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Race, PendingReason.SectionListCapacityShortage, 1);
+                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Race, PendingReason.SectionListCapacityShortage, RaceTree.name + 1);
             }
         RETURN:
             return answer;
@@ -170,7 +170,7 @@
             }
             else
             {
-                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Race, PendingReason.SectionListCapacityShortage, 5);
+                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Race, PendingReason.SectionListCapacityShortage, RaceTree.movetype + 1);
             }
         RETURN:
             return answer;
@@ -215,7 +215,7 @@
             }
             else
             {
-                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Race, PendingReason.SectionListCapacityShortage, 4);
+                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Race, PendingReason.SectionListCapacityShortage, RaceTree.consti + 1);
             }
         RETURN:
             return answer;
@@ -267,7 +267,7 @@
             }
             else
             {
-                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Race, PendingReason.SectionListCapacityShortage, 3);
+                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Race, PendingReason.SectionListCapacityShortage, RaceTree.brave + 1);
             }
         RETURN:
             return answer;
@@ -308,7 +308,7 @@
             }
             else
             {
-                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Race, PendingReason.SectionListCapacityShortage, 2);
+                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Race, PendingReason.SectionListCapacityShortage, RaceTree.align + 1);
             }
         RETURN:
             return answer;

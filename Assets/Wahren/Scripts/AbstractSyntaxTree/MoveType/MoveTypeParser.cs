@@ -2,7 +2,7 @@
 {
     public static unsafe class MoveTypeParser
     {
-        public static TryInterpretReturnValue TryParseMultiThread(this ref TextFile file, ref MoveTypeParserTempData tempData, ref ASTValueTypePairList astValueTypePairList, Span name, Span parentName, Caret nextToLeftBrace, out Caret nextToRightBrace, out int raceTreeIndex, InterpreterStatus* CancellationTokenPtr)
+        public static TryInterpretReturnValue TryParseMultiThread(this ref TextFile file, ref MoveTypeParserTempData tempData, ref ASTValueTypePairList astValueTypePairList, Span name, Span parentName, Caret nextToLeftBrace, out Caret nextToRightBrace, out int raceTreeIndex)
         {
             nextToRightBrace = nextToLeftBrace;
             file.SkipWhiteSpace(ref nextToRightBrace);
@@ -21,11 +21,6 @@
                 {
                     for (int lineLength = file.LineLengths[raw]; column < lineLength; column++)
                     {
-                        if (*CancellationTokenPtr != InterpreterStatus.None)
-                        {
-                            raceTreeIndex = -1;
-                            return TryInterpretReturnValue.CreatePending(new Span(nextToLeftBrace, 0), Location.MoveType, PendingReason.Other);
-                        }
                         switch ((file.Contents + file.LineStarts[raw])[column])
                         {
                             case '}':
