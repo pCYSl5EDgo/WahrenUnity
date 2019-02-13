@@ -72,6 +72,14 @@ public class TestManager : MonoBehaviour
                         buffer.Append(scriptManager.RaceParserTempData.Values[i], scriptManager.Files, scriptManager.RaceParserTempData, scriptManager.ASTValueTypePairList);
                     }
                     UnityEngine.Debug.Log(buffer.ToString());
+                    buffer.Clear();
+                    for (int i = 0; i < scriptManager.MoveTypeParserTempData.Length; i++)
+                    {
+                        if (i != 0)
+                            buffer.AppendLine();
+                        buffer.Append(scriptManager.MoveTypeParserTempData.Values[i], scriptManager.Files, scriptManager.MoveTypeParserTempData, scriptManager.ASTValueTypePairList);
+                    }
+                    UnityEngine.Debug.Log(buffer.ToString());
                 }
                 break;
         }
