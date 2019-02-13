@@ -38,11 +38,13 @@ namespace pcysl5edgo.Wahren.AST
         public RaceTree.BraveAssignExpression* Braves;
         public RaceTree.ConstiAssignExpression* Constis;
         public RaceTree.MoveTypeAssignExpression* MoveTypes;
+        public IdentifierNumberPairList IdentifierNumberPairs;
 
         public RaceParserTempData(int capacity)
         {
             Length = NameLength = AlignLength = BraveLength = ConstiLength = MoveTypeLength = 0;
             Capacity = NameCapacity = AlignCapacity = BraveCapacity = ConstiCapacity = MoveTypeCapacity = capacity;
+            IdentifierNumberPairs = new IdentifierNumberPairList(capacity);
             if (capacity != 0)
             {
                 Values = (RaceTree*)UnsafeUtility.Malloc(sizeof(RaceTree) * capacity, 4, Allocator.Persistent);
@@ -77,6 +79,7 @@ namespace pcysl5edgo.Wahren.AST
                 UnsafeUtility.Free(Constis, Allocator.Persistent);
             if (Capacity != 0)
                 UnsafeUtility.Free(Values, Allocator.Persistent);
+            IdentifierNumberPairs.Dispose();
             this = default;
         }
     }

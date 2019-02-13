@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 
-namespace pcysl5edgo.Wahren
+namespace pcysl5edgo.Wahren.AST
 {
     public static unsafe class StringBuilderExtensionUtility
     {
@@ -67,7 +67,7 @@ namespace pcysl5edgo.Wahren
             return buffer;
         }
 
-        public static unsafe StringBuilder Append(this StringBuilder buffer, in AST.RaceTree tree, TextFile* files, in AST.RaceParserTempData tempData, in IdentifierNumberPairList list, in AST.ASTValueTypePairList astValueTypePairList)
+        public static unsafe StringBuilder Append(this StringBuilder buffer, in AST.RaceTree tree, TextFile* files, in AST.RaceParserTempData tempData, in AST.ASTValueTypePairList astValueTypePairList)
         {
             buffer.Append("race ").Append(files, tree.Name);
             if (tree.ParentName.Length == 0)
@@ -94,7 +94,7 @@ namespace pcysl5edgo.Wahren
                         buffer.Append(files, tempData.Braves[pair.Value]);
                         break;
                     case AST.RaceTree.consti:
-                        buffer.Append(files, tempData.Constis[pair.Value], list);
+                        buffer.Append(files, tempData.Constis[pair.Value], tempData.IdentifierNumberPairs);
                         break;
                     case AST.RaceTree.movetype:
                         buffer.Append(files, tempData.MoveTypes[pair.Value]);

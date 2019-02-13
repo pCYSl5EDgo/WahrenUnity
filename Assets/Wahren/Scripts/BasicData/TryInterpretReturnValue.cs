@@ -1,4 +1,4 @@
-﻿namespace pcysl5edgo.Wahren
+﻿namespace pcysl5edgo.Wahren.AST
 {
     public enum InterpreterStatus
     {
@@ -63,5 +63,21 @@
         };
 
         public static implicit operator bool(in TryInterpretReturnValue value) => value.Status == InterpreterStatus.Success;
+
+        public override string ToString()
+        {
+            var buffer = new System.Text.StringBuilder(128);
+            buffer.Append(Span.ToString()).Append(", ").AppendLine(Status.ToString());
+            if (Status == InterpreterStatus.Pending)
+            {
+                buffer.Append(DataIndex >> 24).Append(", ").Append(DataIndex & 0xff);
+            }
+            else
+            {
+                buffer.Append(DataIndex);
+            }
+            buffer.AppendLine().Append(SubDataIndex).AppendLine().Append(SubdData0).AppendLine().Append(SubdData1);
+            return buffer.ToString();
+        }
     }
 }

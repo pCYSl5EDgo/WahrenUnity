@@ -10,14 +10,12 @@ namespace pcysl5edgo.Wahren.AST
         [NativeDisableUnsafePtrRestriction] public ScriptAnalyzeDataManager_Internal* ScriptPtr;
         [NativeDisableUnsafePtrRestriction] public RaceParserTempData.OldLengths* OldPtr;
         public int OldASTValueTypePairListLength;
-        public int OldIdentifierNumberPairListLength;
 
         public void Execute()
         {
             var Old = *OldPtr;
             ref var raceParserTempData = ref ScriptPtr->RaceParserTempData;
             ref var astPairList = ref ScriptPtr->ASTValueTypePairList;
-            ref var identifierNumberPairList = ref ScriptPtr->IdentifierNumberPairList;
             GC_ASTPairList(Old, ref raceParserTempData, ref astPairList);
             GC_Race_Consti(Old, ref raceParserTempData);
             /*

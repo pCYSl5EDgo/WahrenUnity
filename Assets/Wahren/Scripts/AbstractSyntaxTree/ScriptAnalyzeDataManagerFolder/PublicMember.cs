@@ -114,7 +114,6 @@ namespace pcysl5edgo.Wahren.AST
         public ref TextFile this[int index] => ref ScriptPtr->Files[index];
         public ref int Length => ref ScriptPtr->FileLength;
         public ref TextFile* Files => ref ScriptPtr->Files;
-        public ref IdentifierNumberPairList IdentifierNumberPairList => ref ScriptPtr->IdentifierNumberPairList;
         public ref ASTValueTypePairList ASTValueTypePairList => ref ScriptPtr->ASTValueTypePairList;
     }
 }

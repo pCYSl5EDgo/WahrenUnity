@@ -73,7 +73,7 @@ namespace pcysl5edgo.Wahren.AST
                 switch (CommonPtr->LastStructKind)
                 {
                     case Location.Race:
-                        if (CommonPtr->Result = File.TryParseRaceStructMultiThread(ref ScriptPtr->RaceParserTempData, ref ScriptPtr->IdentifierNumberPairList, ref ScriptPtr->ASTValueTypePairList, CommonPtr->LastNameSpan, CommonPtr->LastParentNameSpan, currentCaret, out currentCaret, out _))
+                        if (CommonPtr->Result = File.TryParseRaceStructMultiThread(ref ScriptPtr->RaceParserTempData, ref ScriptPtr->ASTValueTypePairList, CommonPtr->LastNameSpan, CommonPtr->LastParentNameSpan, currentCaret, out currentCaret, out _))
                         {
                             File.SkipWhiteSpace(ref currentCaret);
                             CommonPtr->Caret = currentCaret;

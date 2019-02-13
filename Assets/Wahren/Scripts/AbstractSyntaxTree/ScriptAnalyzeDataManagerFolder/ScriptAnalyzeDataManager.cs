@@ -1,8 +1,6 @@
 ﻿using Unity.Jobs;
-using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
-using System;
 
 namespace pcysl5edgo.Wahren.AST
 {
@@ -15,7 +13,6 @@ namespace pcysl5edgo.Wahren.AST
 
         private RaceParserTempData.OldLengths* RaceOldLengths;
         private int OldASTValueTypePairListLength;
-        private int OldIdentifierNumberPairListLength;
 
         private NativeList<JobHandle> handles;
         private NativeArray<ParseJob> jobs;
@@ -31,7 +28,6 @@ namespace pcysl5edgo.Wahren.AST
             currentStage = Stage.Parsing;
             UnsafeUtility.MemCpy(RaceOldLengths, &ScriptPtr->RaceParserTempData, sizeof(RaceParserTempData.OldLengths));
             OldASTValueTypePairListLength = ScriptPtr->ASTValueTypePairList.Length;
-            OldIdentifierNumberPairListLength = ScriptPtr->IdentifierNumberPairList.Length;
             *Status = InterpreterStatus.None;
         }
 
@@ -146,7 +142,6 @@ namespace pcysl5edgo.Wahren.AST
                 handles.Clear();
             handles.Add(new GCJob
             {
-                OldIdentifierNumberPairListLength = ScriptPtr->IdentifierNumberPairList.Length,
                 OldASTValueTypePairListLength = ScriptPtr->ASTValueTypePairList.Length,
                 OldPtr = RaceOldLengths,
                 ScriptPtr = ScriptPtr,
@@ -158,40 +153,56 @@ namespace pcysl5edgo.Wahren.AST
             switch ((PendingReason)(result.DataIndex & 0xff))
             {
                 case PendingReason.ASTValueTypePairListCapacityShortage:
+#if UNITY_EDITOR
                     UnityEngine.Debug.Log("race ast value type pair lengthen");
+#endif
                     ListUtility.Lengthen(ref ASTValueTypePairList.Values, ref ASTValueTypePairList.Capacity);
                     break;
                 case PendingReason.IdentifierNumberPairListCapacityShortage:
+#if UNITY_EDITOR
                     UnityEngine.Debug.Log("race identifier number pair lengthen");
-                    ListUtility.Lengthen(ref RaceParserTempData.Constis, ref RaceParserTempData.ConstiCapacity);
+#endif
+                    RaceParserTempData.IdentifierNumberPairs.Lengthen();
                     break;
                 case PendingReason.SectionListCapacityShortage:
                     switch (result.SubDataIndex)
                     {
                         case 1: // name
+#if UNITY_EDITOR
                             UnityEngine.Debug.Log("race name lengthen");
+#endif
                             ListUtility.Lengthen(ref RaceParserTempData.Names, ref RaceParserTempData.NameCapacity);
                             break;
                         case 2: // align
+#if UNITY_EDITOR
                             UnityEngine.Debug.Log("race align lengthen");
+#endif
                             ListUtility.Lengthen(ref RaceParserTempData.Aligns, ref RaceParserTempData.AlignCapacity);
                             break;
                         case 3: // brave
+#if UNITY_EDITOR
                             UnityEngine.Debug.Log("race brave lengthen");
+#endif
                             ListUtility.Lengthen(ref RaceParserTempData.Braves, ref RaceParserTempData.BraveCapacity);
                             break;
                         case 4: //consti
+#if UNITY_EDITOR
                             UnityEngine.Debug.Log("race consti lengthen");
+#endif
                             ListUtility.Lengthen(ref RaceParserTempData.Constis, ref RaceParserTempData.ConstiCapacity);
                             break;
                         case 5: // movetype
+#if UNITY_EDITOR
                             UnityEngine.Debug.Log("race movetype lengthen");
+#endif
                             ListUtility.Lengthen(ref RaceParserTempData.MoveTypes, ref RaceParserTempData.MoveTypeCapacity);
                             break;
                     }
                     break;
                 case PendingReason.TreeListCapacityShortage:
+#if UNITY_EDITOR
                     UnityEngine.Debug.Log("race lengthen");
+#endif
                     ListUtility.Lengthen(ref RaceParserTempData.Values, ref RaceParserTempData.Capacity);
                     break;
             }

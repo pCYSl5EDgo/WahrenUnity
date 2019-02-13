@@ -1,12 +1,8 @@
-﻿using System;
-using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
-
-namespace pcysl5edgo.Wahren.AST
+﻿namespace pcysl5edgo.Wahren.AST
 {
     public static unsafe class RaceParser
     {
-        public static TryInterpretReturnValue TryParseRaceStructMultiThread(this ref TextFile file, ref RaceParserTempData tempData, ref IdentifierNumberPairList identifierNumberPairList, ref ASTValueTypePairList astValueTypePairList, Span name, Span parentName, Caret nextToLeftBrace, out Caret nextToRightBrace, out int raceTreeIndex)
+        public static TryInterpretReturnValue TryParseRaceStructMultiThread(this ref TextFile file, ref RaceParserTempData tempData, ref ASTValueTypePairList astValueTypePairList, Span name, Span parentName, Caret nextToLeftBrace, out Caret nextToRightBrace, out int raceTreeIndex)
         {
             nextToRightBrace = nextToLeftBrace;
             file.SkipWhiteSpace(ref nextToRightBrace);
@@ -19,72 +15,83 @@ namespace pcysl5edgo.Wahren.AST
                 ParentName = parentName,
             };
             var list = ASTValueTypePairList.MallocTemp(4);
-            for (ref var raw = ref nextToRightBrace.Line; raw < file.LineCount; raw++, column = 0)
+            try
             {
-                for (int lineLength = file.LineLengths[raw]; column < lineLength; column++)
+                for (ref var raw = ref nextToRightBrace.Line; raw < file.LineCount; raw++, column = 0)
                 {
-                    switch ((file.Contents + file.LineStarts[raw])[column])
+                    for (int lineLength = file.LineLengths[raw]; column < lineLength; column++)
                     {
-                        case '}':
-                            column++;
-                            tree.Start = astValueTypePairList.TryAddBulkMultiThread(list, out tree.Length);
-                            ASTValueTypePairList.FreeTemp(ref list);
-                            if (tree.Start == -1)
-                            {
-                                raceTreeIndex = -1;
-                                return TryInterpretReturnValue.CreatePending(new Span(nextToLeftBrace, 0), Location.Race, PendingReason.ASTValueTypePairListCapacityShortage);
-                            }
-                            if (tree.TryAddToMultiThread(ref tempData.Values, tempData.Capacity, ref tempData.Length, out raceTreeIndex))
-                            {
-                                return new TryInterpretReturnValue(nextToRightBrace, SuccessSentence.RaceTreeIntrepretSuccess, InterpreterStatus.Success);
-                            }
-                            else
-                            {
-                                return TryInterpretReturnValue.CreatePending(new Span(nextToLeftBrace, 0), Location.Race, PendingReason.TreeListCapacityShortage);
-                            }
-                        case 'a': // align
-                            answer = AlignDetect(ref file, ref tempData, ref nextToRightBrace, ref list);
-                            if (!answer.IsSuccess)
+                        switch ((file.Contents + file.LineStarts[raw])[column])
+                        {
+                            case '}':
+                                column++;
+                                tree.Start = astValueTypePairList.TryAddBulkMultiThread(list, out tree.Length);
+                                if (tree.Start == -1)
+                                {
+                                    raceTreeIndex = -1;
+                                    return TryInterpretReturnValue.CreatePending(new Span(nextToLeftBrace, 0), Location.Race, PendingReason.ASTValueTypePairListCapacityShortage);
+                                }
+                                if (tree.TryAddToMultiThread(ref tempData.Values, tempData.Capacity, ref tempData.Length, out raceTreeIndex))
+                                {
+                                    return new TryInterpretReturnValue(nextToRightBrace, SuccessSentence.RaceTreeIntrepretSuccess, InterpreterStatus.Success);
+                                }
+                                else
+                                {
+                                    return TryInterpretReturnValue.CreatePending(new Span(nextToLeftBrace, 0), Location.Race, PendingReason.TreeListCapacityShortage);
+                                }
+                            case 'a': // align
+                                if (!(answer = AlignDetect(ref file, ref tempData, ref nextToRightBrace, ref list)))
+                                {
+                                    goto RETURN;
+                                }
+                                nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
+                                break;
+                            case 'b': // brave
+                                if (!(answer = BraveDetect(ref file, ref tempData, ref nextToRightBrace, ref list)))
+                                {
+                                    goto RETURN;
+                                }
+                                nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
+                                break;
+                            case 'c': // consti
+                                if (!(answer = ConstiDetect(ref file, ref tempData, ref nextToRightBrace, ref list)))
+                                {
+                                    goto RETURN;
+                                }
+                                nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
+                                break;
+                            case 'm': // movetype
+                                if (!(answer = MoveTypeDetect(ref file, ref tempData, ref nextToRightBrace, ref list)))
+                                {
+                                    goto RETURN;
+                                }
+                                nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
+                                break;
+                            case 'n': // name
+                                if (!(answer = NameDetect(ref file, ref tempData, ref nextToRightBrace, ref list)))
+                                {
+                                    goto RETURN;
+                                }
+                                nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
+                                break;
+                            case ' ':
+                            case '\t':
+                                break;
+                            default:
+                                answer = new TryInterpretReturnValue(new Span(nextToRightBrace, 1), ErrorSentence.NotExpectedCharacterError, InterpreterStatus.Error);
                                 goto RETURN;
-                            nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
-                            break;
-                        case 'b': // brave
-                            answer = BraveDetect(ref file, ref tempData, ref nextToRightBrace, ref list);
-                            if (!answer.IsSuccess)
-                                goto RETURN;
-                            nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
-                            break;
-                        case 'c': // consti
-                            answer = ConstiDetect(ref file, ref tempData, ref nextToRightBrace, ref list, ref identifierNumberPairList);
-                            if (!answer.IsSuccess)
-                                goto RETURN;
-                            nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
-                            break;
-                        case 'm': // movetype
-                            answer = MoveTypeDetect(ref file, ref tempData, ref nextToRightBrace, ref list);
-                            if (!answer.IsSuccess)
-                                goto RETURN;
-                            nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
-                            break;
-                        case 'n': // name
-                            answer = NameDetect(ref file, ref tempData, ref nextToRightBrace, ref list);
-                            if (!answer.IsSuccess)
-                                goto RETURN;
-                            nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
-                            break;
-                        case ' ':
-                        case '\t':
-                            break;
-                        default:
-                            answer = new TryInterpretReturnValue(new Span(nextToRightBrace, 1), ErrorSentence.NotExpectedCharacterError, InterpreterStatus.Error);
-                            goto RETURN;
+                        }
                     }
                 }
+                answer = new TryInterpretReturnValue(nextToRightBrace, ErrorSentence.ExpectedCharNotFoundError, 2, InterpreterStatus.Error);
+            RETURN:
+                raceTreeIndex = -1;
+                return answer;
             }
-            answer = new TryInterpretReturnValue(nextToRightBrace, ErrorSentence.ExpectedCharNotFoundError, 2, InterpreterStatus.Error);
-        RETURN:
-            raceTreeIndex = -1;
-            return answer;
+            finally
+            {
+                ASTValueTypePairList.FreeTemp(ref list);
+            }
         }
 
         private static TryInterpretReturnValue NameDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref ASTValueTypePairList list)
@@ -152,7 +159,7 @@ namespace pcysl5edgo.Wahren.AST
             current.Column++;
             file.SkipWhiteSpace(ref current);
             answer = ReadUtility.TryReadIdentifierNotEmpty(file.Contents + file.LineStarts[current.Line], file.CurrentLineLength(current), current.File, current.Line, current.Column);
-            if (!answer.IsSuccess)
+            if (!answer)
                 goto RETURN;
             answer.DataIndex = SuccessSentence.AssignmentInterpretationSuccess;
             expression.Value = answer.Span;
@@ -169,7 +176,7 @@ namespace pcysl5edgo.Wahren.AST
             return answer;
         }
 
-        private static TryInterpretReturnValue ConstiDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref ASTValueTypePairList listTemp, ref IdentifierNumberPairList pairList)
+        private static TryInterpretReturnValue ConstiDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref ASTValueTypePairList listTemp)
         {
             var cs = file.CurrentCharPointer(current);
             var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, InterpreterStatus.Error);
@@ -193,12 +200,12 @@ namespace pcysl5edgo.Wahren.AST
             }
             current.Column++;
             file.SkipWhiteSpace(ref current);
-            answer = file.TryReadIdentifierNumberPairs(ref pairList, current, out expression.Start, out expression.Length);
-            if (!answer.IsSuccess)
+            answer = file.TryReadIdentifierNumberPairs(ref tempData.IdentifierNumberPairs, current, out expression.Start, out expression.Length);
+            if (!answer)
                 goto RETURN;
             current = answer.Span.CaretNextToEndOfThisSpan;
             file.SkipWhiteSpace(ref current);
-            answer = VerifyConsti(expression, pairList, answer.Span);
+            answer = VerifyConsti(expression, tempData.IdentifierNumberPairs, answer.Span);
             if (answer.IsError)
                 goto RETURN;
             var ast = new ASTValueTypePair(RaceTree.consti);
@@ -250,7 +257,7 @@ namespace pcysl5edgo.Wahren.AST
             current.Column++;
             file.SkipWhiteSpace(ref current);
             answer = file.TryReadNumber(current, out var value);
-            if (!answer.IsSuccess)
+            if (!answer)
                 goto RETURN;
             expression.Value = (sbyte)value;
             var ast = new ASTValueTypePair(RaceTree.brave);
@@ -291,7 +298,7 @@ namespace pcysl5edgo.Wahren.AST
             current.Column++;
             file.SkipWhiteSpace(ref current);
             answer = file.TryReadNumber(current, out var value);
-            if (!answer.IsSuccess)
+            if (!answer)
                 goto RETURN;
             expression.Value = (sbyte)value;
             var ast = new ASTValueTypePair(RaceTree.align);
