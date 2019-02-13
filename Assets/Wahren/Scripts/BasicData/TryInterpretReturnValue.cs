@@ -52,20 +52,20 @@
 
         public static TryInterpretReturnValue CreateSuccessDetectStructType(in Caret caret, int length, Location location) => new TryInterpretReturnValue(new Span(caret, length), SuccessSentence.StructKindInterpretSuccess, (int)location, InterpreterStatus.Success);
 
-        public static TryInterpretReturnValue CreatePending(Span span, Location location, PendingReason reason, int subDataIndex = 0, long subData0 = 0, long subData1 = 0) => new TryInterpretReturnValue
+        public static TryInterpretReturnValue CreatePending(Span span, Location location, PendingReason reason, int subDataIndex = 0) => new TryInterpretReturnValue
         {
             Span = span,
-            DataIndex = ((byte)location << 24) | (byte)reason,
+            DataIndex = 0,
             SubDataIndex = subDataIndex,
-            SubdData0 = subData0,
-            SubdData1 = subData1,
+            SubdData0 = (long)location,
+            SubdData1 = (long)reason,
             Status = InterpreterStatus.Pending,
         };
 
         public void Deconstruct(out Location location, out PendingReason reason)
         {
-            location = (Location)(DataIndex >> 24);
-            reason = (PendingReason)(DataIndex & 0xff);
+            location = (Location)SubdData0;
+            reason = (PendingReason)SubdData1;
         }
 
         public static implicit operator bool(in TryInterpretReturnValue value) => value.Status == InterpreterStatus.Success;
@@ -76,13 +76,13 @@
             buffer.Append(Span.ToString()).Append(", ").AppendLine(Status.ToString());
             if (Status == InterpreterStatus.Pending)
             {
-                buffer.Append(DataIndex >> 24).Append(", ").Append(DataIndex & 0xff);
+                var (location, reason) = this;
+                buffer.Append(location).Append(", ").Append(reason).AppendLine().Append(SubDataIndex);
             }
             else
             {
-                buffer.Append(DataIndex);
+                buffer.Append(DataIndex).Append(", ").Append(SubDataIndex).AppendLine().Append(SubdData0).AppendLine().Append(SubdData1);
             }
-            buffer.AppendLine().Append(SubDataIndex).AppendLine().Append(SubdData0).AppendLine().Append(SubdData1);
             return buffer.ToString();
         }
     }
