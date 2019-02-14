@@ -5,6 +5,8 @@ using UnityEngine.TestTools;
 using pcysl5edgo.Wahren.AST;
 
 using A = UnityEngine.Assertions.Assert;
+using System;
+using System.Collections.Generic;
 
 public class TestScript
 {
@@ -18,36 +20,8 @@ public class TestScript
         using (var scriptManager = new ScriptAnalyzeDataManager(new System.IO.DirectoryInfo(ScriptDirectoryFullPath).GetFiles("*.dat", System.IO.SearchOption.AllDirectories), IsUtf16, IsDebug, false))
         {
             yield return null;
-            while (scriptManager.CurrentStage != ScriptAnalyzeDataManager.Stage.Done)
-            {
-                switch (scriptManager.CurrentStage)
-                {
-                    case ScriptAnalyzeDataManager.Stage.None:
-                        Assert.Fail("Stage must not be 'None'");
-                        yield return null;
-                        break;
-                    case ScriptAnalyzeDataManager.Stage.PreLoading:
-                        scriptManager.StartLoad();
-                        yield return null;
-                        break;
-                    case ScriptAnalyzeDataManager.Stage.Loading:
-                        scriptManager.Update();
-                        yield return null;
-                        break;
-                    case ScriptAnalyzeDataManager.Stage.PreParsing:
-                        scriptManager.StartParse();
-                        yield return null;
-                        break;
-                    case ScriptAnalyzeDataManager.Stage.Parsing:
-                        scriptManager.Update();
-                        yield return null;
-                        break;
-                    case ScriptAnalyzeDataManager.Stage.GarbageCollecting:
-                        scriptManager.Update();
-                        yield return null;
-                        break;
-                }
-            }
+            foreach (var _ in PreparationLoop(scriptManager))
+                yield return null;
             const int RaceCount_Vahren = 12;
             A.AreEqual(RaceCount_Vahren, scriptManager.RaceParserTempData.Length);
             for (int i = 0; i < scriptManager.RaceParserTempData.Length; i++)
@@ -67,6 +41,57 @@ public class TestScript
                 AppendMovetype(buffer, scriptManager, i);
             }
             UnityEngine.Debug.Log(buffer.ToString());
+        }
+    }
+
+    private IEnumerable PreparationLoop(ScriptAnalyzeDataManager scriptManager)
+    {
+        while (scriptManager.CurrentStage != ScriptAnalyzeDataManager.Stage.Done)
+        {
+            switch (scriptManager.CurrentStage)
+            {
+                case ScriptAnalyzeDataManager.Stage.None:
+                    Assert.Fail("Stage must not be 'None'");
+                    yield return null;
+                    break;
+                case ScriptAnalyzeDataManager.Stage.PreLoading:
+                    scriptManager.StartLoad();
+                    yield return null;
+                    break;
+                case ScriptAnalyzeDataManager.Stage.Loading:
+                    scriptManager.Update();
+                    yield return null;
+                    break;
+                case ScriptAnalyzeDataManager.Stage.PreParsing:
+                    scriptManager.StartParse();
+                    yield return null;
+                    break;
+                case ScriptAnalyzeDataManager.Stage.Parsing:
+                    scriptManager.Update();
+                    yield return null;
+                    break;
+                case ScriptAnalyzeDataManager.Stage.GarbageCollecting:
+                    scriptManager.Update();
+                    yield return null;
+                    break;
+            }
+        }
+    }
+
+    [UnityTest]
+    public IEnumerator Vahren_Abnormal_Race_Movetype()
+    {
+        string ScriptDirectoryFullPath = System.IO.Path.Combine(UnityEngine.Application.dataPath, "Wahren/ScriptTests/VahrenTestScripts/Race_Movetype_Abnormals");
+        const bool IsUtf16 = false;
+        const bool IsDebug = false;
+        var buffer = new StringBuilder(1024);
+        using (var scriptManager = new ScriptAnalyzeDataManager(new System.IO.DirectoryInfo(ScriptDirectoryFullPath).GetFiles("*.dat", System.IO.SearchOption.AllDirectories), IsUtf16, IsDebug, false))
+        {
+            yield return null;
+            foreach (var _ in PreparationLoop(scriptManager))
+            {
+                yield return null;
+            }
         }
     }
 
