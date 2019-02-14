@@ -58,19 +58,6 @@ namespace pcysl5edgo.Wahren.AST
             return buffer;
         }
 
-        private static StringBuilder AppendHeader(this StringBuilder buffer, TextFile* files, string structKind, Span structName, Span structParentName)
-        {
-            buffer.Append(structKind).Append(' ').AppendPrimitive(files, structName);
-            if (structParentName.Length == 0)
-            {
-                return buffer.Append("\n{");
-            }
-            else
-            {
-                return buffer.Append(" : ").AppendPrimitive(files, structParentName).Append("\n{");
-            }
-        }
-
         private static StringBuilder Append(this StringBuilder buffer, TextFile* files, in RaceTree.AlignAssignExpression expression)
         => buffer.AppendExtension(files, "align", expression.ScenarioVariant, expression.Value);
 
@@ -88,31 +75,33 @@ namespace pcysl5edgo.Wahren.AST
 
         public static StringBuilder AppendEx(this StringBuilder buffer, in RaceTree tree, TextFile* files, in RaceParserTempData tempData, in ASTValueTypePairList astValueTypePairList)
         {
-            buffer.AppendHeader(files, "race", tree.Name, tree.ParentName);
-            for (int i = tree.Start, end = tree.Start + tree.Length; i < end; i++)
+            using (new ClosingStruct(buffer, files, "race", tree.Name, tree.ParentName))
             {
-                var pair = astValueTypePairList.Values[i];
-                buffer.Append("\n  ");
-                switch (pair.Type)
+                for (int i = tree.Start, end = tree.Start + tree.Length; i < end; i++)
                 {
-                    case RaceTree.name:
-                        buffer.Append(files, tempData.Names[pair.Value]);
-                        break;
-                    case RaceTree.align:
-                        buffer.Append(files, tempData.Aligns[pair.Value]);
-                        break;
-                    case RaceTree.brave:
-                        buffer.Append(files, tempData.Braves[pair.Value]);
-                        break;
-                    case RaceTree.consti:
-                        buffer.Append(files, tempData.Constis[pair.Value], tempData.IdentifierNumberPairs);
-                        break;
-                    case RaceTree.movetype:
-                        buffer.Append(files, tempData.MoveTypes[pair.Value]);
-                        break;
+                    var pair = astValueTypePairList.Values[i];
+                    buffer.Append("\n  ");
+                    switch (pair.Type)
+                    {
+                        case RaceTree.name:
+                            buffer.Append(files, tempData.Names[pair.Value]);
+                            break;
+                        case RaceTree.align:
+                            buffer.Append(files, tempData.Aligns[pair.Value]);
+                            break;
+                        case RaceTree.brave:
+                            buffer.Append(files, tempData.Braves[pair.Value]);
+                            break;
+                        case RaceTree.consti:
+                            buffer.Append(files, tempData.Constis[pair.Value], tempData.IdentifierNumberPairs);
+                            break;
+                        case RaceTree.movetype:
+                            buffer.Append(files, tempData.MoveTypes[pair.Value]);
+                            break;
+                    }
                 }
             }
-            return buffer.Append("\n}");
+            return buffer;
         }
 
         private static StringBuilder Append(this StringBuilder buffer, TextFile* files, MoveTypeTree.NameAssignExpression expression)
@@ -126,25 +115,27 @@ namespace pcysl5edgo.Wahren.AST
 
         public static StringBuilder AppendEx(this StringBuilder buffer, in MoveTypeTree tree, TextFile* files, in MovetypeParserTempData tempData, in ASTValueTypePairList astValueTypePairList)
         {
-            buffer.AppendHeader(files, "movetype", tree.Name, tree.ParentName);
-            for (int i = tree.Start, end = tree.Start + tree.Length; i < end; i++)
+            using (new ClosingStruct(buffer, files, "movetype", tree.Name, tree.ParentName))
             {
-                var pair = astValueTypePairList.Values[i];
-                buffer.Append("\n  ");
-                switch (pair.Type)
+                for (int i = tree.Start, end = tree.Start + tree.Length; i < end; i++)
                 {
-                    case MoveTypeTree.name:
-                        buffer.Append(files, tempData.Names[pair.Value]);
-                        break;
-                    case MoveTypeTree.consti:
-                        buffer.Append(files, tempData.Constis[pair.Value], tempData.IdentifierNumberPairs);
-                        break;
-                    case MoveTypeTree.help:
-                        buffer.Append(files, tempData.Helps[pair.Value]);
-                        break;
+                    var pair = astValueTypePairList.Values[i];
+                    buffer.Append("\n  ");
+                    switch (pair.Type)
+                    {
+                        case MoveTypeTree.name:
+                            buffer.Append(files, tempData.Names[pair.Value]);
+                            break;
+                        case MoveTypeTree.consti:
+                            buffer.Append(files, tempData.Constis[pair.Value], tempData.IdentifierNumberPairs);
+                            break;
+                        case MoveTypeTree.help:
+                            buffer.Append(files, tempData.Helps[pair.Value]);
+                            break;
+                    }
                 }
             }
-            return buffer.Append("\n}");
+            return buffer;
         }
 
         public static StringBuilder Append(this StringBuilder buffer, in TryInterpretReturnValue value, ScriptAnalyzeDataManager script)
@@ -164,6 +155,27 @@ namespace pcysl5edgo.Wahren.AST
             if (value.Span.Length > 1)
                 buffer.Append('-').Append(value.Span.Column + 1 + value.Span.Length);
             return buffer.Append(")\n").AppendPrimitive(script, value.Span);
+        }
+        struct ClosingStruct : IDisposable
+        {
+            public unsafe ClosingStruct(StringBuilder buffer, TextFile* files, string structKind, Span structName, Span structParentName)
+            {
+                this.buffer = buffer.Append(structKind).Append(' ').AppendPrimitive(files, structName);
+                if (structParentName.Length == 0)
+                {
+                    buffer.Append("\n{");
+                }
+                else
+                {
+                    buffer.Append(" : ").AppendPrimitive(files, structParentName).Append("\n{");
+                }
+            }
+            StringBuilder buffer;
+
+            public void Dispose()
+            {
+                buffer.Append("\n}");
+            }
         }
     }
 }
