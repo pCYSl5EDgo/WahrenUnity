@@ -8,7 +8,7 @@ using Unity.IO.LowLevel.Unsafe;
 
 namespace pcysl5edgo.Wahren.AST
 {
-    partial class ScriptAnalyzeDataManager
+    partial class ScriptAnalyzeDataManager : IDisposable
     {
         private unsafe struct InitialReadTempData : IDisposable
         {

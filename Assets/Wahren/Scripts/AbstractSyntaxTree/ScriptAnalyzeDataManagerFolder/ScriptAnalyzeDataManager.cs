@@ -18,6 +18,9 @@ namespace pcysl5edgo.Wahren.AST
         private NativeArray<ParseJob> jobs;
         private NativeArray<ParseJob.CommonData> commonDatas;
         private Stage currentStage;
+#if UNITY_EDITOR
+        public bool ShowLog;
+#endif
 
         private void ScheduleParsing()
         {
@@ -165,13 +168,19 @@ namespace pcysl5edgo.Wahren.AST
             {
                 case PendingReason.ASTValueTypePairListCapacityShortage:
 #if UNITY_EDITOR
-                    UnityEngine.Debug.Log(prefix + " ast value type pair lengthen\n" + result.ToString());
+                    if (ShowLog)
+                    {
+                        UnityEngine.Debug.Log(prefix + " ast value type pair lengthen\n" + result.ToString());
+                    }
 #endif
                     ListUtility.Lengthen(ref ASTValueTypePairList.Values, ref ASTValueTypePairList.Capacity);
                     break;
                 case PendingReason.IdentifierNumberPairListCapacityShortage:
 #if UNITY_EDITOR
-                    UnityEngine.Debug.Log(prefix + " identifier number pair lengthen\n" + result.ToString() + "\n" + identifierNumberPairs.Capacity);
+                    if (ShowLog)
+                    {
+                        UnityEngine.Debug.Log(prefix + " identifier number pair lengthen\n" + result.ToString() + "\n" + identifierNumberPairs.Capacity);
+                    }
 #endif
                     identifierNumberPairs.Lengthen();
                     break;
@@ -180,19 +189,28 @@ namespace pcysl5edgo.Wahren.AST
                     {
                         case MoveTypeTree.name + 1: // name
 #if UNITY_EDITOR
-                            UnityEngine.Debug.Log(prefix + " name lengthen\n" + result.ToString());
+                            if (ShowLog)
+                            {
+                                UnityEngine.Debug.Log(prefix + " name lengthen\n" + result.ToString());
+                            }
 #endif
                             ListUtility.Lengthen(ref tmpData.Names, ref tmpData.NameCapacity);
                             break;
                         case MoveTypeTree.help + 1: // help
 #if UNITY_EDITOR
-                            UnityEngine.Debug.Log(prefix + " help lengthen\n" + result.ToString());
+                            if (ShowLog)
+                            {
+                                UnityEngine.Debug.Log(prefix + " help lengthen\n" + result.ToString());
+                            }
 #endif
                             ListUtility.Lengthen(ref tmpData.Helps, ref tmpData.HelpCapacity);
                             break;
                         case MoveTypeTree.consti + 1: // consti
 #if UNITY_EDITOR
-                            UnityEngine.Debug.Log(prefix + " consti lengthen\n" + result.ToString());
+                            if (ShowLog)
+                            {
+                                UnityEngine.Debug.Log(prefix + " consti lengthen\n" + result.ToString());
+                            }
 #endif
                             ListUtility.Lengthen(ref tmpData.Constis, ref tmpData.ConstiCapacity);
                             break;
@@ -200,7 +218,10 @@ namespace pcysl5edgo.Wahren.AST
                     break;
                 case PendingReason.TreeListCapacityShortage:
 #if UNITY_EDITOR
-                    UnityEngine.Debug.Log(prefix + " lengthen\n" + result.ToString());
+                    if (ShowLog)
+                    {
+                        UnityEngine.Debug.Log(prefix + " lengthen\n" + result.ToString());
+                    }
 #endif
                     ListUtility.Lengthen(ref tmpData.Values, ref tmpData.Capacity);
                     break;
@@ -217,13 +238,19 @@ namespace pcysl5edgo.Wahren.AST
             {
                 case PendingReason.ASTValueTypePairListCapacityShortage:
 #if UNITY_EDITOR
-                    UnityEngine.Debug.Log(prefix + " ast value type pair lengthen\n" + result.ToString());
+                    if (ShowLog)
+                    {
+                        UnityEngine.Debug.Log(prefix + " ast value type pair lengthen\n" + result.ToString());
+                    }
 #endif
                     ListUtility.Lengthen(ref ASTValueTypePairList.Values, ref ASTValueTypePairList.Capacity);
                     break;
                 case PendingReason.IdentifierNumberPairListCapacityShortage:
 #if UNITY_EDITOR
-                    UnityEngine.Debug.Log(prefix + " identifier number pair lengthen\n" + result.ToString() + "\nCapacity: " + identifierNumberPairs.Capacity + " , Length: " + identifierNumberPairs.Length);
+                    if (ShowLog)
+                    {
+                        UnityEngine.Debug.Log(prefix + " identifier number pair lengthen\n" + result.ToString() + "\nCapacity: " + identifierNumberPairs.Capacity + " , Length: " + identifierNumberPairs.Length);
+                    }
 #endif
                     identifierNumberPairs.Lengthen();
                     break;
@@ -232,31 +259,46 @@ namespace pcysl5edgo.Wahren.AST
                     {
                         case RaceTree.name + 1: // name
 #if UNITY_EDITOR
-                            UnityEngine.Debug.Log(prefix + " name lengthen\n" + result.ToString());
+                            if (ShowLog)
+                            {
+                                UnityEngine.Debug.Log(prefix + " name lengthen\n" + result.ToString());
+                            }
 #endif
                             ListUtility.Lengthen(ref raceParserTempData.Names, ref raceParserTempData.NameCapacity);
                             break;
                         case RaceTree.align + 1: // align
 #if UNITY_EDITOR
-                            UnityEngine.Debug.Log(prefix + " align lengthen\n" + result.ToString());
+                            if (ShowLog)
+                            {
+                                UnityEngine.Debug.Log(prefix + " align lengthen\n" + result.ToString());
+                            }
 #endif
                             ListUtility.Lengthen(ref raceParserTempData.Aligns, ref raceParserTempData.AlignCapacity);
                             break;
                         case RaceTree.brave + 1: // brave
 #if UNITY_EDITOR
-                            UnityEngine.Debug.Log(prefix + " brave lengthen\n" + result.ToString());
+                            if (ShowLog)
+                            {
+                                UnityEngine.Debug.Log(prefix + " brave lengthen\n" + result.ToString());
+                            }
 #endif
                             ListUtility.Lengthen(ref raceParserTempData.Braves, ref raceParserTempData.BraveCapacity);
                             break;
                         case RaceTree.consti + 1: //consti
 #if UNITY_EDITOR
-                            UnityEngine.Debug.Log(prefix + " consti lengthen\n" + result.ToString());
+                            if (ShowLog)
+                            {
+                                UnityEngine.Debug.Log(prefix + " consti lengthen\n" + result.ToString());
+                            }
 #endif
                             ListUtility.Lengthen(ref raceParserTempData.Constis, ref raceParserTempData.ConstiCapacity);
                             break;
                         case RaceTree.movetype + 1: // movetype
 #if UNITY_EDITOR
-                            UnityEngine.Debug.Log(prefix + " movetype lengthen\n" + result.ToString());
+                            if (ShowLog)
+                            {
+                                UnityEngine.Debug.Log(prefix + " movetype lengthen\n" + result.ToString());
+                            }
 #endif
                             ListUtility.Lengthen(ref raceParserTempData.MoveTypes, ref raceParserTempData.MoveTypeCapacity);
                             break;
@@ -264,7 +306,10 @@ namespace pcysl5edgo.Wahren.AST
                     break;
                 case PendingReason.TreeListCapacityShortage:
 #if UNITY_EDITOR
-                    UnityEngine.Debug.Log(prefix + " lengthen\n" + result.ToString());
+                    if (ShowLog)
+                    {
+                        UnityEngine.Debug.Log(prefix + " lengthen\n" + result.ToString());
+                    }
 #endif
                     ListUtility.Lengthen(ref raceParserTempData.Values, ref raceParserTempData.Capacity);
                     break;

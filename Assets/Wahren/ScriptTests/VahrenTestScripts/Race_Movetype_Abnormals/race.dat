@@ -1,0 +1,188 @@
+
+//種族_____________________________________________________
+
+race human
+{
+	name = 人間
+	align = 15
+	brave = 70
+	movetype = normal
+	consti = dispel*10, dark*4
+	, suck*4, magsuck*4, drain*4
+}
+
+race elf
+{
+	name = エルフ
+	align = 0
+	brave = 55
+	movetype = wood
+	consti = fire*3, water*7, air*7, light*7, dark*3, poi*3, para*3, fear*4, suck*3, ill*7, sil*7, conf*7, magsuck*7, dispel*10
+}
+race delf : elf
+{
+	align = 40
+	consti = ground*3, light*3, dark*7, poi*4, para*4, conf*7, sil*7, magsuck*7, dispel*10
+}
+
+race dwarf
+{
+	name = ドワーフ
+	align = 30
+	brave = 75
+	movetype = rock
+	consti = arrow*7, air*3, water*4, fire*6, ground*8, poi*8, para*8, ill*4, conf*6, sil*3, stone*7, fear*7, suck*8, magsuck*3, dispel*10
+}
+
+race lizard
+{
+	name = リザードマン
+	align = 60
+	brave = 85
+	movetype = mersh
+	consti = fire*4, water*7, air*4, ground*7, poi*7, para*7, ill*3, conf*3, fear*7, suck*7, magsuck*3, dispel*10
+}
+
+race goblin
+{
+	name = ゴブリン
+	align = 35
+	brave = 60
+	movetype = moor
+	consti = fire*3, water*3, poi*6, ill*3, conf*3, sil*3, fear*4, magsuck*3, drain*3, death*4, dispel*10
+}
+
+race devil
+{
+	name = 悪魔
+	align = 50
+	brave = 80
+	movetype = fly
+	consti = holy*3, light*3, dark*8, poi*7, para*7, sil*6, fear*7, suck*7, magsuck*7, drain*7, death*7, dispel*10
+}
+
+race monster
+{
+	name = モンスター
+	brave = 80
+	consti = dispel*10
+	movetype = normal
+}
+
+race undead
+{
+	name = アンデッド
+	brave = 100
+	movetype = normal
+	consti = dispel*0, light*3, holy*3, dark*7, poi*10, para*10, fear*10, suck*10, death*10
+}
+
+race undead2
+{
+	name = 古アンデッド
+	brave = 100
+	movetype = normal
+	consti = holy*3, poi*10, para*10, ill*10, sil*10, conf*10, stone*10, fear*10, suck*10, magsuck*10, drain*10, death*10, dispel*10
+}
+
+race ghost
+{
+	name = 死霊
+	align = 50
+	brave = 100
+	movetype = fly
+	consti = dispel*2, holy*1, light*3, dark*7, poi*10, para*10, ill*10, conf*10, sil*10, stone*10, fear*10, suck*10, magsuck*10, drain*10, death*10
+}
+
+race element
+{
+	name = 精霊
+	brave = 70
+	consti = dispel*10
+	movetype = normal
+}
+
+//移動タイプ_____________________________________________________
+
+movetype normal
+{
+	name = 普通
+	help = 山岳、森林、沼地、海上で遅い
+	consti = grass*6, wood*3, rock*3, mersh*3, sea*2
+}
+
+movetype hover
+{
+	name = 浮遊
+	help = どの地形も普通に進める
+}
+
+movetype sinobi
+{
+	name = 強脚
+	help = 山岳、森林、沼地で速い。遅くなる地形が無い
+	consti = grass*6, mersh*7, wood*7, rock*7
+}
+
+movetype moor
+{
+	name = 荒地
+	help = 山岳、荒地、砂漠で速い。海上、森林、沼地で遅い
+	consti = rock*7, mud*7, sand*7, grass*6, mersh*3, wood*3, sea*3
+}
+
+movetype fly
+{
+	name = 飛行
+	help = 森林、山岳以外で高速になる
+	consti = grass*7, mud*7, sand*7, mersh*7, snow*7, sea*7
+}
+
+movetype grass
+{
+	name = 草原
+	help = 草原で速い。海上、森林、山岳、沼地で遅い
+	consti = grass*10, mud*8, wood*3, rock*3, mersh*3, sea*2
+}
+
+movetype sand
+{
+	name = 砂漠
+	help = 砂漠で速い。海上、森林、山岳、沼地で遅い
+	consti = sand*10, grass*7, mud*7, wood*3, rock*3, mersh*3, sea*2
+}
+
+movetype sea
+{
+	name = 海上
+	help = 海上で速い。森林、山岳で遅い
+	consti = sea*10, wood*3, rock*3
+}
+
+movetype rock
+{
+	name = 山地
+	help = 山岳で速い。海上、森林、沼地で遅い
+	consti = rock*10, mud*8, sand*6, mersh*3, wood*3, sea*2
+}
+
+movetype wood
+{
+	name = 森林
+	help = 森林で速い。海上、山岳、沼地で遅い
+	consti = wood*10, grass*7, rock*3, mersh*3, sea*2
+}
+
+movetype mersh
+{
+	name = 沼地
+	help = 沼地で速い。山岳と砂漠で遅い
+	consti = mersh*10, grass*7, mud*7, rock*3, sand*3
+}
+
+movetype snow
+{
+	name = 雪原
+	help = 雪原で速い。海上、山岳で遅い
+	consti = snow*10, grass*7, mud*7, mersh*6, sand*4, rock*3, sea*3
+}

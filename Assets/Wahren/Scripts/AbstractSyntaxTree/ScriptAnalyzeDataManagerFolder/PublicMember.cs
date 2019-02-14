@@ -17,9 +17,16 @@ namespace pcysl5edgo.Wahren.AST
 
         public Stage CurrentStage => currentStage;
 
-        public ScriptAnalyzeDataManager(System.IO.FileInfo[] fileInfos, bool isUtf16, bool isDebug)
+        public ScriptAnalyzeDataManager(System.IO.FileInfo[] fileInfos, bool isUtf16, bool isDebug
+#if UNITY_EDITOR
+        , bool showLog
+#endif
+        )
         {
             if (fileInfos is null) throw new ArgumentNullException();
+#if UNITY_EDITOR
+            ShowLog = showLog;
+#endif
             FileInfos = fileInfos;
             FullPaths = new string[FileInfos.Length];
             Names = new string[FileInfos.Length];
@@ -111,7 +118,7 @@ namespace pcysl5edgo.Wahren.AST
         }
 
         public ref RaceParserTempData RaceParserTempData => ref ScriptPtr->RaceParserTempData;
-        public ref MovetypeParserTempData MoveTypeParserTempData => ref ScriptPtr->MoveTypeParserTempData;
+        public ref MovetypeParserTempData MovetypeParserTempData => ref ScriptPtr->MoveTypeParserTempData;
         public ref TextFile this[int index] => ref ScriptPtr->Files[index];
         public ref int Length => ref ScriptPtr->FileLength;
         public ref TextFile* Files => ref ScriptPtr->Files;
