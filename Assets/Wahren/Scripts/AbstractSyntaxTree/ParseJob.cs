@@ -81,9 +81,8 @@ namespace pcysl5edgo.Wahren.AST
                         if (CommonPtr->Result.IsPending)
                         {
                             *CancellationTokenPtr = InterpreterStatus.Pending;
-                            return;
                         }
-                        break;
+                        return;
                     case Location.MoveType:
                         CommonPtr->Result = File.TryParseMovetypeStructMultiThread(ref ScriptPtr->MoveTypeParserTempData, ref ScriptPtr->ASTValueTypePairList, CommonPtr->LastNameSpan, CommonPtr->LastParentNameSpan, currentCaret, out currentCaret, out _);
                         if (CommonPtr->Result)
@@ -95,9 +94,8 @@ namespace pcysl5edgo.Wahren.AST
                         {
                             *CancellationTokenPtr = InterpreterStatus.Pending;
                             var (location, _) = CommonPtr->Result;
-                            return;
                         }
-                        break;
+                        return;
                     default:
                         return;
                 }
