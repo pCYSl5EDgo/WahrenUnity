@@ -35,11 +35,11 @@ namespace pcysl5edgo.Wahren.AST
                 FullPaths[i] = FileInfos[i].FullName;
                 Names[i] = FileInfos[i].Name;
             }
-            ScriptPtr = ScriptAnalyzeDataManager_Internal.CreatePtr(FileInfos.Length);
+            ScriptPtr = ScriptAnalyzeDataManager_Internal.CreatePtr(FullPaths.Length);
             Status = (InterpreterStatus*)UnsafeUtility.Malloc(sizeof(InterpreterStatus), 4, Allocator.Persistent);
-            handles = new NativeList<JobHandle>(fileInfos.Length, Allocator.Persistent);
-            jobs = new NativeArray<ParseJob>(fileInfos.Length, Allocator.Persistent);
-            commonDatas = new NativeArray<ParseJob.CommonData>(fileInfos.Length, Allocator.Persistent);
+            handles = new NativeList<JobHandle>(FullPaths.Length, Allocator.Persistent);
+            jobs = new NativeArray<ParseJob>(FullPaths.Length, Allocator.Persistent);
+            commonDatas = new NativeArray<ParseJob.CommonData>(FullPaths.Length, Allocator.Persistent);
             RaceOldLengths = (RaceParserTempData.OldLengths*)UnsafeUtility.Malloc(sizeof(RaceParserTempData.OldLengths), 4, Allocator.Persistent);
             InitialReadTempDataPtr = InitialReadTempData.CreatePtr(FileInfos, ScriptPtr->FileLength, &ScriptPtr->Files, isUtf16, isDebug);
             currentStage = Stage.PreLoading;

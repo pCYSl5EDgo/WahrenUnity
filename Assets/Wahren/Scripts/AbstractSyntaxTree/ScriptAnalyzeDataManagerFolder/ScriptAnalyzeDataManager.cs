@@ -131,10 +131,18 @@ namespace pcysl5edgo.Wahren.AST
                 switch (location)
                 {
                     case Location.Race:
-                        LengthenRace(result);
+                        RaceParserTempData.Lengthen(ref ASTValueTypePairList, result
+#if UNITY_EDITOR
+                        , ShowLog
+#endif
+                        );
                         break;
                     case Location.MoveType:
-                        LengthenMoveType(result);
+                        MovetypeParserTempData.Lengthen(ref ASTValueTypePairList, result
+#if UNITY_EDITOR
+                        , ShowLog
+#endif
+                        );
                         break;
                     default:
                         throw new System.NotImplementedException(this.FullPaths[result.Span.File] + "  " + location.ToString() + " : " + reason.ToString() + " " + result.Span.ToString());
@@ -143,209 +151,6 @@ namespace pcysl5edgo.Wahren.AST
             *Status = InterpreterStatus.None;
             result = new TryInterpretReturnValue(job.CommonPtr->LastNameSpan, 0, InterpreterStatus.None);
             handles.Add(job.Schedule());
-        }
-
-        private void GarbageCollection()
-        {
-            currentStage = Stage.GarbageCollecting;
-            if (handles.Length != 0)
-                handles.Clear();
-            handles.Add(new GCJob
-            {
-                OldASTValueTypePairListLength = ScriptPtr->ASTValueTypePairList.Length,
-                OldPtr = RaceOldLengths,
-                ScriptPtr = ScriptPtr,
-            }.Schedule());
-        }
-
-        private void LengthenMoveType(TryInterpretReturnValue result)
-        {
-            ref var tmpData = ref ScriptPtr->MoveTypeParserTempData;
-            ref var identifierNumberPairs = ref tmpData.IdentifierNumberPairs;
-            (_, var reason) = result;
-            const string prefix = "movetype";
-            switch (reason)
-            {
-                case PendingReason.ASTValueTypePairListCapacityShortage:
-#if UNITY_EDITOR
-                    if (ShowLog)
-                    {
-                        UnityEngine.Debug.Log(prefix + " ast value type pair lengthen\n" + result.ToString());
-                    }
-#endif
-                    ListUtility.Lengthen(ref ASTValueTypePairList.Values, ref ASTValueTypePairList.Capacity);
-                    break;
-                case PendingReason.IdentifierNumberPairListCapacityShortage:
-#if UNITY_EDITOR
-                    if (ShowLog)
-                    {
-                        UnityEngine.Debug.Log(prefix + " identifier number pair lengthen\n" + result.ToString() + "\n" + identifierNumberPairs.Capacity);
-                    }
-#endif
-                    identifierNumberPairs.Lengthen();
-                    break;
-                case PendingReason.SectionListCapacityShortage:
-                    switch (result.SubDataIndex)
-                    {
-                        case MoveTypeTree.name + 1: // name
-#if UNITY_EDITOR
-                            if (ShowLog)
-                            {
-                                UnityEngine.Debug.Log(prefix + " name lengthen\n" + result.ToString());
-                            }
-#endif
-                            ListUtility.Lengthen(ref tmpData.Names, ref tmpData.NameCapacity);
-                            break;
-                        case MoveTypeTree.help + 1: // help
-#if UNITY_EDITOR
-                            if (ShowLog)
-                            {
-                                UnityEngine.Debug.Log(prefix + " help lengthen\n" + result.ToString());
-                            }
-#endif
-                            ListUtility.Lengthen(ref tmpData.Helps, ref tmpData.HelpCapacity);
-                            break;
-                        case MoveTypeTree.consti + 1: // consti
-#if UNITY_EDITOR
-                            if (ShowLog)
-                            {
-                                UnityEngine.Debug.Log(prefix + " consti lengthen\n" + result.ToString());
-                            }
-#endif
-                            ListUtility.Lengthen(ref tmpData.Constis, ref tmpData.ConstiCapacity);
-                            break;
-                    }
-                    break;
-                case PendingReason.TreeListCapacityShortage:
-#if UNITY_EDITOR
-                    if (ShowLog)
-                    {
-                        UnityEngine.Debug.Log(prefix + " lengthen\n" + result.ToString());
-                    }
-#endif
-                    ListUtility.Lengthen(ref tmpData.Values, ref tmpData.Capacity);
-                    break;
-            }
-        }
-
-        private void LengthenRace(in TryInterpretReturnValue result)
-        {
-            ref var raceParserTempData = ref ScriptPtr->RaceParserTempData;
-            ref var identifierNumberPairs = ref raceParserTempData.IdentifierNumberPairs;
-            (_, var reason) = result;
-            const string prefix = "race";
-            switch (reason)
-            {
-                case PendingReason.ASTValueTypePairListCapacityShortage:
-#if UNITY_EDITOR
-                    if (ShowLog)
-                    {
-                        UnityEngine.Debug.Log(prefix + " ast value type pair lengthen\n" + result.ToString());
-                    }
-#endif
-                    ListUtility.Lengthen(ref ASTValueTypePairList.Values, ref ASTValueTypePairList.Capacity);
-                    break;
-                case PendingReason.IdentifierNumberPairListCapacityShortage:
-#if UNITY_EDITOR
-                    if (ShowLog)
-                    {
-                        UnityEngine.Debug.Log(prefix + " identifier number pair lengthen\n" + result.ToString() + "\nCapacity: " + identifierNumberPairs.Capacity + " , Length: " + identifierNumberPairs.Length);
-                    }
-#endif
-                    identifierNumberPairs.Lengthen();
-                    break;
-                case PendingReason.SectionListCapacityShortage:
-                    switch (result.SubDataIndex)
-                    {
-                        case RaceTree.name + 1: // name
-#if UNITY_EDITOR
-                            if (ShowLog)
-                            {
-                                UnityEngine.Debug.Log(prefix + " name lengthen\n" + result.ToString());
-                            }
-#endif
-                            ListUtility.Lengthen(ref raceParserTempData.Names, ref raceParserTempData.NameCapacity);
-                            break;
-                        case RaceTree.align + 1: // align
-#if UNITY_EDITOR
-                            if (ShowLog)
-                            {
-                                UnityEngine.Debug.Log(prefix + " align lengthen\n" + result.ToString());
-                            }
-#endif
-                            ListUtility.Lengthen(ref raceParserTempData.Aligns, ref raceParserTempData.AlignCapacity);
-                            break;
-                        case RaceTree.brave + 1: // brave
-#if UNITY_EDITOR
-                            if (ShowLog)
-                            {
-                                UnityEngine.Debug.Log(prefix + " brave lengthen\n" + result.ToString());
-                            }
-#endif
-                            ListUtility.Lengthen(ref raceParserTempData.Braves, ref raceParserTempData.BraveCapacity);
-                            break;
-                        case RaceTree.consti + 1: //consti
-#if UNITY_EDITOR
-                            if (ShowLog)
-                            {
-                                UnityEngine.Debug.Log(prefix + " consti lengthen\n" + result.ToString());
-                            }
-#endif
-                            ListUtility.Lengthen(ref raceParserTempData.Constis, ref raceParserTempData.ConstiCapacity);
-                            break;
-                        case RaceTree.movetype + 1: // movetype
-#if UNITY_EDITOR
-                            if (ShowLog)
-                            {
-                                UnityEngine.Debug.Log(prefix + " movetype lengthen\n" + result.ToString());
-                            }
-#endif
-                            ListUtility.Lengthen(ref raceParserTempData.MoveTypes, ref raceParserTempData.MoveTypeCapacity);
-                            break;
-                    }
-                    break;
-                case PendingReason.TreeListCapacityShortage:
-#if UNITY_EDITOR
-                    if (ShowLog)
-                    {
-                        UnityEngine.Debug.Log(prefix + " lengthen\n" + result.ToString());
-                    }
-#endif
-                    ListUtility.Lengthen(ref raceParserTempData.Values, ref raceParserTempData.Capacity);
-                    break;
-            }
-            // if (ScriptPtr->ASTValueTypePairList.Capacity == ScriptPtr->ASTValueTypePairList.Length)
-            // {
-            //     ListUtility.Lengthen(ref ScriptPtr->ASTValueTypePairList.Values, ref ScriptPtr->ASTValueTypePairList.Capacity);
-            // }
-            // if (identifierNumberPairs.Length == identifierNumberPairs.Capacity)
-            // {
-            //     identifierNumberPairs.Lengthen();
-            // }
-            // if (raceParserTempData.NameCapacity == raceParserTempData.NameLength)
-            // {
-            //     ListUtility.Lengthen(ref raceParserTempData.Names, ref raceParserTempData.NameCapacity);
-            // }
-            // if (raceParserTempData.AlignCapacity == raceParserTempData.AlignLength)
-            // {
-            //     ListUtility.Lengthen(ref raceParserTempData.Aligns, ref raceParserTempData.AlignCapacity);
-            // }
-            // if (raceParserTempData.BraveCapacity == raceParserTempData.BraveLength)
-            // {
-            //     ListUtility.Lengthen(ref raceParserTempData.Braves, ref raceParserTempData.BraveCapacity);
-            // }
-            // if (raceParserTempData.ConstiCapacity == raceParserTempData.ConstiLength)
-            // {
-            //     ListUtility.Lengthen(ref raceParserTempData.Constis, ref raceParserTempData.ConstiCapacity);
-            // }
-            // if (raceParserTempData.MoveTypeCapacity == raceParserTempData.MoveTypeLength)
-            // {
-            //     ListUtility.Lengthen(ref raceParserTempData.MoveTypes, ref raceParserTempData.MoveTypeCapacity);
-            // }
-            // if (raceParserTempData.Capacity == raceParserTempData.Length)
-            // {
-            //     ListUtility.Lengthen(ref raceParserTempData.Values, ref raceParserTempData.Capacity);
-            // }
         }
 
         private void CreateNewParseJob(TextFile file)

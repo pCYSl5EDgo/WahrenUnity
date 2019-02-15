@@ -19,6 +19,12 @@ namespace pcysl5edgo.Wahren.AST
             this.Type = type;
         }
 
+        public void Deconstruct(out int value, out int type)
+        {
+            value = Value;
+            type = Type;
+        }
+
         public bool TryAddAST<T>(T* list, in T value, int capacity, ref int length) where T : unmanaged
         {
             do

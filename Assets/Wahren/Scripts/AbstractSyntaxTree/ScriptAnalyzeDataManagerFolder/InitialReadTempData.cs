@@ -28,6 +28,54 @@ namespace pcysl5edgo.Wahren.AST
             public Stage CurrentStage => _currentStage;
             private int Length;
 
+            public void Complete()
+            {
+                switch (_currentStage)
+                {
+                    case Stage.None:
+                    case Stage.Done:
+                        return;
+                    case Stage.ReadAsync:
+                        ReadComplete();
+                        goto case Stage.DeleteCommentAsync;
+                    case Stage.DeleteCommentAsync:
+                        DeleteCommentComplete();
+                        return;
+                }
+            }
+
+            private void DeleteCommentComplete()
+            {
+                for (int i = 0; i < Length; i++)
+                {
+                    DeleteCommentJobHandles[i].Complete();
+                }
+                UnsafeUtility.Free(DeleteCommentJobHandles, Allocator.Persistent);
+                DeleteCommentJobHandles = null;
+                _currentStage = Stage.Done;
+            }
+
+            private void ReadComplete()
+            {
+                for (int i = 0; i < Length; i++)
+                {
+                    if (!ReadHandles[i].IsValid()) continue;
+                    ReadHandles[i].JobHandle.Complete();
+                    ReadHandles[i].Dispose();
+                    if (IsUtf16)
+                    {
+                        FilesPtr[0][i] = TextFile.FromRawTextFileUtf16(RawFiles[i]);
+                        DeleteCommentJobHandles[i] = DeleteCommentJob.Schedule(FilesPtr[0] + i, IsDebug);
+                    }
+                    else
+                    {
+                        FilesPtr[0][i] = TextFile.FromRawTextFileCp932(RawFiles[i]);
+                        DeleteCommentJobHandles[i] = DeleteCommentJob.Schedule(FilesPtr[0] + i, IsDebug);
+                    }
+                }
+                _currentStage = Stage.DeleteCommentAsync;
+            }
+
             public void Update()
             {
                 switch (_currentStage)

@@ -3,7 +3,7 @@ using Unity.Collections.LowLevel.Unsafe;
 
 namespace pcysl5edgo.Wahren.AST
 {
-    public unsafe struct MovetypeParserTempData : System.IDisposable
+    public unsafe struct MovetypeParserTempData : IParserTempData
     {
         internal struct OldLengths
         {
@@ -66,6 +66,79 @@ namespace pcysl5edgo.Wahren.AST
                 UnsafeUtility.Free(Values, Allocator.Persistent);
             IdentifierNumberPairs.Dispose();
             this = default;
+        }
+
+        public void Lengthen(ref ASTValueTypePairList astValueTypePairList, in TryInterpretReturnValue result
+#if UNITY_EDITOR
+        , bool ShowLog
+#endif
+        )
+        {
+            ref var identifierNumberPairs = ref IdentifierNumberPairs;
+            (_, var reason) = result;
+            const string prefix = "movetype";
+            switch (reason)
+            {
+                case PendingReason.ASTValueTypePairListCapacityShortage:
+#if UNITY_EDITOR
+                    if (ShowLog)
+                    {
+                        UnityEngine.Debug.Log(prefix + " ast value type pair lengthen\n" + result.ToString());
+                    }
+#endif
+                    ListUtility.Lengthen(ref astValueTypePairList.Values, ref astValueTypePairList.Capacity);
+                    break;
+                case PendingReason.IdentifierNumberPairListCapacityShortage:
+#if UNITY_EDITOR
+                    if (ShowLog)
+                    {
+                        UnityEngine.Debug.Log(prefix + " identifier number pair lengthen\n" + result.ToString() + "\n" + identifierNumberPairs.Capacity);
+                    }
+#endif
+                    identifierNumberPairs.Lengthen();
+                    break;
+                case PendingReason.SectionListCapacityShortage:
+                    switch (result.SubDataIndex)
+                    {
+                        case MoveTypeTree.name + 1: // name
+#if UNITY_EDITOR
+                            if (ShowLog)
+                            {
+                                UnityEngine.Debug.Log(prefix + " name lengthen\n" + result.ToString());
+                            }
+#endif
+                            ListUtility.Lengthen(ref Names, ref NameCapacity);
+                            break;
+                        case MoveTypeTree.help + 1: // help
+#if UNITY_EDITOR
+                            if (ShowLog)
+                            {
+                                UnityEngine.Debug.Log(prefix + " help lengthen\n" + result.ToString());
+                            }
+#endif
+                            ListUtility.Lengthen(ref Helps, ref HelpCapacity);
+                            break;
+                        case MoveTypeTree.consti + 1: // consti
+#if UNITY_EDITOR
+                            if (ShowLog)
+                            {
+                                UnityEngine.Debug.Log(prefix + " consti lengthen\n" + result.ToString());
+                            }
+#endif
+                            ListUtility.Lengthen(ref Constis, ref ConstiCapacity);
+                            break;
+                    }
+                    break;
+                case PendingReason.TreeListCapacityShortage:
+#if UNITY_EDITOR
+                    if (ShowLog)
+                    {
+                        UnityEngine.Debug.Log(prefix + " lengthen\n" + result.ToString());
+                    }
+#endif
+                    ListUtility.Lengthen(ref Values, ref Capacity);
+                    break;
+            }
         }
     }
 }

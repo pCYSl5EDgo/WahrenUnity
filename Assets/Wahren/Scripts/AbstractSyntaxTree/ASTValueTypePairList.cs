@@ -22,6 +22,19 @@ namespace pcysl5edgo.Wahren.AST
             Length = 0;
             Values = (ASTValueTypePair*)UnsafeUtility.Malloc(sizeof(ASTValueTypePair) * capacity, 4, Allocator.Persistent);
         }
+
+        public ref ASTValueTypePair this[int index]
+        {
+            get
+            {
+                if (index >= Length || index < 0)
+                {
+                    throw new System.ArgumentOutOfRangeException();
+                }
+                return ref Values[index];
+            }
+        }
+
         public int TryAddBulkMultiThread(in ASTValueTypePairList list, out int length)
         {
             if (list.Length == 0)

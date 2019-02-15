@@ -1,12 +1,14 @@
 ﻿using System.Text;
-using System.Collections;
 using NUnit.Framework;
 using UnityEngine.TestTools;
 using pcysl5edgo.Wahren.AST;
 
 using A = UnityEngine.Assertions.Assert;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 
 public class TestScript
 {

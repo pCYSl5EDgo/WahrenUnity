@@ -8,11 +8,11 @@ namespace pcysl5edgo.Wahren.AST
 {
     public static unsafe class StringBuilderExtensionUtility
     {
-        private static StringBuilder AppendPrimitive(this StringBuilder buffer, in TextFile file, Span span)
-        => buffer.Append((char*)file.Contents + file.LineStarts[span.Line] + span.Column, span.Length);
-        private static StringBuilder AppendPrimitive(this StringBuilder buffer, in ScriptAnalyzeDataManager script, Span span)
+        internal static StringBuilder AppendPrimitive(this StringBuilder buffer, in TextFile file, Span span)
+        => span.Length == 0 ? buffer.Append('@') : buffer.Append((char*)file.Contents + file.LineStarts[span.Line] + span.Column, span.Length);
+        internal static StringBuilder AppendPrimitive(this StringBuilder buffer, in ScriptAnalyzeDataManager script, Span span)
         => buffer.AppendPrimitive(script[span.File], span);
-        private static StringBuilder AppendPrimitive(this StringBuilder buffer, TextFile* files, Span span)
+        internal static StringBuilder AppendPrimitive(this StringBuilder buffer, TextFile* files, Span span)
         => buffer.AppendPrimitive(files[span.File], span);
 
         private static StringBuilder AppendExtension(this StringBuilder buffer, TextFile* files, string sectionName, Span scenarioVariant, Span value)
@@ -176,6 +176,21 @@ namespace pcysl5edgo.Wahren.AST
             {
                 buffer.Append("\n}");
             }
+        }
+    }
+
+    internal static class FromStringHelper
+    {
+        public static unsafe ushort* ToNativeArray(this string text, Allocator allocator)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                throw new ArgumentException();
+            var answer = (ushort*)UnsafeUtility.Malloc(sizeof(ushort) * text.Length, 2, allocator);
+            fixed (char* cptr = text)
+            {
+                UnsafeUtility.MemCpy(answer, cptr, text.Length * 2);
+            }
+            return answer;
         }
     }
 }
