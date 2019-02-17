@@ -3,28 +3,22 @@ using pcysl5edgo.Wahren.AST;
 
 using static UnityEngine.Assertions.Assert;
 
-public unsafe class UnitTest
+unsafe struct USING_STRUCT : System.IDisposable
 {
-    void InitializeComponents(char* ptr, int length, out System.Text.StringBuilder buffer, out TextFile file, out InterpreterStatus token, out ParseJob.CommonData cdata, out ScriptAnalyzeDataManager_Internal script)
+    public TextFile file;
+    public ScriptAnalyzeDataManager_Internal script;
+    public ParseJob.CommonData commonData;
+    public USING_STRUCT(string input, out System.Text.StringBuilder buffer)
     {
-        file = default;
-        token = default;
-        cdata = default;
-        script = default;
-        fixed (TextFile* fp = &file)
-        fixed (InterpreterStatus* tp = &token)
-        fixed (ParseJob.CommonData* cp = &cdata)
-        fixed (ScriptAnalyzeDataManager_Internal* sp = &script)
+        file = new TextFile(0, input.Length);
+        fixed (char* p = input)
         {
-            InitializeComponents(ptr, length, out buffer, fp, tp, cp, sp);
+            Unity.Collections.LowLevel.Unsafe.UnsafeUtility.MemCpy(file.Contents, p, input.Length * sizeof(char));
         }
-    }
-    void InitializeComponents(char* ptr, int length, out System.Text.StringBuilder buffer, TextFile* file, InterpreterStatus* token, ParseJob.CommonData* cdata, ScriptAnalyzeDataManager_Internal* script)
-    {
+        file.Split();
         buffer = new System.Text.StringBuilder(256);
-        *file = new TextFile(0, length);
-        *token = InterpreterStatus.None;
-        *cdata = new ParseJob.CommonData
+        var token = InterpreterStatus.None;
+        var cdata = new ParseJob.CommonData
         {
             Caret = new Caret(),
             LastNameSpan = default,
@@ -32,63 +26,85 @@ public unsafe class UnitTest
             LastStructKind = Location.None,
             Result = new TryInterpretReturnValue(new Span(), 0, 0, InterpreterStatus.None)
         };
-        *script = new ScriptAnalyzeDataManager_Internal
+        fixed (ScriptAnalyzeDataManager_Internal* scriptPtr = &script)
         {
-            ASTValueTypePairList = new ASTValueTypePairList(4),
-            FileLength = 1,
-            Files = file,
-            MoveTypeParserTempData = new MovetypeParserTempData(1),
-            RaceParserTempData = new RaceParserTempData(1),
-        };
-        file->Contents = (ushort*)ptr;
-        file->Split();
-        var job = new ParseJob
-        {
-            CancellationTokenPtr = token,
-            CommonPtr = cdata,
-            File = *file,
-            ScriptPtr = script,
-        };
-        ref var result = ref cdata->Result;
-    PARSE:
-        job.Execute();
-        AreNotEqual(result.Status, InterpreterStatus.Error);
-        if (result.Status == InterpreterStatus.Pending)
-        {
-            var (location, reason) = result;
-            AreEqual(location, Location.Race);
-            AreNotEqual(reason, PendingReason.Other);
-            script->RaceParserTempData.Lengthen(ref script->ASTValueTypePairList, result, false);
-            goto PARSE;
+            script = new ScriptAnalyzeDataManager_Internal
+            {
+                ASTValueTypePairList = new ASTValueTypePairList(4),
+                FileLength = 1,
+                Files = (TextFile*)Unity.Collections.LowLevel.Unsafe.UnsafeUtility.Malloc(sizeof(System.IntPtr), 4, Unity.Collections.Allocator.Persistent),
+                MoveTypeParserTempData = new MovetypeParserTempData(1),
+                RaceParserTempData = new RaceParserTempData(1),
+            };
+            *script.Files = file;
+            var job = new ParseJob
+            {
+                CancellationTokenPtr = &token,
+                CommonPtr = &cdata,
+                File = file,
+                ScriptPtr = scriptPtr,
+            };
+            ref var result = ref cdata.Result;
+        PARSE:
+            job.Execute();
+            if (result.Status == InterpreterStatus.Pending)
+            {
+                var (location, reason) = result;
+                script.RaceParserTempData.Lengthen(ref script.ASTValueTypePairList, result, false);
+                goto PARSE;
+            }
         }
+        commonData = cdata;
     }
+    public void Dispose()
+    {
+        script.Dispose();
+    }
+}
+
+public unsafe class UnitTest
+{
     [Test]
-    public void UnitTestSimplePasses()
+    public void race_name_success()
     {
         var str0 = "o0_21uruse021902e";
         var str1 = "絶対に許さねえ！ドン・サウザンド！";
         var scriptText = $@"race {str0}{{
             name = {str1}
         }}";
-        fixed (char* ptr = scriptText)
+        using (var _ = new USING_STRUCT(scriptText, out var buffer))
         {
-            InitializeComponents(ptr, scriptText.Length, out var buffer, out var file, out var token, out var cdata, out var script);
-            AreEqual(script.RaceParserTempData.Length, 1);
-            ref var tree = ref script.RaceParserTempData.Values[0];
+            AreEqual(_.script.RaceParserTempData.Length, 1);
+            ref var tree = ref _.script.RaceParserTempData.Values[0];
             AreEqual(tree.Length, 1);
-            AreEqual(buffer.Clear().AppendPrimitive(file, tree.Name).ToString(), str0);
+            AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
-            var (value, type) = script.ASTValueTypePairList[tree.Start];
+            var (value, type) = _.script.ASTValueTypePairList[tree.Start];
             AreEqual(value, 0);
             AreEqual(type, RaceTree.name);
-            AreEqual(script.RaceParserTempData.NameLength, 1);
-            var nameAssignExpression = script.RaceParserTempData.Names[value];
+            AreEqual(_.script.RaceParserTempData.NameLength, 1);
+            var nameAssignExpression = _.script.RaceParserTempData.Names[value];
             AreEqual(nameAssignExpression.ScenarioVariant.Length, 0);
-            AreEqual(buffer.Clear().AppendPrimitive(file, nameAssignExpression.Value).ToString(), str1);
-            file.Contents = null;
-            file.Dispose();
-            script.Files = null;
-            script.Dispose();
+            AreEqual(buffer.Clear().AppendPrimitive(_.file, nameAssignExpression.Value).ToString(), str1);
+        }
+    }
+
+    [Test]
+    public void race_name_fail()
+    {
+        var str0 = "o0_21uruse021902e";
+        var str1 = "絶対に許さねえ！\nドン・サウザンド！";
+        var scriptText = $@"race {str0}{{
+            name = {str1}
+        }}";
+        using (var _ = new USING_STRUCT(scriptText, out var buffer))
+        {
+            AreEqual(_.script.RaceParserTempData.Length, 0);
+            AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
+            AreEqual(_.commonData.LastParentNameSpan.Length, 0);
+            AreEqual(_.commonData.LastStructKind, Location.Race);
+            AreEqual(_.commonData.Result.Status, InterpreterStatus.Error);
+            AreEqual(_.commonData.Result.Span, new Span(0, 2, 0, 1));
         }
     }
 }
