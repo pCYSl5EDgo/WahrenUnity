@@ -10,8 +10,8 @@
         public int DataIndex;
         public int SubDataIndex;
         public InterpreterStatus Status;
-        public long SubdData0;
-        public long SubdData1;
+        public long SubData0;
+        public long SubData1;
 
         public bool IsSuccess => Status == InterpreterStatus.Success;
         public bool IsError => Status == InterpreterStatus.Error;
@@ -23,7 +23,7 @@
             this.Status = status;
             this.DataIndex = dataIndex;
             this.SubDataIndex = 0;
-            SubdData0 = SubdData1 = 0;
+            SubData0 = SubData1 = 0;
         }
         public TryInterpretReturnValue(Caret start, int dataIndex, int subDataIndex, InterpreterStatus status)
         {
@@ -31,7 +31,7 @@
             this.Status = status;
             this.DataIndex = dataIndex;
             this.SubDataIndex = subDataIndex;
-            SubdData0 = SubdData1 = 0;
+            SubData0 = SubData1 = 0;
         }
         public TryInterpretReturnValue(Span span, int dataIndex, InterpreterStatus status)
         {
@@ -39,7 +39,7 @@
             this.Status = status;
             this.DataIndex = dataIndex;
             this.SubDataIndex = 0;
-            SubdData0 = SubdData1 = 0;
+            SubData0 = SubData1 = 0;
         }
         public TryInterpretReturnValue(Span span, int dataIndex, int subDataIndex, InterpreterStatus status)
         {
@@ -47,7 +47,7 @@
             this.Status = status;
             this.DataIndex = dataIndex;
             this.SubDataIndex = subDataIndex;
-            this.SubdData0 = this.SubdData1 = 0;
+            this.SubData0 = this.SubData1 = 0;
         }
 
         public static TryInterpretReturnValue CreateSuccessDetectStructType(in Caret caret, int length, Location location) => new TryInterpretReturnValue(new Span(caret, length), SuccessSentence.StructKindInterpretSuccess, (int)location, InterpreterStatus.Success);
@@ -57,15 +57,15 @@
             Span = span,
             DataIndex = 0,
             SubDataIndex = subDataIndex,
-            SubdData0 = (long)location,
-            SubdData1 = (long)reason,
+            SubData0 = (long)location,
+            SubData1 = (long)reason,
             Status = InterpreterStatus.Pending,
         };
 
         public void Deconstruct(out Location location, out PendingReason reason)
         {
-            location = (Location)SubdData0;
-            reason = (PendingReason)SubdData1;
+            location = (Location)SubData0;
+            reason = (PendingReason)SubData1;
         }
 
         public static implicit operator bool(in TryInterpretReturnValue value) => value.Status == InterpreterStatus.Success;
@@ -81,7 +81,7 @@
             }
             else
             {
-                buffer.Append(DataIndex).Append(", ").Append(SubDataIndex).AppendLine().Append(SubdData0).AppendLine().Append(SubdData1);
+                buffer.Append(DataIndex).Append(", ").Append(SubDataIndex).AppendLine().Append(SubData0).AppendLine().Append(SubData1);
             }
             return buffer.ToString();
         }
