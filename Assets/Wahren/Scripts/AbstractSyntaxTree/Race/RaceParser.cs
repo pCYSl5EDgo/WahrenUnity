@@ -4,11 +4,7 @@
     {
         public static TryInterpretReturnValue TryParseRaceStructMultiThread(this ref TextFile file, ref RaceParserTempData tempData, ref ASTValueTypePairList astValueTypePairList, Span name, Span parentName, Caret nextToLeftBrace, out Caret nextToRightBrace, out int raceTreeIndex)
         {
-            var tree = new RaceTree
-            {
-                Name = name,
-                ParentName = parentName,
-            };
+            var tree = CreateNameTreeHelper.Create<RaceTree>(name, parentName);
             var _ = new InitialProc_USING_STRUCT(4, file, nextToLeftBrace, out nextToRightBrace, out TryInterpretReturnValue answer, out raceTreeIndex);
             ref var column = ref nextToRightBrace.Column;
             for (ref var raw = ref nextToRightBrace.Line; raw < file.LineCount; raw++, column = 0)

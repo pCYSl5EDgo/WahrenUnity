@@ -1,6 +1,6 @@
 ﻿namespace pcysl5edgo.Wahren.AST
 {
-    public struct RaceTree
+    public struct RaceTree : INameStruct
     {
         public Span Name;
         public Span ParentName;
@@ -35,6 +35,12 @@
         {
             public Span ScenarioVariant;
             public Span Value;
+        }
+
+        public void SetNameAndParentName(Span name, Span parentName)
+        {
+            Name = name;
+            ParentName = parentName;
         }
     }
 }
