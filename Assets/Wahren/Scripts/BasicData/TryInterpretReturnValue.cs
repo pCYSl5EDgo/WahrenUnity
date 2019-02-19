@@ -62,6 +62,7 @@
             Status = InterpreterStatus.Pending,
         };
 
+        public static TryInterpretReturnValue CreateRightBraceNotFound(Caret current) => new TryInterpretReturnValue(current, ErrorSentence.ExpectedCharNotFoundError, 2, InterpreterStatus.Error);
         public static TryInterpretReturnValue CreateNotExpectedCharacter(Caret current) => new TryInterpretReturnValue
         {
             Span = new Span

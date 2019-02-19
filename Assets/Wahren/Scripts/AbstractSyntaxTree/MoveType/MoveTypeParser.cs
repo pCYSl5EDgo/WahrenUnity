@@ -46,7 +46,7 @@
                     }
                 }
             }
-            answer = new TryInterpretReturnValue(nextToRightBrace, ErrorSentence.ExpectedCharNotFoundError, 2, InterpreterStatus.Error);
+            answer = TryInterpretReturnValue.CreateRightBraceNotFound(nextToRightBrace);
         RETURN:
             _.Dispose();
             return answer;
