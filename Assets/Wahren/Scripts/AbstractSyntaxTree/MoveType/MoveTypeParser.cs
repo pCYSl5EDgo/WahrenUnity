@@ -16,16 +16,18 @@
                         case '}':
                             column++;
                             tree.Start = astValueTypePairList.TryAddBulkMultiThread(_.list, out tree.Length);
-                            _.Dispose();
                             if (tree.Start == -1)
                             {
-                                return TryInterpretReturnValue.CreatePending(new Span(nextToLeftBrace, 0), Location.MoveType, PendingReason.ASTValueTypePairListCapacityShortage);
+                                answer = TryInterpretReturnValue.CreatePending(new Span(nextToLeftBrace, 0), Location.MoveType, PendingReason.ASTValueTypePairListCapacityShortage);
+                                goto RETURN;
                             }
                             if (tree.TryAddToMultiThread(ref tempData.Values, tempData.Capacity, ref tempData.Length, out treeIndex))
                             {
-                                return new TryInterpretReturnValue(nextToRightBrace, SuccessSentence.MoveTypeTreeInterpretSuccess, InterpreterStatus.Success);
+                                answer = new TryInterpretReturnValue(nextToRightBrace, SuccessSentence.MoveTypeTreeInterpretSuccess, InterpreterStatus.Success);
+                                goto RETURN;
                             }
-                            return TryInterpretReturnValue.CreatePending(new Span(nextToLeftBrace, 0), Location.MoveType, PendingReason.TreeListCapacityShortage);
+                            answer = TryInterpretReturnValue.CreatePending(new Span(nextToLeftBrace, 0), Location.MoveType, PendingReason.TreeListCapacityShortage);
+                            goto RETURN;
                         case 'n':
                             if (!(answer = NameDetect(ref file, ref tempData, ref nextToRightBrace, &_.list)))
                             {
@@ -58,6 +60,7 @@
             }
             answer = new TryInterpretReturnValue(nextToRightBrace, ErrorSentence.ExpectedCharNotFoundError, 2, InterpreterStatus.Error);
         RETURN:
+            _.Dispose();
             return answer;
         }
 

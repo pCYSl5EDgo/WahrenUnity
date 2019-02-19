@@ -16,16 +16,18 @@
                         case '}':
                             column++;
                             tree.Start = astValueTypePairList.TryAddBulkMultiThread(_.list, out tree.Length);
-                            _.Dispose();
                             if (tree.Start == -1)
                             {
-                                return TryInterpretReturnValue.CreatePending(new Span(nextToLeftBrace, 0), Location.Race, PendingReason.ASTValueTypePairListCapacityShortage);
+                                answer = TryInterpretReturnValue.CreatePending(new Span(nextToLeftBrace, 0), Location.Race, PendingReason.ASTValueTypePairListCapacityShortage);
+                                goto RETURN;
                             }
                             if (tree.TryAddToMultiThread(ref tempData.Values, tempData.Capacity, ref tempData.Length, out raceTreeIndex))
                             {
-                                return new TryInterpretReturnValue(nextToRightBrace, SuccessSentence.RaceTreeIntrepretSuccess, InterpreterStatus.Success);
+                                answer = new TryInterpretReturnValue(nextToRightBrace, SuccessSentence.RaceTreeIntrepretSuccess, InterpreterStatus.Success);
+                                goto RETURN;
                             }
-                            return TryInterpretReturnValue.CreatePending(new Span(nextToLeftBrace, 0), Location.Race, PendingReason.TreeListCapacityShortage);
+                            answer = TryInterpretReturnValue.CreatePending(new Span(nextToLeftBrace, 0), Location.Race, PendingReason.TreeListCapacityShortage);
+                            goto RETURN;
                         case 'a': // align
                             if (!(answer = AlignDetect(ref file, ref tempData, ref nextToRightBrace, &_.list)))
                             {
