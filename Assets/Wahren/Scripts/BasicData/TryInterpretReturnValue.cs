@@ -62,6 +62,17 @@
             Status = InterpreterStatus.Pending,
         };
 
+        public static TryInterpretReturnValue CreateNotExpectedCharacter(Caret current) => new TryInterpretReturnValue
+        {
+            Span = new Span
+            {
+                Start = current,
+                Length = 1,
+            },
+            DataIndex = ErrorSentence.NotExpectedCharacterError,
+            Status = InterpreterStatus.Error,
+        };
+
         public void Deconstruct(out Location location, out PendingReason reason)
         {
             location = (Location)SubData0;

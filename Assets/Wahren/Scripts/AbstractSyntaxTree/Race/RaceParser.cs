@@ -55,7 +55,7 @@
                         case '\t':
                             break;
                         default:
-                            answer = new TryInterpretReturnValue(new Span(nextToRightBrace, 1), ErrorSentence.NotExpectedCharacterError, InterpreterStatus.Error);
+                            answer = TryInterpretReturnValue.CreateNotExpectedCharacter(nextToRightBrace);
                             goto RETURN;
                     }
                 }
