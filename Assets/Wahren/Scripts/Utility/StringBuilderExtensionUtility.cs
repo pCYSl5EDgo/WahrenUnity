@@ -104,16 +104,16 @@ namespace pcysl5edgo.Wahren.AST
             return buffer;
         }
 
-        private static StringBuilder Append(this StringBuilder buffer, TextFile* files, MoveTypeTree.NameAssignExpression expression)
+        private static StringBuilder Append(this StringBuilder buffer, TextFile* files, MovetypeTree.NameAssignExpression expression)
         => buffer.AppendExtension(files, "name", expression.ScenarioVariant, expression.Value);
 
-        private static StringBuilder Append(this StringBuilder buffer, TextFile* files, MoveTypeTree.HelpAssignExpression expression)
+        private static StringBuilder Append(this StringBuilder buffer, TextFile* files, MovetypeTree.HelpAssignExpression expression)
         => buffer.AppendExtension(files, "help", expression.ScenarioVariant, expression.Value);
 
-        private static StringBuilder Append(this StringBuilder buffer, TextFile* files, MoveTypeTree.ConstiAssignExpression expression, in IdentifierNumberPairList list)
+        private static StringBuilder Append(this StringBuilder buffer, TextFile* files, MovetypeTree.ConstiAssignExpression expression, in IdentifierNumberPairList list)
         => buffer.AppendExtension(files, "consti", expression.ScenarioVariant, list, expression.Start, expression.Length);
 
-        public static StringBuilder AppendEx(this StringBuilder buffer, in MoveTypeTree tree, TextFile* files, in MovetypeParserTempData tempData, in ASTValueTypePairList astValueTypePairList)
+        public static StringBuilder AppendEx(this StringBuilder buffer, in MovetypeTree tree, TextFile* files, in MovetypeParserTempData tempData, in ASTValueTypePairList astValueTypePairList)
         {
             using (new ClosingStruct(buffer, files, "movetype", tree.Name, tree.ParentName))
             {
@@ -123,13 +123,13 @@ namespace pcysl5edgo.Wahren.AST
                     buffer.Append("\n  ");
                     switch (pair.Type)
                     {
-                        case MoveTypeTree.name:
+                        case MovetypeTree.name:
                             buffer.Append(files, tempData.Names[pair.Value]);
                             break;
-                        case MoveTypeTree.consti:
+                        case MovetypeTree.consti:
                             buffer.Append(files, tempData.Constis[pair.Value], tempData.IdentifierNumberPairs);
                             break;
-                        case MoveTypeTree.help:
+                        case MovetypeTree.help:
                             buffer.Append(files, tempData.Helps[pair.Value]);
                             break;
                     }

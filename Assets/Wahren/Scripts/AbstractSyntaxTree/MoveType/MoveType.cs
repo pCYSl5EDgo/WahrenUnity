@@ -1,6 +1,6 @@
 ﻿namespace pcysl5edgo.Wahren.AST
 {
-    public struct MoveTypeTree
+    public struct MovetypeTree : INameStruct
     {
         public Span Name;
         public Span ParentName;
@@ -27,6 +27,12 @@
             public Span ScenarioVariant;
             public int Start;
             public int Length;
+        }
+
+        public void SetNameAndParentName(Span name, Span parentName)
+        {
+            Name = name;
+            ParentName = parentName;
         }
     }
 }

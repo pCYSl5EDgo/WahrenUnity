@@ -1,14 +1,10 @@
 ﻿namespace pcysl5edgo.Wahren.AST
 {
-    public static unsafe class MoveTypeParser
+    public static unsafe class MovetypeParser
     {
         public static TryInterpretReturnValue TryParseMovetypeStructMultiThread(this ref TextFile file, ref MovetypeParserTempData tempData, ref ASTValueTypePairList astValueTypePairList, Span name, Span parentName, Caret nextToLeftBrace, out Caret nextToRightBrace, out int treeIndex)
         {
-            var tree = new MoveTypeTree
-            {
-                Name = name,
-                ParentName = parentName,
-            };
+            var tree = CreateNameTreeHelper.Create<MovetypeTree>(name, parentName);
             var _ = new InitialProc_USING_STRUCT(3, file, nextToLeftBrace, out nextToRightBrace, out var answer, out treeIndex);
             ref var column = ref nextToRightBrace.Column;
             for (ref var raw = ref nextToRightBrace.Line; raw < file.LineCount; raw++, column = 0)
@@ -73,7 +69,7 @@
             if (current.Column + 3 >= thisLineLength || *++cs != 'e' || *++cs != 'l' || *++cs != 'p')
                 goto RETURN;
             current.Column += 4;
-            var expression = new MoveTypeTree.HelpAssignExpression();
+            var expression = new MovetypeTree.HelpAssignExpression();
             if (current.Column < thisLineLength && *++cs == '@')
             {
                 if (!file.TryGetScenarioVariantName(current, out answer))
@@ -92,14 +88,14 @@
             file.SkipWhiteSpace(ref current);
             answer = new TryInterpretReturnValue(file.ReadLine(current), SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Success);
             expression.Value = answer.Span;
-            var ast = new ASTValueTypePair(MoveTypeTree.help);
+            var ast = new ASTValueTypePair(MovetypeTree.help);
             if (ast.TryAddAST(tempData.Helps, expression, tempData.HelpCapacity, ref tempData.HelpLength))
             {
                 ast.AddToTempJob(ref list->Values, ref list->Capacity, ref list->Length, out _);
             }
             else
             {
-                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.MoveType, PendingReason.SectionListCapacityShortage, MoveTypeTree.help + 1);
+                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.MoveType, PendingReason.SectionListCapacityShortage, MovetypeTree.help + 1);
             }
         RETURN:
             return answer;
@@ -112,7 +108,7 @@
             if (current.Column + 3 >= thisLineLength || *++cs != 'a' || *++cs != 'm' || *++cs != 'e')
                 goto RETURN;
             current.Column += 4;
-            var expression = new MoveTypeTree.NameAssignExpression();
+            var expression = new MovetypeTree.NameAssignExpression();
             if (current.Column < thisLineLength && *++cs == '@')
             {
                 if (!file.TryGetScenarioVariantName(current, out answer))
@@ -131,14 +127,14 @@
             file.SkipWhiteSpace(ref current);
             answer = new TryInterpretReturnValue(file.ReadLine(current), SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Success);
             expression.Value = answer.Span;
-            var ast = new ASTValueTypePair(MoveTypeTree.name);
+            var ast = new ASTValueTypePair(MovetypeTree.name);
             if (ast.TryAddAST(tempData.Names, expression, tempData.NameCapacity, ref tempData.NameLength))
             {
                 ast.AddToTempJob(ref list->Values, ref list->Capacity, ref list->Length, out _);
             }
             else
             {
-                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.MoveType, PendingReason.SectionListCapacityShortage, MoveTypeTree.name + 1);
+                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.MoveType, PendingReason.SectionListCapacityShortage, MovetypeTree.name + 1);
             }
         RETURN:
             return answer;
@@ -152,7 +148,7 @@
             if (current.Column + 5 >= thisLineLength || *++cs != 'o' || *++cs != 'n' || *++cs != 's' || *++cs != 't' || *++cs != 'i')
                 goto RETURN;
             current.Column += 6;
-            var expression = new MoveTypeTree.ConstiAssignExpression();
+            var expression = new MovetypeTree.ConstiAssignExpression();
             if (current.Column < thisLineLength && *++cs == '@')
             {
                 if (!file.TryGetScenarioVariantName(current, out answer))
@@ -176,20 +172,20 @@
             answer = VerifyConsti(expression, tempData.IdentifierNumberPairs, answer.Span);
             if (answer.IsError)
                 goto RETURN;
-            var ast = new ASTValueTypePair(MoveTypeTree.consti);
+            var ast = new ASTValueTypePair(MovetypeTree.consti);
             if (ast.TryAddAST(tempData.Constis, expression, tempData.ConstiCapacity, ref tempData.ConstiLength))
             {
                 ast.AddToTempJob(ref listTemp->Values, ref listTemp->Capacity, ref listTemp->Length, out _);
             }
             else
             {
-                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.MoveType, PendingReason.SectionListCapacityShortage, MoveTypeTree.consti + 1);
+                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.MoveType, PendingReason.SectionListCapacityShortage, MovetypeTree.consti + 1);
             }
         RETURN:
             return answer;
         }
 
-        internal static TryInterpretReturnValue VerifyConsti(MoveTypeTree.ConstiAssignExpression expression, in IdentifierNumberPairList list, Span span)
+        internal static TryInterpretReturnValue VerifyConsti(MovetypeTree.ConstiAssignExpression expression, in IdentifierNumberPairList list, Span span)
         {
             for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
             {

@@ -27,10 +27,10 @@ namespace pcysl5edgo.Wahren.AST
         public int HelpCapacity;
         public int ConstiCapacity;
 
-        public MoveTypeTree* Values;
-        public MoveTypeTree.NameAssignExpression* Names;
-        public MoveTypeTree.HelpAssignExpression* Helps;
-        public MoveTypeTree.ConstiAssignExpression* Constis;
+        public MovetypeTree* Values;
+        public MovetypeTree.NameAssignExpression* Names;
+        public MovetypeTree.HelpAssignExpression* Helps;
+        public MovetypeTree.ConstiAssignExpression* Constis;
         public IdentifierNumberPairList IdentifierNumberPairs;
 
         public MovetypeParserTempData(int capacity)
@@ -40,10 +40,10 @@ namespace pcysl5edgo.Wahren.AST
             IdentifierNumberPairs = new IdentifierNumberPairList(capacity);
             if (capacity != 0)
             {
-                Values = (MoveTypeTree*)UnsafeUtility.Malloc(sizeof(MoveTypeTree) * capacity, 4, Allocator.Persistent);
-                Names = (MoveTypeTree.NameAssignExpression*)UnsafeUtility.Malloc(sizeof(MoveTypeTree.NameAssignExpression) * capacity, 4, Allocator.Persistent);
-                Helps = (MoveTypeTree.HelpAssignExpression*)UnsafeUtility.Malloc(sizeof(MoveTypeTree.HelpAssignExpression) * capacity, 4, Allocator.Persistent);
-                Constis = (MoveTypeTree.ConstiAssignExpression*)UnsafeUtility.Malloc(sizeof(MoveTypeTree.ConstiAssignExpression) * capacity, 4, Allocator.Persistent);
+                Values = (MovetypeTree*)UnsafeUtility.Malloc(sizeof(MovetypeTree) * capacity, 4, Allocator.Persistent);
+                Names = (MovetypeTree.NameAssignExpression*)UnsafeUtility.Malloc(sizeof(MovetypeTree.NameAssignExpression) * capacity, 4, Allocator.Persistent);
+                Helps = (MovetypeTree.HelpAssignExpression*)UnsafeUtility.Malloc(sizeof(MovetypeTree.HelpAssignExpression) * capacity, 4, Allocator.Persistent);
+                Constis = (MovetypeTree.ConstiAssignExpression*)UnsafeUtility.Malloc(sizeof(MovetypeTree.ConstiAssignExpression) * capacity, 4, Allocator.Persistent);
             }
             else
             {
@@ -100,7 +100,7 @@ namespace pcysl5edgo.Wahren.AST
                 case PendingReason.SectionListCapacityShortage:
                     switch (result.SubDataIndex)
                     {
-                        case MoveTypeTree.name + 1: // name
+                        case MovetypeTree.name + 1: // name
 #if UNITY_EDITOR
                             if (ShowLog)
                             {
@@ -109,7 +109,7 @@ namespace pcysl5edgo.Wahren.AST
 #endif
                             ListUtility.Lengthen(ref Names, ref NameCapacity);
                             break;
-                        case MoveTypeTree.help + 1: // help
+                        case MovetypeTree.help + 1: // help
 #if UNITY_EDITOR
                             if (ShowLog)
                             {
@@ -118,7 +118,7 @@ namespace pcysl5edgo.Wahren.AST
 #endif
                             ListUtility.Lengthen(ref Helps, ref HelpCapacity);
                             break;
-                        case MoveTypeTree.consti + 1: // consti
+                        case MovetypeTree.consti + 1: // consti
 #if UNITY_EDITOR
                             if (ShowLog)
                             {
