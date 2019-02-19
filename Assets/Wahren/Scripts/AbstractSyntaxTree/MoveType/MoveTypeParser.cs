@@ -18,23 +18,17 @@
                             goto RETURN;
                         case 'n':
                             if (!(answer = NameDetect(ref file, ref tempData, ref nextToRightBrace, &_.list)))
-                            {
                                 goto RETURN;
-                            }
                             nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
                             break;
                         case 'h':
                             if (!(answer = HelpDetect(ref file, ref tempData, ref nextToRightBrace, &_.list)))
-                            {
                                 goto RETURN;
-                            }
                             nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
                             break;
                         case 'c':
                             if (!(answer = ConstiDetect(ref file, ref tempData, ref nextToRightBrace, &_.list)))
-                            {
                                 goto RETURN;
-                            }
                             nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
                             break;
                         case ' ':
@@ -54,29 +48,10 @@
 
         private static TryInterpretReturnValue HelpDetect(ref TextFile file, ref MovetypeParserTempData tempData, ref Caret current, ASTValueTypePairList* list)
         {
-            var cs = file.CurrentCharPointer(current);
-            var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, 0, InterpreterStatus.Error);
-            int thisLineLength = file.CurrentLineLength(current);
-            if (current.Column + 3 >= thisLineLength || *++cs != 'e' || *++cs != 'l' || *++cs != 'p')
-                goto RETURN;
-            current.Column += 4;
             var expression = new MovetypeTree.HelpAssignExpression();
-            if (current.Column < thisLineLength && *++cs == '@')
-            {
-                if (!file.TryGetScenarioVariantName(current, out answer))
-                    goto RETURN;
-                expression.ScenarioVariant = answer.Span;
-                current = answer.Span.CaretNextToEndOfThisSpan;
-            }
-            file.SkipWhiteSpace(ref current);
-            if (file.CurrentChar(current) != '=')
-            {
-                answer.DataIndex = ErrorSentence.ExpectedCharNotFoundError;
-                answer.Status = InterpreterStatus.Error;
+            var cs = stackalloc char[] { 'e', 'l', 'p' };
+            if (!file.TryInitializeDetect(cs, 3, ref current, out var answer, out expression.ScenarioVariant))
                 goto RETURN;
-            }
-            current.Column++;
-            file.SkipWhiteSpace(ref current);
             answer = new TryInterpretReturnValue(file.ReadLine(current), SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Success);
             expression.Value = answer.Span;
             var ast = new ASTValueTypePair(MovetypeTree.help);
@@ -93,29 +68,10 @@
         }
         private static TryInterpretReturnValue NameDetect(ref TextFile file, ref MovetypeParserTempData tempData, ref Caret current, ASTValueTypePairList* list)
         {
-            var cs = file.CurrentCharPointer(current);
-            var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, 0, InterpreterStatus.Error);
-            int thisLineLength = file.CurrentLineLength(current);
-            if (current.Column + 3 >= thisLineLength || *++cs != 'a' || *++cs != 'm' || *++cs != 'e')
-                goto RETURN;
-            current.Column += 4;
             var expression = new MovetypeTree.NameAssignExpression();
-            if (current.Column < thisLineLength && *++cs == '@')
-            {
-                if (!file.TryGetScenarioVariantName(current, out answer))
-                    goto RETURN;
-                expression.ScenarioVariant = answer.Span;
-                current = answer.Span.CaretNextToEndOfThisSpan;
-            }
-            file.SkipWhiteSpace(ref current);
-            if (file.CurrentChar(current) != '=')
-            {
-                answer.DataIndex = ErrorSentence.ExpectedCharNotFoundError;
-                answer.Status = InterpreterStatus.Error;
+            var cs = stackalloc char[] { 'a', 'm', 'e' };
+            if (!file.TryInitializeDetect(cs, 3, ref current, out var answer, out expression.ScenarioVariant))
                 goto RETURN;
-            }
-            current.Column++;
-            file.SkipWhiteSpace(ref current);
             answer = new TryInterpretReturnValue(file.ReadLine(current), SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Success);
             expression.Value = answer.Span;
             var ast = new ASTValueTypePair(MovetypeTree.name);
@@ -133,28 +89,10 @@
 
         private static TryInterpretReturnValue ConstiDetect(ref TextFile file, ref MovetypeParserTempData tempData, ref Caret current, ASTValueTypePairList* listTemp)
         {
-            var cs = file.CurrentCharPointer(current);
-            var answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, InterpreterStatus.Error);
-            int thisLineLength = file.CurrentLineLength(current);
-            if (current.Column + 5 >= thisLineLength || *++cs != 'o' || *++cs != 'n' || *++cs != 's' || *++cs != 't' || *++cs != 'i')
-                goto RETURN;
-            current.Column += 6;
             var expression = new MovetypeTree.ConstiAssignExpression();
-            if (current.Column < thisLineLength && *++cs == '@')
-            {
-                if (!file.TryGetScenarioVariantName(current, out answer))
-                    goto RETURN;
-                expression.ScenarioVariant = answer.Span;
-                current = answer.Span.CaretNextToEndOfThisSpan;
-            }
-            file.SkipWhiteSpace(ref current);
-            if (file.CurrentChar(current) != '=')
-            {
-                answer.DataIndex = ErrorSentence.ExpectedCharNotFoundError;
+            var cs = stackalloc char[] { 'o', 'n', 's', 't', 'i' };
+            if (!file.TryInitializeDetect(cs, 5, ref current, out var answer, out expression.ScenarioVariant))
                 goto RETURN;
-            }
-            current.Column++;
-            file.SkipWhiteSpace(ref current);
             answer = file.TryReadIdentifierNumberPairs(Location.Movetype, ref tempData.IdentifierNumberPairs, current, out expression.Start, out expression.Length);
             if (!answer)
                 goto RETURN;
