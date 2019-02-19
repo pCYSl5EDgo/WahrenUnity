@@ -83,7 +83,7 @@ namespace pcysl5edgo.Wahren.AST
                             *CancellationTokenPtr = InterpreterStatus.Pending;
                         }
                         return;
-                    case Location.MoveType:
+                    case Location.Movetype:
                         CommonPtr->Result = File.TryParseMovetypeStructMultiThread(ref ScriptPtr->MoveTypeParserTempData, ref ScriptPtr->ASTValueTypePairList, CommonPtr->LastNameSpan, CommonPtr->LastParentNameSpan, currentCaret, out currentCaret, out _);
                         if (CommonPtr->Result)
                         {

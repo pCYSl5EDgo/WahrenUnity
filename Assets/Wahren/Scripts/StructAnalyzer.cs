@@ -270,7 +270,7 @@ namespace pcysl5edgo.Wahren.AST
             const int _len1 = _length - 1;
             if (column + _len1 < thisLineLength && *++ccp == 'o' && *++ccp == 'v' && *++ccp == 'e' && *++ccp == 't' && *++ccp == 'y' && *++ccp == 'p' && *++ccp == 'e' && IsNextEndOfLineOrSpace(ccp, column + _len1, thisLineLength))
             {
-                return TryInterpretReturnValue.CreateSuccessDetectStructType(start, _length, Location.MoveType);
+                return TryInterpretReturnValue.CreateSuccessDetectStructType(start, _length, Location.Movetype);
             }
             else
             {

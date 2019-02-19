@@ -137,7 +137,7 @@ namespace pcysl5edgo.Wahren.AST
 #endif
                         );
                         break;
-                    case Location.MoveType:
+                    case Location.Movetype:
                         MovetypeParserTempData.Lengthen(ref ASTValueTypePairList, result
 #if UNITY_EDITOR
                         , ShowLog

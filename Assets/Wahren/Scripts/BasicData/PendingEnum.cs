@@ -9,7 +9,7 @@
         Attribute = 3,
         Field = 4,
         Object = 5,
-        MoveType = 6,
+        Movetype = 6,
         Event = 7,
         Dungeon = 8,
         Detail = 9,

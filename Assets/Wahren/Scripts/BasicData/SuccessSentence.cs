@@ -4,7 +4,6 @@ public static class SuccessSentence
 {
     public static readonly string[] Contents;
     public static readonly string[][] SubContents;
-
     internal const int StructKindInterpretSuccess = 1;
     internal const int StructNameInterpretSuccess = 2;
     internal const int ParentStructNameInterpretSuccess = 3;
@@ -14,7 +13,8 @@ public static class SuccessSentence
     internal const int LeftBraceConfirmationSuccess = 7;
     internal const int NumberInterpretSuccess = 8;
     internal const int IdentifierInterpretSuccess = 9;
-    internal const int MoveTypeTreeInterpretSuccess = 10;
+    internal const int MovetypeTreeInterpretSuccess = 10;
+    internal const int VoiceTreeIntrepretSuccess = 11;
 
     static SuccessSentence()
     {
@@ -31,6 +31,7 @@ public static class SuccessSentence
             "Number Interpretation Success", // 8
             "Identifier Interpretation Success", // 9
             "Struct 'movetype' Interpretation Success", //10
+            "Struct 'voice' Interpretation Success", // 11
         };
         SubContents = new string[][]
         {
@@ -69,6 +70,7 @@ public static class SuccessSentence
             null, // 8
             null, // 9
             null, // 10
+            null, // 11
         };
     }
 }
