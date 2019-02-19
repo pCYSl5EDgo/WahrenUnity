@@ -14,19 +14,7 @@
                     switch ((file.Contents + file.LineStarts[raw])[column])
                     {
                         case '}':
-                            column++;
-                            tree.Start = astValueTypePairList.TryAddBulkMultiThread(_.list, out tree.Length);
-                            if (tree.Start == -1)
-                            {
-                                answer = TryInterpretReturnValue.CreatePending(new Span(nextToLeftBrace, 0), Location.MoveType, PendingReason.ASTValueTypePairListCapacityShortage);
-                                goto RETURN;
-                            }
-                            if (tree.TryAddToMultiThread(ref tempData.Values, tempData.Capacity, ref tempData.Length, out treeIndex))
-                            {
-                                answer = new TryInterpretReturnValue(nextToRightBrace, SuccessSentence.MoveTypeTreeInterpretSuccess, InterpreterStatus.Success);
-                                goto RETURN;
-                            }
-                            answer = TryInterpretReturnValue.CreatePending(new Span(nextToLeftBrace, 0), Location.MoveType, PendingReason.TreeListCapacityShortage);
+                            answer = tree.CloseBrace(ref tree.Start, out tree.Length, ref astValueTypePairList, _.list, ref tempData.Values, tempData.Capacity, ref tempData.Length, Location.Movetype, SuccessSentence.MovetypeTreeInterpretSuccess, ref treeIndex, nextToLeftBrace, ref nextToRightBrace);
                             goto RETURN;
                         case 'n':
                             if (!(answer = NameDetect(ref file, ref tempData, ref nextToRightBrace, &_.list)))
@@ -98,7 +86,7 @@
             }
             else
             {
-                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.MoveType, PendingReason.SectionListCapacityShortage, MovetypeTree.help + 1);
+                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Movetype, PendingReason.SectionListCapacityShortage, MovetypeTree.help + 1);
             }
         RETURN:
             return answer;
@@ -137,7 +125,7 @@
             }
             else
             {
-                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.MoveType, PendingReason.SectionListCapacityShortage, MovetypeTree.name + 1);
+                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Movetype, PendingReason.SectionListCapacityShortage, MovetypeTree.name + 1);
             }
         RETURN:
             return answer;
@@ -167,7 +155,7 @@
             }
             current.Column++;
             file.SkipWhiteSpace(ref current);
-            answer = file.TryReadIdentifierNumberPairs(Location.MoveType, ref tempData.IdentifierNumberPairs, current, out expression.Start, out expression.Length);
+            answer = file.TryReadIdentifierNumberPairs(Location.Movetype, ref tempData.IdentifierNumberPairs, current, out expression.Start, out expression.Length);
             if (!answer)
                 goto RETURN;
             current = answer.Span.CaretNextToEndOfThisSpan;
@@ -182,7 +170,7 @@
             }
             else
             {
-                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.MoveType, PendingReason.SectionListCapacityShortage, MovetypeTree.consti + 1);
+                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Movetype, PendingReason.SectionListCapacityShortage, MovetypeTree.consti + 1);
             }
         RETURN:
             return answer;

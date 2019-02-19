@@ -2,10 +2,10 @@
 {
     public static unsafe class RaceParser
     {
-        public static TryInterpretReturnValue TryParseRaceStructMultiThread(this ref TextFile file, ref RaceParserTempData tempData, ref ASTValueTypePairList astValueTypePairList, Span name, Span parentName, Caret nextToLeftBrace, out Caret nextToRightBrace, out int raceTreeIndex)
+        public static TryInterpretReturnValue TryParseRaceStructMultiThread(this ref TextFile file, ref RaceParserTempData tempData, ref ASTValueTypePairList astValueTypePairList, Span name, Span parentName, Caret nextToLeftBrace, out Caret nextToRightBrace, out int treeIndex)
         {
             var tree = CreateNameTreeHelper.Create<RaceTree>(name, parentName);
-            var _ = new InitialProc_USING_STRUCT(4, file, nextToLeftBrace, out nextToRightBrace, out TryInterpretReturnValue answer, out raceTreeIndex);
+            var _ = new InitialProc_USING_STRUCT(4, file, nextToLeftBrace, out nextToRightBrace, out TryInterpretReturnValue answer, out treeIndex);
             ref var column = ref nextToRightBrace.Column;
             for (ref var raw = ref nextToRightBrace.Line; raw < file.LineCount; raw++, column = 0)
             {
@@ -14,19 +14,7 @@
                     switch ((file.Contents + file.LineStarts[raw])[column])
                     {
                         case '}':
-                            column++;
-                            tree.Start = astValueTypePairList.TryAddBulkMultiThread(_.list, out tree.Length);
-                            if (tree.Start == -1)
-                            {
-                                answer = TryInterpretReturnValue.CreatePending(new Span(nextToLeftBrace, 0), Location.Race, PendingReason.ASTValueTypePairListCapacityShortage);
-                                goto RETURN;
-                            }
-                            if (tree.TryAddToMultiThread(ref tempData.Values, tempData.Capacity, ref tempData.Length, out raceTreeIndex))
-                            {
-                                answer = new TryInterpretReturnValue(nextToRightBrace, SuccessSentence.RaceTreeIntrepretSuccess, InterpreterStatus.Success);
-                                goto RETURN;
-                            }
-                            answer = TryInterpretReturnValue.CreatePending(new Span(nextToLeftBrace, 0), Location.Race, PendingReason.TreeListCapacityShortage);
+                            answer = tree.CloseBrace(ref tree.Start, out tree.Length, ref astValueTypePairList, _.list, ref tempData.Values, tempData.Capacity, ref tempData.Length, Location.Race, SuccessSentence.RaceTreeIntrepretSuccess, ref treeIndex, nextToLeftBrace, ref nextToRightBrace);
                             goto RETURN;
                         case 'a': // align
                             if (!(answer = AlignDetect(ref file, ref tempData, ref nextToRightBrace, &_.list)))
