@@ -77,7 +77,7 @@
             return answer;
         }
 
-        private static TryInterpretReturnValue MoveTypeDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTValueTypePairList* listTemp)
+        private static TryInterpretReturnValue MoveTypeDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTValueTypePairList* list)
         {
             var expression = new RaceTree.MoveTypeAssignExpression();
             var cs = stackalloc char[] { 'o', 'v', 'e', 't', 'y', 'p', 'e' };
@@ -91,7 +91,7 @@
             var ast = new ASTValueTypePair(RaceTree.movetype);
             if (ast.TryAddAST(tempData.MoveTypes, expression, tempData.MoveTypeCapacity, ref tempData.MoveTypeLength))
             {
-                ast.AddToTempJob(ref listTemp->Values, ref listTemp->Capacity, ref listTemp->Length, out _);
+                ast.AddToTempJob(ref list->Values, ref list->Capacity, ref list->Length, out _);
             }
             else
             {
@@ -101,7 +101,7 @@
             return answer;
         }
 
-        private static TryInterpretReturnValue ConstiDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTValueTypePairList* listTemp)
+        private static TryInterpretReturnValue ConstiDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTValueTypePairList* list)
         {
             var expression = new RaceTree.ConstiAssignExpression();
             var cs = stackalloc char[] { 'o', 'n', 's', 't', 'i' };
@@ -118,7 +118,7 @@
             var ast = new ASTValueTypePair(RaceTree.consti);
             if (ast.TryAddAST(tempData.Constis, expression, tempData.ConstiCapacity, ref tempData.ConstiLength))
             {
-                ast.AddToTempJob(ref listTemp->Values, ref listTemp->Capacity, ref listTemp->Length, out _);
+                ast.AddToTempJob(ref list->Values, ref list->Capacity, ref list->Length, out _);
             }
             else
             {
@@ -139,7 +139,7 @@
             return new TryInterpretReturnValue(span, default, default, InterpreterStatus.Success);
         }
 
-        private static TryInterpretReturnValue BraveDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTValueTypePairList* listTemp)
+        private static TryInterpretReturnValue BraveDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTValueTypePairList* list)
         {
             var expression = new RaceTree.BraveAssignExpression();
             var cs = stackalloc char[] { 'r', 'a', 'v', 'e' };
@@ -152,7 +152,7 @@
             var ast = new ASTValueTypePair(RaceTree.brave);
             if (ast.TryAddAST(tempData.Braves, expression, tempData.BraveCapacity, ref tempData.BraveLength))
             {
-                ast.AddToTempJob(ref listTemp->Values, ref listTemp->Capacity, ref listTemp->Length, out _);
+                ast.AddToTempJob(ref list->Values, ref list->Capacity, ref list->Length, out _);
             }
             else
             {
@@ -162,7 +162,7 @@
             return answer;
         }
 
-        private static TryInterpretReturnValue AlignDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTValueTypePairList* listTemp)
+        private static TryInterpretReturnValue AlignDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTValueTypePairList* list)
         {
             var expression = new RaceTree.AlignAssignExpression();
             var cs = stackalloc char[] { 'l', 'i', 'g', 'n' };
@@ -175,7 +175,7 @@
             var ast = new ASTValueTypePair(RaceTree.align);
             if (ast.TryAddAST(tempData.Aligns, expression, tempData.AlignCapacity, ref tempData.AlignLength))
             {
-                ast.AddToTempJob(ref listTemp->Values, ref listTemp->Capacity, ref listTemp->Length, out _);
+                ast.AddToTempJob(ref list->Values, ref list->Capacity, ref list->Length, out _);
             }
             else
             {

@@ -87,7 +87,7 @@
             return answer;
         }
 
-        private static TryInterpretReturnValue ConstiDetect(ref TextFile file, ref MovetypeParserTempData tempData, ref Caret current, ASTValueTypePairList* listTemp)
+        private static TryInterpretReturnValue ConstiDetect(ref TextFile file, ref MovetypeParserTempData tempData, ref Caret current, ASTValueTypePairList* list)
         {
             var expression = new MovetypeTree.ConstiAssignExpression();
             var cs = stackalloc char[] { 'o', 'n', 's', 't', 'i' };
@@ -104,7 +104,7 @@
             var ast = new ASTValueTypePair(MovetypeTree.consti);
             if (ast.TryAddAST(tempData.Constis, expression, tempData.ConstiCapacity, ref tempData.ConstiLength))
             {
-                ast.AddToTempJob(ref listTemp->Values, ref listTemp->Capacity, ref listTemp->Length, out _);
+                ast.AddToTempJob(ref list->Values, ref list->Capacity, ref list->Length, out _);
             }
             else
             {
