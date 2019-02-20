@@ -23,18 +23,6 @@ namespace pcysl5edgo.Wahren.AST
 
         public override string ToString() => "capacity : " + Capacity + "\nlength : " + Length;
 
-        public bool TryAddMultiThread(IdentifierNumberPair* pairs, int length, out int start)
-        {
-            do
-            {
-                start = Length;
-                if (start + length > Capacity)
-                    return false;
-            } while (start != Interlocked.CompareExchange(ref Length, start + length, start));
-            UnsafeUtility.MemCpy(Values + start, pairs, length * sizeof(IdentifierNumberPair));
-            return true;
-        }
-
         public void Lengthen(Allocator allocator = Allocator.Persistent)
         {
             if (Capacity == 0) return;
@@ -52,22 +40,6 @@ namespace pcysl5edgo.Wahren.AST
                 UnsafeUtility.Free(Values, Allocator.Persistent);
                 this = default;
             }
-        }
-
-        public static IdentifierNumberPairList MallocTemp(int capacity)
-        => new IdentifierNumberPairList
-        {
-            Capacity = capacity,
-            Length = 0,
-            Values = (IdentifierNumberPair*)UnsafeUtility.Malloc(sizeof(IdentifierNumberPair) * capacity, 4, Allocator.Temp),
-        };
-        public static void FreeTemp(ref IdentifierNumberPairList list)
-        {
-            if (list.Capacity != 0)
-            {
-                UnsafeUtility.Free(list.Values, Allocator.Temp);
-            }
-            list = default;
         }
     }
 }

@@ -15,6 +15,7 @@ public static class SuccessSentence
     internal const int IdentifierInterpretSuccess = 9;
     internal const int MovetypeTreeInterpretSuccess = 10;
     internal const int VoiceTreeIntrepretSuccess = 11;
+    internal const int SentencesEndWithSemicolonInterpretSuccess = 12;
 
     static SuccessSentence()
     {
@@ -32,6 +33,7 @@ public static class SuccessSentence
             "Identifier Interpretation Success", // 9
             "Struct 'movetype' Interpretation Success", //10
             "Struct 'voice' Interpretation Success", // 11
+            "Sentences Interpretation Success", // 12
         };
         SubContents = new string[][]
         {
@@ -71,6 +73,7 @@ public static class SuccessSentence
             null, // 9
             null, // 10
             null, // 11
+            null, // 12
         };
     }
 }

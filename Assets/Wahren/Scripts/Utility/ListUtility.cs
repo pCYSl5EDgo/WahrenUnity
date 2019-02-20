@@ -56,12 +56,47 @@ namespace pcysl5edgo.Wahren.AST
             values[index] = value;
             return true;
         }
-        public static T* MallcTemp<T>(int capacity, out int length) where T : unmanaged
+        public static bool TryAddBulkToMultiThread<T>(T* srcValues, int srcLength, T* destValues, ref int destLength, int destCapacity, out int start) where T : unmanaged
+        {
+            do
+            {
+                start = destLength;
+                if (start + srcLength > destCapacity)
+                    return false;
+            } while (start != Interlocked.CompareExchange(ref destLength, start + srcLength, start));
+            UnsafeUtility.MemCpy(destValues + start, srcValues, srcLength * sizeof(T));
+            return true;
+        }
+        public static bool TryAddBulkToMultiThread<T>(T* srcValues, long srcLength, T* destValues, ref long destLength, long destCapacity, out long start) where T : unmanaged
+        {
+            do
+            {
+                start = destLength;
+                if (start + srcLength > destCapacity)
+                    return false;
+            } while (start != Interlocked.CompareExchange(ref destLength, start + srcLength, start));
+            UnsafeUtility.MemCpy(destValues + start, srcValues, srcLength * sizeof(T));
+            return true;
+        }
+        public static T* MallocTemp<T>(int capacity, out int length) where T : unmanaged
+        {
+            length = 0;
+            return (T*)UnsafeUtility.Malloc(sizeof(T) * capacity, 4, Allocator.Temp);
+        }
+        public static T* MallocTemp<T>(long capacity, out long length) where T : unmanaged
         {
             length = 0;
             return (T*)UnsafeUtility.Malloc(sizeof(T) * capacity, 4, Allocator.Temp);
         }
         public static void FreeTemp<T>(ref T* values, ref int capacity, ref int length) where T : unmanaged
+        {
+            if (capacity != 0)
+                UnsafeUtility.Free(values, Allocator.Temp);
+            length = 0;
+            values = null;
+            capacity = 0;
+        }
+        public static void FreeTemp<T>(ref T* values, ref long capacity, ref long length) where T : unmanaged
         {
             if (capacity != 0)
                 UnsafeUtility.Free(values, Allocator.Temp);
