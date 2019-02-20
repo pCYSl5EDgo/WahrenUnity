@@ -4,7 +4,7 @@ namespace pcysl5edgo.Wahren.AST
 {
     public static unsafe class DetectionHelper
     {
-        public static bool TryInitializeDetect(this ref TextFile file, char* input, int inputLength, ref Caret current, out TryInterpretReturnValue answer, out Span scenarioVariant)
+        public static bool TryInitializeDetect(this ref TextFile file, ushort* input, int inputLength, ref Caret current, out TryInterpretReturnValue answer, out Span scenarioVariant)
         {
             var cs = file.CurrentCharPointer(current) + 1;
             answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, 0, InterpreterStatus.Error);
