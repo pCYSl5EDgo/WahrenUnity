@@ -54,7 +54,7 @@
                 goto RETURN;
             answer = new TryInterpretReturnValue(file.ReadLine(current), SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Success);
             expression.Value = answer.Span;
-            var ast = new ASTValueTypePair(MovetypeTree.help);
+            var ast = MovetypeTree.Kind.help.CreateASTPair();
             if (ast.TryAddAST(tempData.Helps, expression, tempData.HelpCapacity, ref tempData.HelpLength))
             {
                 ast.AddToTempJob(ref list->Values, ref list->Capacity, ref list->Length, out _);
@@ -101,7 +101,7 @@
             answer = VerifyConsti(expression, tempData.IdentifierNumberPairs, answer.Span);
             if (answer.IsError)
                 goto RETURN;
-            var ast = new ASTValueTypePair(MovetypeTree.consti);
+            var ast = MovetypeTree.Kind.consti.CreateASTPair();
             if (ast.TryAddAST(tempData.Constis, expression, tempData.ConstiCapacity, ref tempData.ConstiLength))
             {
                 ast.AddToTempJob(ref list->Values, ref list->Capacity, ref list->Length, out _);
