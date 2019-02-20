@@ -8,7 +8,12 @@
         public int Start;
         public int Length;
 
-        internal const int name = 0, help = 1, consti = 2;
+        internal enum Kind
+        {
+            name,
+            help,
+            consti,
+        }
 
         public struct NameAssignExpression // 0
         {

@@ -98,9 +98,9 @@ namespace pcysl5edgo.Wahren.AST
                     identifierNumberPairs.Lengthen();
                     break;
                 case PendingReason.SectionListCapacityShortage:
-                    switch (result.SubDataIndex)
+                    switch ((MovetypeTree.Kind)result.SubDataIndex)
                     {
-                        case MovetypeTree.name + 1: // name
+                        case MovetypeTree.Kind.name: // name
 #if UNITY_EDITOR
                             if (ShowLog)
                             {
@@ -109,7 +109,7 @@ namespace pcysl5edgo.Wahren.AST
 #endif
                             ListUtility.Lengthen(ref Names, ref NameCapacity);
                             break;
-                        case MovetypeTree.help + 1: // help
+                        case MovetypeTree.Kind.help: // help
 #if UNITY_EDITOR
                             if (ShowLog)
                             {
@@ -118,7 +118,7 @@ namespace pcysl5edgo.Wahren.AST
 #endif
                             ListUtility.Lengthen(ref Helps, ref HelpCapacity);
                             break;
-                        case MovetypeTree.consti + 1: // consti
+                        case MovetypeTree.Kind.consti: // consti
 #if UNITY_EDITOR
                             if (ShowLog)
                             {

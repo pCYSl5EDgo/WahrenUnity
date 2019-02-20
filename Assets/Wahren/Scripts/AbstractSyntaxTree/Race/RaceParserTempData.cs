@@ -112,9 +112,9 @@ namespace pcysl5edgo.Wahren.AST
                     identifierNumberPairs.Lengthen();
                     break;
                 case PendingReason.SectionListCapacityShortage:
-                    switch (result.SubDataIndex)
+                    switch ((RaceTree.Kind)result.SubDataIndex)
                     {
-                        case RaceTree.name + 1: // name
+                        case RaceTree.Kind.name: // name
 #if UNITY_EDITOR
                             if (ShowLog)
                             {
@@ -123,7 +123,7 @@ namespace pcysl5edgo.Wahren.AST
 #endif
                             ListUtility.Lengthen(ref Names, ref NameCapacity);
                             break;
-                        case RaceTree.align + 1: // align
+                        case RaceTree.Kind.align: // align
 #if UNITY_EDITOR
                             if (ShowLog)
                             {
@@ -132,7 +132,7 @@ namespace pcysl5edgo.Wahren.AST
 #endif
                             ListUtility.Lengthen(ref Aligns, ref AlignCapacity);
                             break;
-                        case RaceTree.brave + 1: // brave
+                        case RaceTree.Kind.brave: // brave
 #if UNITY_EDITOR
                             if (ShowLog)
                             {
@@ -141,7 +141,7 @@ namespace pcysl5edgo.Wahren.AST
 #endif
                             ListUtility.Lengthen(ref Braves, ref BraveCapacity);
                             break;
-                        case RaceTree.consti + 1: //consti
+                        case RaceTree.Kind.consti: //consti
 #if UNITY_EDITOR
                             if (ShowLog)
                             {
@@ -150,7 +150,7 @@ namespace pcysl5edgo.Wahren.AST
 #endif
                             ListUtility.Lengthen(ref Constis, ref ConstiCapacity);
                             break;
-                        case RaceTree.movetype + 1: // movetype
+                        case RaceTree.Kind.movetype: // movetype
 #if UNITY_EDITOR
                             if (ShowLog)
                             {

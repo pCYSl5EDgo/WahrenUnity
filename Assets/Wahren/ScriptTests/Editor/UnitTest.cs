@@ -81,7 +81,7 @@ public unsafe class UnitTest
             AreEqual(tree.ParentName.Length, 0);
             var (value, type) = _.script.ASTValueTypePairList[tree.Start];
             AreEqual(value, 0);
-            AreEqual(type, RaceTree.name);
+            AreEqual((RaceTree.Kind)type, RaceTree.Kind.name);
             AreEqual(_.script.RaceParserTempData.NameLength, 1);
             var nameAssignExpression = _.script.RaceParserTempData.Names[value];
             AreEqual(nameAssignExpression.ScenarioVariant.Length, 0);

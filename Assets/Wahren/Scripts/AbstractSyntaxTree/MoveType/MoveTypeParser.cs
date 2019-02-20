@@ -49,7 +49,7 @@
         private static TryInterpretReturnValue HelpDetect(ref TextFile file, ref MovetypeParserTempData tempData, ref Caret current, ASTValueTypePairList* list)
         {
             var expression = new MovetypeTree.HelpAssignExpression();
-            var cs = stackalloc char[] { 'e', 'l', 'p' };
+            var cs = stackalloc ushort[] { 'e', 'l', 'p' };
             if (!file.TryInitializeDetect(cs, 3, ref current, out var answer, out expression.ScenarioVariant))
                 goto RETURN;
             answer = new TryInterpretReturnValue(file.ReadLine(current), SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Success);
@@ -61,7 +61,7 @@
             }
             else
             {
-                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Movetype, PendingReason.SectionListCapacityShortage, MovetypeTree.help + 1);
+                answer = MovetypeTree.Kind.help.CreatePending(answer.Span);
             }
         RETURN:
             return answer;
@@ -69,19 +69,19 @@
         private static TryInterpretReturnValue NameDetect(ref TextFile file, ref MovetypeParserTempData tempData, ref Caret current, ASTValueTypePairList* list)
         {
             var expression = new MovetypeTree.NameAssignExpression();
-            var cs = stackalloc char[] { 'a', 'm', 'e' };
+            var cs = stackalloc ushort[] { 'a', 'm', 'e' };
             if (!file.TryInitializeDetect(cs, 3, ref current, out var answer, out expression.ScenarioVariant))
                 goto RETURN;
             answer = new TryInterpretReturnValue(file.ReadLine(current), SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Success);
             expression.Value = answer.Span;
-            var ast = new ASTValueTypePair(MovetypeTree.name);
+            var ast = MovetypeTree.Kind.name.CreateASTPair();
             if (ast.TryAddAST(tempData.Names, expression, tempData.NameCapacity, ref tempData.NameLength))
             {
                 ast.AddToTempJob(ref list->Values, ref list->Capacity, ref list->Length, out _);
             }
             else
             {
-                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Movetype, PendingReason.SectionListCapacityShortage, MovetypeTree.name + 1);
+                answer = MovetypeTree.Kind.name.CreatePending(answer.Span);
             }
         RETURN:
             return answer;
@@ -90,7 +90,7 @@
         private static TryInterpretReturnValue ConstiDetect(ref TextFile file, ref MovetypeParserTempData tempData, ref Caret current, ASTValueTypePairList* list)
         {
             var expression = new MovetypeTree.ConstiAssignExpression();
-            var cs = stackalloc char[] { 'o', 'n', 's', 't', 'i' };
+            var cs = stackalloc ushort[] { 'o', 'n', 's', 't', 'i' };
             if (!file.TryInitializeDetect(cs, 5, ref current, out var answer, out expression.ScenarioVariant))
                 goto RETURN;
             answer = file.TryReadIdentifierNumberPairs(Location.Movetype, ref tempData.IdentifierNumberPairs, current, out expression.Start, out expression.Length);
@@ -108,7 +108,7 @@
             }
             else
             {
-                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Movetype, PendingReason.SectionListCapacityShortage, MovetypeTree.consti + 1);
+                answer = MovetypeTree.Kind.consti.CreatePending(answer.Span);
             }
         RETURN:
             return answer;

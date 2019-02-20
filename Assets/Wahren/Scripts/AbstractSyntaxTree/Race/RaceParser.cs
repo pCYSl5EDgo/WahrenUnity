@@ -59,19 +59,19 @@
         private static TryInterpretReturnValue NameDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTValueTypePairList* list)
         {
             var expression = new RaceTree.NameAssignExpression();
-            var cs = stackalloc char[] { 'a', 'm', 'e' };
+            var cs = stackalloc ushort[] { 'a', 'm', 'e' };
             if (!file.TryInitializeDetect(cs, 3, ref current, out var answer, out expression.ScenarioVariant))
                 goto RETURN;
             answer = new TryInterpretReturnValue(file.ReadLine(current), SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Success);
             expression.Value = answer.Span;
-            var ast = new ASTValueTypePair(RaceTree.name);
+            var ast = RaceTree.Kind.name.CreateASTPair();
             if (ast.TryAddAST(tempData.Names, expression, tempData.NameCapacity, ref tempData.NameLength))
             {
                 ast.AddToTempJob(ref list->Values, ref list->Capacity, ref list->Length, out _);
             }
             else
             {
-                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Race, PendingReason.SectionListCapacityShortage, RaceTree.name + 1);
+                answer = RaceTree.Kind.name.CreatePending(answer.Span);
             }
         RETURN:
             return answer;
@@ -80,7 +80,7 @@
         private static TryInterpretReturnValue MoveTypeDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTValueTypePairList* list)
         {
             var expression = new RaceTree.MoveTypeAssignExpression();
-            var cs = stackalloc char[] { 'o', 'v', 'e', 't', 'y', 'p', 'e' };
+            var cs = stackalloc ushort[] { 'o', 'v', 'e', 't', 'y', 'p', 'e' };
             if (!file.TryInitializeDetect(cs, 7, ref current, out var answer, out expression.ScenarioVariant))
                 goto RETURN;
             answer = ReadUtility.TryReadIdentifierNotEmpty(file.Contents + file.LineStarts[current.Line], file.CurrentLineLength(current), current.File, current.Line, current.Column);
@@ -88,14 +88,14 @@
                 goto RETURN;
             answer.DataIndex = SuccessSentence.AssignmentInterpretationSuccess;
             expression.Value = answer.Span;
-            var ast = new ASTValueTypePair(RaceTree.movetype);
+            var ast = RaceTree.Kind.movetype.CreateASTPair();
             if (ast.TryAddAST(tempData.MoveTypes, expression, tempData.MoveTypeCapacity, ref tempData.MoveTypeLength))
             {
                 ast.AddToTempJob(ref list->Values, ref list->Capacity, ref list->Length, out _);
             }
             else
             {
-                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Race, PendingReason.SectionListCapacityShortage, RaceTree.movetype + 1);
+                answer = RaceTree.Kind.movetype.CreatePending(answer.Span);
             }
         RETURN:
             return answer;
@@ -104,7 +104,7 @@
         private static TryInterpretReturnValue ConstiDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTValueTypePairList* list)
         {
             var expression = new RaceTree.ConstiAssignExpression();
-            var cs = stackalloc char[] { 'o', 'n', 's', 't', 'i' };
+            var cs = stackalloc ushort[] { 'o', 'n', 's', 't', 'i' };
             if (!file.TryInitializeDetect(cs, 5, ref current, out var answer, out expression.ScenarioVariant))
                 goto RETURN;
             answer = file.TryReadIdentifierNumberPairs(Location.Race, ref tempData.IdentifierNumberPairs, current, out expression.Start, out expression.Length);
@@ -115,14 +115,14 @@
             answer = VerifyConsti(expression, tempData.IdentifierNumberPairs, answer.Span);
             if (answer.IsError)
                 goto RETURN;
-            var ast = new ASTValueTypePair(RaceTree.consti);
+            var ast = RaceTree.Kind.consti.CreateASTPair();
             if (ast.TryAddAST(tempData.Constis, expression, tempData.ConstiCapacity, ref tempData.ConstiLength))
             {
                 ast.AddToTempJob(ref list->Values, ref list->Capacity, ref list->Length, out _);
             }
             else
             {
-                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Race, PendingReason.SectionListCapacityShortage, RaceTree.consti + 1);
+                answer = RaceTree.Kind.consti.CreatePending(answer.Span);
             }
         RETURN:
             return answer;
@@ -142,21 +142,21 @@
         private static TryInterpretReturnValue BraveDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTValueTypePairList* list)
         {
             var expression = new RaceTree.BraveAssignExpression();
-            var cs = stackalloc char[] { 'r', 'a', 'v', 'e' };
+            var cs = stackalloc ushort[] { 'r', 'a', 'v', 'e' };
             if (!file.TryInitializeDetect(cs, 4, ref current, out var answer, out expression.ScenarioVariant))
                 goto RETURN;
             answer = file.TryReadNumber(current, out var value);
             if (!answer)
                 goto RETURN;
             expression.Value = (sbyte)value;
-            var ast = new ASTValueTypePair(RaceTree.brave);
+            var ast = RaceTree.Kind.brave.CreateASTPair();
             if (ast.TryAddAST(tempData.Braves, expression, tempData.BraveCapacity, ref tempData.BraveLength))
             {
                 ast.AddToTempJob(ref list->Values, ref list->Capacity, ref list->Length, out _);
             }
             else
             {
-                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Race, PendingReason.SectionListCapacityShortage, RaceTree.brave + 1);
+                answer = RaceTree.Kind.brave.CreatePending(answer.Span);
             }
         RETURN:
             return answer;
@@ -165,21 +165,21 @@
         private static TryInterpretReturnValue AlignDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTValueTypePairList* list)
         {
             var expression = new RaceTree.AlignAssignExpression();
-            var cs = stackalloc char[] { 'l', 'i', 'g', 'n' };
+            var cs = stackalloc ushort[] { 'l', 'i', 'g', 'n' };
             if (!file.TryInitializeDetect(cs, 4, ref current, out var answer, out expression.ScenarioVariant))
                 goto RETURN;
             answer = file.TryReadNumber(current, out var value);
             if (!answer)
                 goto RETURN;
             expression.Value = (sbyte)value;
-            var ast = new ASTValueTypePair(RaceTree.align);
+            var ast = RaceTree.Kind.align.CreateASTPair();
             if (ast.TryAddAST(tempData.Aligns, expression, tempData.AlignCapacity, ref tempData.AlignLength))
             {
                 ast.AddToTempJob(ref list->Values, ref list->Capacity, ref list->Length, out _);
             }
             else
             {
-                answer = TryInterpretReturnValue.CreatePending(answer.Span, Location.Race, PendingReason.SectionListCapacityShortage, RaceTree.align + 1);
+                answer = RaceTree.Kind.align.CreatePending(answer.Span);
             }
         RETURN:
             return answer;

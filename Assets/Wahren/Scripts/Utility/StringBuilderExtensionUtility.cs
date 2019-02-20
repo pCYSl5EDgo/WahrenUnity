@@ -81,21 +81,21 @@ namespace pcysl5edgo.Wahren.AST
                 {
                     var pair = astValueTypePairList.Values[i];
                     buffer.Append("\n  ");
-                    switch (pair.Type)
+                    switch ((RaceTree.Kind)pair.Type)
                     {
-                        case RaceTree.name:
+                        case RaceTree.Kind.name:
                             buffer.Append(files, tempData.Names[pair.Value]);
                             break;
-                        case RaceTree.align:
+                        case RaceTree.Kind.align:
                             buffer.Append(files, tempData.Aligns[pair.Value]);
                             break;
-                        case RaceTree.brave:
+                        case RaceTree.Kind.brave:
                             buffer.Append(files, tempData.Braves[pair.Value]);
                             break;
-                        case RaceTree.consti:
+                        case RaceTree.Kind.consti:
                             buffer.Append(files, tempData.Constis[pair.Value], tempData.IdentifierNumberPairs);
                             break;
-                        case RaceTree.movetype:
+                        case RaceTree.Kind.movetype:
                             buffer.Append(files, tempData.MoveTypes[pair.Value]);
                             break;
                     }
@@ -121,15 +121,15 @@ namespace pcysl5edgo.Wahren.AST
                 {
                     var pair = astValueTypePairList.Values[i];
                     buffer.Append("\n  ");
-                    switch (pair.Type)
+                    switch ((MovetypeTree.Kind)pair.Type)
                     {
-                        case MovetypeTree.name:
+                        case MovetypeTree.Kind.name:
                             buffer.Append(files, tempData.Names[pair.Value]);
                             break;
-                        case MovetypeTree.consti:
+                        case MovetypeTree.Kind.consti:
                             buffer.Append(files, tempData.Constis[pair.Value], tempData.IdentifierNumberPairs);
                             break;
-                        case MovetypeTree.help:
+                        case MovetypeTree.Kind.help:
                             buffer.Append(files, tempData.Helps[pair.Value]);
                             break;
                     }
