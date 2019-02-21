@@ -14,7 +14,7 @@
                     switch ((file.Contents + file.LineStarts[raw])[column])
                     {
                         case '}':
-                            answer = tree.CloseBrace(ref tree.Start, out tree.Length, ref astValueTypePairList, _.list, ref tempData.Values, tempData.Capacity, ref tempData.Length, Location.Movetype, SuccessSentence.MovetypeTreeInterpretSuccess, ref treeIndex, nextToLeftBrace, ref nextToRightBrace);
+                            answer = tree.CloseBrace(ref tree.Start, out tree.Length, ref astValueTypePairList, _.list, ref tempData.Values, tempData.Capacity, ref tempData.Length, Location.Movetype, SuccessSentence.Kind.MovetypeTreeInterpretSuccess, ref treeIndex, nextToLeftBrace, ref nextToRightBrace);
                             goto RETURN;
                         case 'n':
                             if (!(answer = NameDetect(ref file, ref tempData, ref nextToRightBrace, &_.list)))
@@ -52,7 +52,7 @@
             var cs = stackalloc ushort[] { 'e', 'l', 'p' };
             if (!file.TryInitializeDetect(cs, 3, ref current, out var answer, out expression.ScenarioVariant))
                 goto RETURN;
-            answer = new TryInterpretReturnValue(file.ReadLine(current), SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Success);
+            answer = new TryInterpretReturnValue(file.ReadLine(current), SuccessSentence.Kind.AssignmentInterpretationSuccess);
             expression.Value = answer.Span;
             var ast = MovetypeTree.Kind.help.CreateASTPair();
             if (ast.TryAddAST(tempData.Helps, expression, tempData.HelpCapacity, ref tempData.HelpLength))
@@ -72,7 +72,7 @@
             var cs = stackalloc ushort[] { 'a', 'm', 'e' };
             if (!file.TryInitializeDetect(cs, 3, ref current, out var answer, out expression.ScenarioVariant))
                 goto RETURN;
-            answer = new TryInterpretReturnValue(file.ReadLine(current), SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Success);
+            answer = new TryInterpretReturnValue(file.ReadLine(current), SuccessSentence.Kind.AssignmentInterpretationSuccess);
             expression.Value = answer.Span;
             var ast = MovetypeTree.Kind.name.CreateASTPair();
             if (ast.TryAddAST(tempData.Names, expression, tempData.NameCapacity, ref tempData.NameLength))
@@ -120,7 +120,7 @@
             {
                 ref IdentifierNumberPair val = ref list.Values[i];
                 if (val.Span.Length == 0 || val.Number < 0 || val.Number > 10)
-                    return new TryInterpretReturnValue(val.NumberSpan, ErrorSentence.OutOfRangeError, InterpreterStatus.Error);
+                    return new TryInterpretReturnValue(val.NumberSpan, ErrorSentence.Kind.OutOfRangeError);
             }
             return new TryInterpretReturnValue(span, default, default, InterpreterStatus.Success);
         }

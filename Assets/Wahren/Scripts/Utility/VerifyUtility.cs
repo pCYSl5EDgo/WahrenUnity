@@ -11,11 +11,11 @@ namespace pcysl5edgo.Wahren.AST
 
             if (cLeft == cRight)
             {
-                return new TryInterpretReturnValue(new Span(caret, 1), SuccessSentence.LeftBraceConfirmationSuccess, InterpreterStatus.Success);
+                return new TryInterpretReturnValue(new Span(caret, 1), SuccessSentence.Kind.LeftBraceConfirmationSuccess);
             }
             else
             {
-                return new TryInterpretReturnValue(new Span(caret, 1), ErrorSentence.ExpectedCharNotFoundError, 1, InterpreterStatus.Error);
+                return new TryInterpretReturnValue(new Span(caret, 1), ErrorSentence.Kind.ExpectedCharNotFoundError, 1);
             }
         }
     }

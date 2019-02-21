@@ -19,7 +19,7 @@ namespace pcysl5edgo.Wahren.AST
             {
                 start = 0;
                 length = 0;
-                return new TryInterpretReturnValue(new Span(current, 1), SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Success);
+                return new TryInterpretReturnValue(new Span(current, 1), SuccessSentence.Kind.AssignmentInterpretationSuccess);
             }
             IdentifierNumberPairList tempList;
             tempList.Values = ListUtility.MallocTemp<IdentifierNumberPair>(tempList.Capacity = 4, out tempList.Length);
@@ -219,7 +219,7 @@ namespace pcysl5edgo.Wahren.AST
                                     {
                                         start = 0;
                                         length = 0;
-                                        answer = new TryInterpretReturnValue(current, ErrorSentence.IdentifierCannotBeNumberError, InterpreterStatus.Error);
+                                        answer = new TryInterpretReturnValue(current, ErrorSentence.Kind.IdentifierCannotBeNumberError);
                                         goto RETURN;
                                     }
                                     column++;
@@ -376,12 +376,12 @@ namespace pcysl5edgo.Wahren.AST
                     case 1:
                         start = 0;
                         length = 0;
-                        answer = new TryInterpretReturnValue(span, ErrorSentence.InvalidEndOfLineError, InterpreterStatus.Error);
+                        answer = new TryInterpretReturnValue(span, ErrorSentence.Kind.InvalidEndOfLineError);
                         goto RETURN;
                     case 5:
                         start = 0;
                         length = 0;
-                        answer = new TryInterpretReturnValue(span, ErrorSentence.InvalidMinusNumberError, InterpreterStatus.Error);
+                        answer = new TryInterpretReturnValue(span, ErrorSentence.Kind.InvalidMinusNumberError);
                         goto RETURN;
                     case 4:
                         tempList.Values[tempList.Length - 1].Number = number;
@@ -397,7 +397,7 @@ namespace pcysl5edgo.Wahren.AST
             length = tempList.Length;
             if (ListUtility.TryAddBulkToMultiThread(tempList.Values, length, pairList.Values, ref pairList.Length, pairList.Capacity, out start))
             {
-                answer = new TryInterpretReturnValue(span, SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Success);
+                answer = new TryInterpretReturnValue(span, SuccessSentence.Kind.AssignmentInterpretationSuccess);
             }
             else
             {
@@ -493,15 +493,15 @@ namespace pcysl5edgo.Wahren.AST
                         span.Length++;
                         break;
                     case (ushort)'@':
-                        return new TryInterpretReturnValue(new Span(filePathId, line, i, 0), SuccessSentence.IdentifierInterpretSuccess, InterpreterStatus.Success);
+                        return new TryInterpretReturnValue(new Span(filePathId, line, i, 0), SuccessSentence.Kind.IdentifierInterpretSuccess);
                     default:
                         span.Length++;
-                        return new TryInterpretReturnValue(span, ErrorSentence.InvalidIdentifierError, InterpreterStatus.Error);
+                        return new TryInterpretReturnValue(span, ErrorSentence.Kind.InvalidIdentifierError);
                 }
             }
             if (onlyDigit)
-                return new TryInterpretReturnValue(span, ErrorSentence.IdentifierCannotBeNumberError, InterpreterStatus.Error);
-            return new TryInterpretReturnValue(span, SuccessSentence.IdentifierInterpretSuccess, InterpreterStatus.Success);
+                return new TryInterpretReturnValue(span, ErrorSentence.Kind.IdentifierCannotBeNumberError);
+            return new TryInterpretReturnValue(span, SuccessSentence.Kind.IdentifierInterpretSuccess);
         }
         public static TryInterpretReturnValue TryReadNumber(this ref TextFile file, Caret current, out long value)
         {
@@ -537,7 +537,7 @@ namespace pcysl5edgo.Wahren.AST
                                 span.Column = i;
                                 break;
                             default:
-                                return new TryInterpretReturnValue(new Span(file.FilePathId, current.Line, i, 1), ErrorSentence.NotNumberError, InterpreterStatus.Error);
+                                return new TryInterpretReturnValue(new Span(file.FilePathId, current.Line, i, 1), ErrorSentence.Kind.NotNumberError);
                         }
                         break;
                     case 1:
@@ -558,7 +558,7 @@ namespace pcysl5edgo.Wahren.AST
                                 value += *cptr - '0';
                                 break;
                             default:
-                                return new TryInterpretReturnValue(new Span(file.FilePathId, current.Line, i, 1), ErrorSentence.NotNumberError, InterpreterStatus.Error);
+                                return new TryInterpretReturnValue(new Span(file.FilePathId, current.Line, i, 1), ErrorSentence.Kind.NotNumberError);
                         }
                         break;
                     case 2:
@@ -579,12 +579,12 @@ namespace pcysl5edgo.Wahren.AST
                                 value -= *cptr - '0';
                                 break;
                             default:
-                                return new TryInterpretReturnValue(new Span(file.FilePathId, current.Line, i, 1), ErrorSentence.NotNumberError, InterpreterStatus.Error);
+                                return new TryInterpretReturnValue(new Span(file.FilePathId, current.Line, i, 1), ErrorSentence.Kind.NotNumberError);
                         }
                         break;
                 }
             }
-            return new TryInterpretReturnValue(span, SuccessSentence.NumberInterpretSuccess, InterpreterStatus.Success);
+            return new TryInterpretReturnValue(span, SuccessSentence.Kind.NumberInterpretSuccess);
         }
     }
 }

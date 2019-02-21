@@ -93,7 +93,7 @@ namespace pcysl5edgo.Wahren.AST
                 case 'v': // voice
                     return start.VoiceDetect(column, lineLength, ccp);
                 default:
-                    return new TryInterpretReturnValue(start, ErrorSentence.StructKindNotFoundError, InterpreterStatus.Error);
+                    return new TryInterpretReturnValue(start, ErrorSentence.Kind.StructKindNotFoundError);
             }
         }
 
@@ -358,8 +358,8 @@ namespace pcysl5edgo.Wahren.AST
             }
         }
 
-        private static TryInterpretReturnValue Fail(this Caret start, byte errorSubData) => new TryInterpretReturnValue(start, ErrorSentence.StructKindInterpretError, errorSubData, InterpreterStatus.Error);
+        private static TryInterpretReturnValue Fail(this Caret start, byte errorSubData) => new TryInterpretReturnValue(start, ErrorSentence.Kind.StructKindInterpretError, errorSubData);
 
-        private static TryInterpretReturnValue Success(this Caret start, byte successSubData, int length) => new TryInterpretReturnValue(new Span(start, length), SuccessSentence.StructKindInterpretSuccess, successSubData, InterpreterStatus.Success);
+        private static TryInterpretReturnValue Success(this Caret start, byte successSubData, int length) => new TryInterpretReturnValue(new Span(start, length), SuccessSentence.Kind.StructKindInterpretSuccess, successSubData);
     }
 }

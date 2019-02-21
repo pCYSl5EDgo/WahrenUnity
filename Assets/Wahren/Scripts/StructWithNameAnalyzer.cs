@@ -7,7 +7,7 @@ namespace pcysl5edgo.Wahren.AST
         public static TryInterpretReturnValue TryGetStructName(this ref TextFile file, Caret start)
         {
             file.SkipWhiteSpace(ref start);
-            var answer = new TryInterpretReturnValue(start, ErrorSentence.StructNameNotFoundError, InterpreterStatus.Error);
+            var answer = new TryInterpretReturnValue(start, ErrorSentence.Kind.StructNameNotFoundError);
             ref var span = ref answer.Span;
             ref int length = ref span.Length;
             length = 0;
@@ -95,24 +95,24 @@ namespace pcysl5edgo.Wahren.AST
                     case (ushort)'{':
                         goto RETURN;
                     default:
-                        answer.DataIndex = ErrorSentence.InvalidIdentifierError;
+                        answer.DataIndex = (int)ErrorSentence.Kind.InvalidIdentifierError;
                         return answer;
                 }
             }
         RETURN:
             if (length == 0)
             {
-                answer.DataIndex = ErrorSentence.StructNameNotFoundError;
+                answer.DataIndex = (int)ErrorSentence.Kind.StructNameNotFoundError;
                 answer.Status = 0;
             }
             else if (onlyDigit)
             {
-                answer.DataIndex = ErrorSentence.IdentifierCannotBeNumberError;
+                answer.DataIndex = (int)ErrorSentence.Kind.IdentifierCannotBeNumberError;
                 answer.Status = 0;
             }
             else
             {
-                answer.DataIndex = SuccessSentence.StructNameInterpretSuccess;
+                answer.DataIndex = (int)SuccessSentence.Kind.StructNameInterpretSuccess;
                 answer.Status = InterpreterStatus.Success;
             }
             return answer;
@@ -131,7 +131,7 @@ namespace pcysl5edgo.Wahren.AST
                 case (ushort)'{':
                     return new TryInterpretReturnValue(start, 0, InterpreterStatus.Success); ;
                 default:
-                    return new TryInterpretReturnValue(start, ErrorSentence.NotExpectedCharacterError, InterpreterStatus.Error);
+                    return new TryInterpretReturnValue(start, ErrorSentence.Kind.NotExpectedCharacterError);
             }
         }
 
@@ -224,19 +224,19 @@ namespace pcysl5edgo.Wahren.AST
                     case (ushort)'{':
                         goto RETURN;
                     default:
-                        return new TryInterpretReturnValue(span, ErrorSentence.InvalidIdentifierError, InterpreterStatus.Error);
+                        return new TryInterpretReturnValue(span, ErrorSentence.Kind.InvalidIdentifierError);
                 }
             }
         RETURN:
             if (span.Length == 0)
             {
-                return new TryInterpretReturnValue(span, ErrorSentence.ParentStructNameNotFoundError, InterpreterStatus.Error);
+                return new TryInterpretReturnValue(span, ErrorSentence.Kind.ParentStructNameNotFoundError);
             }
             if (onlyDigit)
             {
-                return new TryInterpretReturnValue(span, ErrorSentence.IdentifierCannotBeNumberError, InterpreterStatus.Error);
+                return new TryInterpretReturnValue(span, ErrorSentence.Kind.IdentifierCannotBeNumberError);
             }
-            return new TryInterpretReturnValue(span, SuccessSentence.ParentStructNameInterpretSuccess, InterpreterStatus.Success);
+            return new TryInterpretReturnValue(span, SuccessSentence.Kind.ParentStructNameInterpretSuccess);
         }
     }
 }

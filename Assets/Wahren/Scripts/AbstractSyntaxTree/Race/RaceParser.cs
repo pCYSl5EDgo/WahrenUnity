@@ -16,7 +16,7 @@ namespace pcysl5edgo.Wahren.AST
                     switch ((file.Contents + file.LineStarts[raw])[column])
                     {
                         case '}':
-                            answer = tree.CloseBrace(ref tree.Start, out tree.Length, ref astValueTypePairList, _.list, ref tempData.Values, tempData.Capacity, ref tempData.Length, Location.Race, SuccessSentence.RaceTreeIntrepretSuccess, ref treeIndex, nextToLeftBrace, ref nextToRightBrace);
+                            answer = tree.CloseBrace(ref tree.Start, out tree.Length, ref astValueTypePairList, _.list, ref tempData.Values, tempData.Capacity, ref tempData.Length, Location.Race, SuccessSentence.Kind.RaceTreeIntrepretSuccess, ref treeIndex, nextToLeftBrace, ref nextToRightBrace);
                             goto RETURN;
                         case 'a': // align
                             if (!(answer = AlignDetect(ref file, ref tempData, ref nextToRightBrace, &_.list)))
@@ -64,7 +64,7 @@ namespace pcysl5edgo.Wahren.AST
             var cs = stackalloc ushort[] { 'a', 'm', 'e' };
             if (!file.TryInitializeDetect(cs, 3, ref current, out var answer, out expression.ScenarioVariant))
                 goto RETURN;
-            answer = new TryInterpretReturnValue(file.ReadLine(current), SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Success);
+            answer = new TryInterpretReturnValue(file.ReadLine(current), SuccessSentence.Kind.AssignmentInterpretationSuccess);
             expression.Value = answer.Span;
             var ast = RaceTree.Kind.name.CreateASTPair();
             if (ast.TryAddAST(tempData.Names, expression, tempData.NameCapacity, ref tempData.NameLength))
@@ -88,7 +88,7 @@ namespace pcysl5edgo.Wahren.AST
             answer = ReadUtility.TryReadIdentifierNotEmpty(file.Contents + file.LineStarts[current.Line], file.CurrentLineLength(current), current.File, current.Line, current.Column);
             if (!answer)
                 goto RETURN;
-            answer.DataIndex = SuccessSentence.AssignmentInterpretationSuccess;
+            answer.DataIndex = (int)SuccessSentence.Kind.AssignmentInterpretationSuccess;
             expression.Value = answer.Span;
             var ast = RaceTree.Kind.movetype.CreateASTPair();
             if (ast.TryAddAST(tempData.Movetypes, expression, tempData.MovetypeCapacity, ref tempData.MovetypeLength))
@@ -136,7 +136,7 @@ namespace pcysl5edgo.Wahren.AST
             {
                 ref IdentifierNumberPair val = ref list.Values[i];
                 if (val.Span.Length == 0 || val.Number < 0 || val.Number > 10)
-                    return new TryInterpretReturnValue(val.NumberSpan, ErrorSentence.OutOfRangeError, InterpreterStatus.Error);
+                    return new TryInterpretReturnValue(val.NumberSpan, ErrorSentence.Kind.OutOfRangeError);
             }
             return new TryInterpretReturnValue(span, default, default, InterpreterStatus.Success);
         }
@@ -194,7 +194,7 @@ namespace pcysl5edgo.Wahren.AST
             if (value < 0 || value > 100)
             {
                 answer.Status = InterpreterStatus.Error;
-                answer.DataIndex = ErrorSentence.OutOfRangeError;
+                answer.DataIndex = (int)ErrorSentence.Kind.OutOfRangeError;
             }
         }
     }

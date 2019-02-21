@@ -9,7 +9,7 @@ namespace pcysl5edgo.Wahren.AST
 {
     public static class RightBraceClosingHelper
     {
-        public static unsafe TryInterpretReturnValue CloseBrace<TTree>(this ref TTree tree, ref int treeStart, out int treeLength, ref ASTValueTypePairList astValueTypePairList, in ASTValueTypePairList tmpList, ref TTree* dataValues, int dataCapacity, ref int dataLength, Location location, int successSentence, ref int treeIndex, Caret nextToLeftBrace, ref Caret nextToRightBrace)
+        public static unsafe TryInterpretReturnValue CloseBrace<TTree>(this ref TTree tree, ref int treeStart, out int treeLength, ref ASTValueTypePairList astValueTypePairList, in ASTValueTypePairList tmpList, ref TTree* dataValues, int dataCapacity, ref int dataLength, Location location, SuccessSentence.Kind successKind, ref int treeIndex, Caret nextToLeftBrace, ref Caret nextToRightBrace)
         where TTree : unmanaged, INameStruct
         {
             nextToRightBrace.Column++;
@@ -20,7 +20,7 @@ namespace pcysl5edgo.Wahren.AST
             }
             if (tree.TryAddToMultiThread(ref dataValues, dataCapacity, ref dataLength, out treeIndex))
             {
-                return new TryInterpretReturnValue(nextToRightBrace, SuccessSentence.RaceTreeIntrepretSuccess, InterpreterStatus.Success);
+                return new TryInterpretReturnValue(nextToRightBrace, successKind);
             }
             return TryInterpretReturnValue.CreatePending(new Span(nextToLeftBrace, 0), Location.Race, PendingReason.TreeListCapacityShortage);
         }

@@ -142,10 +142,7 @@ namespace pcysl5edgo.Wahren.AST
         {
             if (value.Status == InterpreterStatus.Error)
             {
-                buffer.Append("Error - ").AppendLine(ErrorSentence.Contents[value.DataIndex]);
-                var subs = ErrorSentence.SubContents[value.DataIndex];
-                if (subs != null && subs.Length != 0)
-                    buffer.AppendLine(subs[value.SubDataIndex]);
+                buffer.Append("Error - ").AppendLine(ErrorSentence.Contents[(ErrorSentence.Kind)value.DataIndex]);
             }
             else if (value.Status == InterpreterStatus.Pending)
             {

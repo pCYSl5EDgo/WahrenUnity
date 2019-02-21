@@ -7,7 +7,7 @@ namespace pcysl5edgo.Wahren.AST
         public static bool TryInitializeDetect(this ref TextFile file, ushort* input, int inputLength, ref Caret current, out TryInterpretReturnValue answer, out Span scenarioVariant)
         {
             var cs = file.CurrentCharPointer(current) + 1;
-            answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.InvalidIdentifierError, 0, InterpreterStatus.Error);
+            answer = new TryInterpretReturnValue(new Span(current, 1), ErrorSentence.Kind.InvalidIdentifierError, 0);
             var thisLineLength = file.CurrentLineLength(current);
             scenarioVariant = default;
             if (current.Column + inputLength >= thisLineLength || UnsafeUtility.MemCmp(input, cs, sizeof(ushort) * inputLength) != 0)
@@ -23,7 +23,7 @@ namespace pcysl5edgo.Wahren.AST
             file.SkipWhiteSpace(ref current);
             if (file.CurrentChar(current) != '=')
             {
-                answer.DataIndex = ErrorSentence.ExpectedCharNotFoundError;
+                answer.DataIndex = (int)ErrorSentence.Kind.ExpectedCharNotFoundError;
                 answer.Status = InterpreterStatus.Error;
                 return false;
             }

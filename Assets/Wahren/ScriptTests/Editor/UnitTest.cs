@@ -537,7 +537,7 @@ public unsafe class UnitTest
             AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
             AreEqual(_.commonData.LastParentNameSpan.Length, 0);
             AreEqual(_.commonData.LastStructKind, Location.Race);
-            AreEqual(_.commonData.Result.DataIndex, ErrorSentence.InvalidIdentifierError);
+            AreEqual((ErrorSentence.Kind)_.commonData.Result.DataIndex, ErrorSentence.Kind.InvalidIdentifierError);
             AreEqual(_.commonData.Result.Status, InterpreterStatus.Error);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.Result.Span).ToString(), str1[0].ToString());
         }
@@ -628,7 +628,7 @@ public unsafe class UnitTest
             AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
             AreEqual(_.commonData.LastParentNameSpan.Length, 0);
             AreEqual(_.commonData.LastStructKind, Location.Race);
-            AreEqual(_.commonData.Result.DataIndex, ErrorSentence.OutOfRangeError);
+            AreEqual((ErrorSentence.Kind)_.commonData.Result.DataIndex, ErrorSentence.Kind.OutOfRangeError);
             AreEqual(_.commonData.Result.Status, InterpreterStatus.Error);
             AreEqual(_.commonData.Result.Span, new Span(0, 1, 20, 2));
         }
@@ -647,7 +647,7 @@ public unsafe class UnitTest
             AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
             AreEqual(_.commonData.LastParentNameSpan.Length, 0);
             AreEqual(_.commonData.LastStructKind, Location.Race);
-            AreEqual(_.commonData.Result.DataIndex, ErrorSentence.OutOfRangeError);
+            AreEqual((ErrorSentence.Kind)_.commonData.Result.DataIndex, ErrorSentence.Kind.OutOfRangeError);
             AreEqual(_.commonData.Result.Status, InterpreterStatus.Error);
             AreEqual(_.commonData.Result.Span, new Span(0, 1, 20, 4));
         }
@@ -666,7 +666,7 @@ public unsafe class UnitTest
             AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
             AreEqual(_.commonData.LastParentNameSpan.Length, 0);
             AreEqual(_.commonData.LastStructKind, Location.Race);
-            AreEqual(_.commonData.Result.DataIndex, ErrorSentence.OutOfRangeError);
+            AreEqual((ErrorSentence.Kind)_.commonData.Result.DataIndex, ErrorSentence.Kind.OutOfRangeError);
             AreEqual(_.commonData.Result.Status, InterpreterStatus.Error);
             AreEqual(_.commonData.Result.Span, new Span(0, 1, 20, 2));
         }
@@ -685,7 +685,7 @@ public unsafe class UnitTest
             AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
             AreEqual(_.commonData.LastParentNameSpan.Length, 0);
             AreEqual(_.commonData.LastStructKind, Location.Race);
-            AreEqual(_.commonData.Result.DataIndex, ErrorSentence.OutOfRangeError);
+            AreEqual((ErrorSentence.Kind)_.commonData.Result.DataIndex, ErrorSentence.Kind.OutOfRangeError);
             AreEqual(_.commonData.Result.Status, InterpreterStatus.Error);
             AreEqual(_.commonData.Result.Span, new Span(0, 1, 20, 8));
         }

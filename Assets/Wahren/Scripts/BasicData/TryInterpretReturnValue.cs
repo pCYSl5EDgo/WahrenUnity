@@ -49,8 +49,12 @@
             this.SubDataIndex = subDataIndex;
             this.SubData0 = this.SubData1 = 0;
         }
+        public TryInterpretReturnValue(Span span, SuccessSentence.Kind kind, int subDataIndex = 0) : this(span, (int)kind, subDataIndex, InterpreterStatus.Success) { }
+        public TryInterpretReturnValue(Caret start, SuccessSentence.Kind kind, int subDataIndex = 0) : this(start, (int)kind, subDataIndex, InterpreterStatus.Success) { }
+        public TryInterpretReturnValue(Span span, ErrorSentence.Kind kind, int subDataIndex = 0) : this(span, (int)kind, subDataIndex, InterpreterStatus.Error) { }
+        public TryInterpretReturnValue(Caret start, ErrorSentence.Kind kind, int subDataIndex = 0) : this(start, (int)kind, subDataIndex, InterpreterStatus.Error) { }
 
-        public static TryInterpretReturnValue CreateSuccessDetectStructType(in Caret caret, int length, Location location) => new TryInterpretReturnValue(new Span(caret, length), SuccessSentence.StructKindInterpretSuccess, (int)location, InterpreterStatus.Success);
+        public static TryInterpretReturnValue CreateSuccessDetectStructType(in Caret caret, int length, Location location) => new TryInterpretReturnValue(new Span(caret, length), SuccessSentence.Kind.StructKindInterpretSuccess, (int)location);
 
         public static TryInterpretReturnValue CreatePending(Span span, Location location, PendingReason reason, int subDataIndex = 0) => new TryInterpretReturnValue
         {
@@ -62,7 +66,7 @@
             Status = InterpreterStatus.Pending,
         };
 
-        public static TryInterpretReturnValue CreateRightBraceNotFound(Caret current) => new TryInterpretReturnValue(current, ErrorSentence.ExpectedCharNotFoundError, 2, InterpreterStatus.Error);
+        public static TryInterpretReturnValue CreateRightBraceNotFound(Caret current) => new TryInterpretReturnValue(current, ErrorSentence.Kind.ExpectedCharNotFoundError, 2);
         public static TryInterpretReturnValue CreateNotExpectedCharacter(Caret current) => new TryInterpretReturnValue
         {
             Span = new Span
@@ -70,7 +74,7 @@
                 Start = current,
                 Length = 1,
             },
-            DataIndex = ErrorSentence.NotExpectedCharacterError,
+            DataIndex = (int)ErrorSentence.Kind.NotExpectedCharacterError,
             Status = InterpreterStatus.Error,
         };
 
