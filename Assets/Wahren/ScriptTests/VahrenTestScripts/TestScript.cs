@@ -32,7 +32,6 @@ public class TestScript
                     buffer.AppendLine();
                 AppendRace(buffer, scriptManager, i);
             }
-            UnityEngine.Debug.Log(buffer.ToString());
             buffer.Clear();
             const int MovetypeCount_Vahren = 12;
             A.AreEqual(MovetypeCount_Vahren, scriptManager.MovetypeParserTempData.Length);
@@ -42,7 +41,6 @@ public class TestScript
                     buffer.AppendLine();
                 AppendMovetype(buffer, scriptManager, i);
             }
-            UnityEngine.Debug.Log(buffer.ToString());
         }
     }
 

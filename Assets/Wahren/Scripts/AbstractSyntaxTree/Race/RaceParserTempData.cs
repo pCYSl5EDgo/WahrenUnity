@@ -30,19 +30,19 @@ namespace pcysl5edgo.Wahren.AST
         public int AlignCapacity;
         public int BraveCapacity;
         public int ConstiCapacity;
-        public int MoveTypeCapacity;
+        public int MovetypeCapacity;
         public RaceTree* Values;
         public RaceTree.NameAssignExpression* Names;
         public RaceTree.AlignAssignExpression* Aligns;
         public RaceTree.BraveAssignExpression* Braves;
         public RaceTree.ConstiAssignExpression* Constis;
-        public RaceTree.MoveTypeAssignExpression* Movetypes;
+        public RaceTree.MovetypeAssignExpression* Movetypes;
         public IdentifierNumberPairList IdentifierNumberPairs;
 
         public RaceParserTempData(int capacity)
         {
             Length = NameLength = AlignLength = BraveLength = ConstiLength = MovetypeLength = 0;
-            Capacity = NameCapacity = AlignCapacity = BraveCapacity = ConstiCapacity = MoveTypeCapacity = capacity;
+            Capacity = NameCapacity = AlignCapacity = BraveCapacity = ConstiCapacity = MovetypeCapacity = capacity;
             IdentifierNumberPairs = new IdentifierNumberPairList(capacity);
             if (capacity != 0)
             {
@@ -51,7 +51,7 @@ namespace pcysl5edgo.Wahren.AST
                 Aligns = (RaceTree.AlignAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.AlignAssignExpression) * capacity, 4, Allocator.Persistent);
                 Braves = (RaceTree.BraveAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.BraveAssignExpression) * capacity, 4, Allocator.Persistent);
                 Constis = (RaceTree.ConstiAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.ConstiAssignExpression) * capacity, 4, Allocator.Persistent);
-                Movetypes = (RaceTree.MoveTypeAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.MoveTypeAssignExpression) * capacity, 4, Allocator.Persistent);
+                Movetypes = (RaceTree.MovetypeAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.MovetypeAssignExpression) * capacity, 4, Allocator.Persistent);
             }
             else
             {
@@ -72,7 +72,7 @@ namespace pcysl5edgo.Wahren.AST
                 UnsafeUtility.Free(Aligns, Allocator.Persistent);
             if (BraveCapacity != 0)
                 UnsafeUtility.Free(Braves, Allocator.Persistent);
-            if (MoveTypeCapacity != 0)
+            if (MovetypeCapacity != 0)
                 UnsafeUtility.Free(Movetypes, Allocator.Persistent);
             if (ConstiCapacity != 0)
                 UnsafeUtility.Free(Constis, Allocator.Persistent);
@@ -157,7 +157,7 @@ namespace pcysl5edgo.Wahren.AST
                                 UnityEngine.Debug.Log(prefix + " movetype lengthen\n" + result.ToString());
                             }
 #endif
-                            ListUtility.Lengthen(ref Movetypes, ref MoveTypeCapacity);
+                            ListUtility.Lengthen(ref Movetypes, ref MovetypeCapacity);
                             break;
                     }
                     break;

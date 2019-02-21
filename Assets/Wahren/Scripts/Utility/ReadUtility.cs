@@ -17,7 +17,7 @@ namespace pcysl5edgo.Wahren.AST
             var preservedFirstLocation = current;
             if (file.CurrentChar(current) == '@')
             {
-                start = pairList.Length - 1;
+                start = 0;
                 length = 0;
                 return new TryInterpretReturnValue(new Span(current, 1), SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Success);
             }
@@ -35,8 +35,8 @@ namespace pcysl5edgo.Wahren.AST
             {
                 for (; column < file.LineLengths[raw]; column++)
                 {
-                    var c = (file.Contents + file.LineStarts[raw])[column];
                 PARSE:
+                    var c = (file.Contents + file.LineStarts[raw])[column];
                     switch (state)
                     {
                         case 0: // Seek for the first char of the identifier.
@@ -493,9 +493,10 @@ namespace pcysl5edgo.Wahren.AST
                         span.Length++;
                         break;
                     case (ushort)'@':
-                        return new TryInterpretReturnValue(new Span(filePathId, line, i, 1), SuccessSentence.IdentifierInterpretSuccess, InterpreterStatus.Success);
+                        return new TryInterpretReturnValue(new Span(filePathId, line, i, 0), SuccessSentence.IdentifierInterpretSuccess, InterpreterStatus.Success);
                     default:
-                        return new TryInterpretReturnValue(new Span(filePathId, line, i, 1), ErrorSentence.NotNumberError, InterpreterStatus.Error);
+                        span.Length++;
+                        return new TryInterpretReturnValue(span, ErrorSentence.InvalidIdentifierError, InterpreterStatus.Error);
                 }
             }
             if (onlyDigit)

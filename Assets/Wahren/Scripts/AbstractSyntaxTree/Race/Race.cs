@@ -38,7 +38,7 @@
             public int Start;
             public int Length;
         }
-        public struct MoveTypeAssignExpression // 4
+        public struct MovetypeAssignExpression // 4
         {
             public Span ScenarioVariant;
             public Span Value;

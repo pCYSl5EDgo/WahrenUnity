@@ -1,4 +1,6 @@
-﻿namespace pcysl5edgo.Wahren.AST
+﻿using System;
+
+namespace pcysl5edgo.Wahren.AST
 {
     public static unsafe class RaceParser
     {
@@ -79,7 +81,7 @@
 
         private static TryInterpretReturnValue MoveTypeDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTValueTypePairList* list)
         {
-            var expression = new RaceTree.MoveTypeAssignExpression();
+            var expression = new RaceTree.MovetypeAssignExpression();
             var cs = stackalloc ushort[] { 'o', 'v', 'e', 't', 'y', 'p', 'e' };
             if (!file.TryInitializeDetect(cs, 7, ref current, out var answer, out expression.ScenarioVariant))
                 goto RETURN;
@@ -89,7 +91,7 @@
             answer.DataIndex = SuccessSentence.AssignmentInterpretationSuccess;
             expression.Value = answer.Span;
             var ast = RaceTree.Kind.movetype.CreateASTPair();
-            if (ast.TryAddAST(tempData.MoveTypes, expression, tempData.MoveTypeCapacity, ref tempData.MoveTypeLength))
+            if (ast.TryAddAST(tempData.Movetypes, expression, tempData.MovetypeCapacity, ref tempData.MovetypeLength))
             {
                 ast.AddToTempJob(ref list->Values, ref list->Capacity, ref list->Length, out _);
             }
@@ -146,6 +148,7 @@
             if (!file.TryInitializeDetect(cs, 4, ref current, out var answer, out expression.ScenarioVariant))
                 goto RETURN;
             answer = file.TryReadNumber(current, out var value);
+            VerifyNumber(ref answer, value);
             if (!answer)
                 goto RETURN;
             expression.Value = (sbyte)value;
@@ -169,6 +172,7 @@
             if (!file.TryInitializeDetect(cs, 4, ref current, out var answer, out expression.ScenarioVariant))
                 goto RETURN;
             answer = file.TryReadNumber(current, out var value);
+            VerifyNumber(ref answer, value);
             if (!answer)
                 goto RETURN;
             expression.Value = (sbyte)value;
@@ -183,6 +187,15 @@
             }
         RETURN:
             return answer;
+        }
+
+        private static void VerifyNumber(ref TryInterpretReturnValue answer, long value)
+        {
+            if (value < 0 || value > 100)
+            {
+                answer.Status = InterpreterStatus.Error;
+                answer.DataIndex = ErrorSentence.OutOfRangeError;
+            }
         }
     }
 }

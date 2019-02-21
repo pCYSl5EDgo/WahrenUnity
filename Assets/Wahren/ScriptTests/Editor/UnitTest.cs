@@ -2,68 +2,415 @@
 using pcysl5edgo.Wahren.AST;
 
 using static UnityEngine.Assertions.Assert;
-
-unsafe struct USING_STRUCT : System.IDisposable
-{
-    public TextFile file;
-    public ScriptAnalyzeDataManager_Internal script;
-    public ParseJob.CommonData commonData;
-    public USING_STRUCT(string input, out System.Text.StringBuilder buffer)
-    {
-        file = new TextFile(0, input.Length);
-        fixed (char* p = input)
-        {
-            Unity.Collections.LowLevel.Unsafe.UnsafeUtility.MemCpy(file.Contents, p, input.Length * sizeof(char));
-        }
-        file.Split();
-        buffer = new System.Text.StringBuilder(256);
-        var token = InterpreterStatus.None;
-        var cdata = new ParseJob.CommonData
-        {
-            Caret = new Caret(),
-            LastNameSpan = default,
-            LastParentNameSpan = default,
-            LastStructKind = Location.None,
-            Result = new TryInterpretReturnValue(new Span(), 0, 0, InterpreterStatus.None)
-        };
-        fixed (ScriptAnalyzeDataManager_Internal* scriptPtr = &script)
-        {
-            script = new ScriptAnalyzeDataManager_Internal
-            {
-                ASTValueTypePairList = new ASTValueTypePairList(4),
-                FileLength = 1,
-                Files = (TextFile*)Unity.Collections.LowLevel.Unsafe.UnsafeUtility.Malloc(sizeof(System.IntPtr), 4, Unity.Collections.Allocator.Persistent),
-                MoveTypeParserTempData = new MovetypeParserTempData(1),
-                RaceParserTempData = new RaceParserTempData(1),
-            };
-            *script.Files = file;
-            var job = new ParseJob
-            {
-                CancellationTokenPtr = &token,
-                CommonPtr = &cdata,
-                File = file,
-                ScriptPtr = scriptPtr,
-            };
-            ref var result = ref cdata.Result;
-        PARSE:
-            job.Execute();
-            if (result.Status == InterpreterStatus.Pending)
-            {
-                var (location, reason) = result;
-                script.RaceParserTempData.Lengthen(ref script.ASTValueTypePairList, result, false);
-                goto PARSE;
-            }
-        }
-        commonData = cdata;
-    }
-    public void Dispose()
-    {
-        script.Dispose();
-    }
-}
+using static UnityEngine.Debug;
 
 public unsafe class UnitTest
 {
+    [Test]
+    public void race_consti_success_4()
+    {
+        var str0 = "o0_21uruse021902e";
+        var strs = new[] { ("lawsuit", 7), ("death", 10), ("wind", 1), ("earth", 0) };
+        var strx = strs[0].Item1 + "*" + strs[0].Item2.ToString();
+        var times = "*";
+        for (int i = 1; i < strs.Length; i++)
+        {
+            var (s, n) = strs[i];
+            strx += ", " + s + times + n;
+        }
+        var scriptText = $@"race {str0}{{
+            consti = {strx}
+        }}";
+        using (var _ = new USING_STRUCT(scriptText, out var buffer))
+        {
+            AreEqual(_.script.RaceParserTempData.Length, 1);
+            ref var tree = ref _.script.RaceParserTempData.Values[0];
+            AreEqual(tree.Length, 1);
+            AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
+            AreEqual(tree.ParentName.Length, 0);
+            var (value, type) = _.script.ASTValueTypePairList[tree.Start];
+            AreEqual(value, 0);
+            AreEqual((RaceTree.Kind)type, RaceTree.Kind.consti);
+            AreEqual(_.script.RaceParserTempData.ConstiLength, 1);
+            var expression = _.script.RaceParserTempData.Constis[value];
+            AreEqual(expression.ScenarioVariant.Length, 0);
+            AreEqual(expression.Start, 0);
+            AreEqual(expression.Length, strs.Length);
+            var pairs = _.script.RaceParserTempData.IdentifierNumberPairs;
+            AreEqual(pairs.Length, strs.Length);
+            for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
+            {
+                var p = pairs.Values[i];
+                var (s, n) = strs[i - expression.Start];
+                AreEqual(buffer.Clear().AppendPrimitive(_.file, p.Span).ToString(), s);
+                AreEqual(p.Number, n);
+            }
+        }
+    }
+    [Test]
+    public void race_consti_success_1()
+    {
+        var str0 = "o0_21uruse021902e";
+        var strs = new[] { ("lawsuit", 7) };
+        var strx = strs[0].Item1 + "*" + strs[0].Item2.ToString();
+        var times = "*";
+        for (int i = 1; i < strs.Length; i++)
+        {
+            var (s, n) = strs[i];
+            strx += ", " + s + times + n;
+        }
+        var scriptText = $@"race {str0}{{
+            consti = {strx}
+        }}";
+        using (var _ = new USING_STRUCT(scriptText, out var buffer))
+        {
+            AreEqual(_.script.RaceParserTempData.Length, 1);
+            ref var tree = ref _.script.RaceParserTempData.Values[0];
+            AreEqual(tree.Length, 1);
+            AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
+            AreEqual(tree.ParentName.Length, 0);
+            var (value, type) = _.script.ASTValueTypePairList[tree.Start];
+            AreEqual(value, 0);
+            AreEqual((RaceTree.Kind)type, RaceTree.Kind.consti);
+            AreEqual(_.script.RaceParserTempData.ConstiLength, 1);
+            var expression = _.script.RaceParserTempData.Constis[value];
+            AreEqual(expression.ScenarioVariant.Length, 0);
+            AreEqual(expression.Start, 0);
+            AreEqual(expression.Length, 1);
+            var pairs = _.script.RaceParserTempData.IdentifierNumberPairs;
+            AreEqual(pairs.Length, 1);
+            for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
+            {
+                var p = pairs.Values[i];
+                var (s, n) = strs[i - expression.Start];
+                AreEqual(buffer.Clear().AppendPrimitive(_.file, p.Span).ToString(), s);
+                AreEqual(p.Number, n);
+            }
+        }
+    }
+    [Test]
+    public void race_consti_success_0()
+    {
+        var str0 = "o0_21uruse021902e";
+        var scriptText = $@"race {str0}{{
+            consti = @
+        }}";
+        using (var _ = new USING_STRUCT(scriptText, out var buffer))
+        {
+            AreEqual(_.script.RaceParserTempData.Length, 1);
+            ref var tree = ref _.script.RaceParserTempData.Values[0];
+            AreEqual(tree.Length, 1);
+            AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
+            AreEqual(tree.ParentName.Length, 0);
+            var (value, type) = _.script.ASTValueTypePairList[tree.Start];
+            AreEqual(value, 0);
+            AreEqual((RaceTree.Kind)type, RaceTree.Kind.consti);
+            AreEqual(_.script.RaceParserTempData.ConstiLength, 1);
+            var expression = _.script.RaceParserTempData.Constis[value];
+            AreEqual(expression.ScenarioVariant.Length, 0);
+            AreEqual(expression.Start, 0);
+            AreEqual(expression.Length, 0);
+        }
+    }
+    [Test]
+    public void race_consti_success_4_space()
+    {
+        var str0 = "o0_21uruse021902e";
+        var strs = new[] { ("lawsuit", 7), ("death", 10), ("wind", 1), ("earth", 0) };
+        var times = "  \t\t  *    \t\t\t";
+        var strx = strs[0].Item1 + times + strs[0].Item2.ToString();
+        for (int i = 1; i < strs.Length; i++)
+        {
+            var (s, n) = strs[i];
+            strx += "," + s + times + n;
+        }
+        var scriptText = $@"race {str0}{{
+            consti = {strx}
+        }}";
+        using (var _ = new USING_STRUCT(scriptText, out var buffer))
+        {
+            AreEqual(_.script.RaceParserTempData.Length, 1);
+            ref var tree = ref _.script.RaceParserTempData.Values[0];
+            AreEqual(tree.Length, 1);
+            AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
+            AreEqual(tree.ParentName.Length, 0);
+            var (value, type) = _.script.ASTValueTypePairList[tree.Start];
+            AreEqual(value, 0);
+            AreEqual((RaceTree.Kind)type, RaceTree.Kind.consti);
+            AreEqual(_.script.RaceParserTempData.ConstiLength, 1);
+            var expression = _.script.RaceParserTempData.Constis[value];
+            AreEqual(expression.ScenarioVariant.Length, 0);
+            AreEqual(expression.Start, 0);
+            AreEqual(expression.Length, strs.Length);
+            var pairs = _.script.RaceParserTempData.IdentifierNumberPairs;
+            AreEqual(pairs.Length, strs.Length);
+            for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
+            {
+                var p = pairs.Values[i];
+                var (s, n) = strs[i - expression.Start];
+                AreEqual(buffer.Clear().AppendPrimitive(_.file, p.Span).ToString(), s);
+                AreEqual(p.Number, n);
+            }
+        }
+    }
+    [Test]
+    public void race_consti_success_1_space()
+    {
+        var str0 = "o0_21uruse021902e";
+        var strs = new[] { ("lawsuit", 7) };
+        var times = "  \t\t  *    \t\t\t";
+        var strx = strs[0].Item1 + times + strs[0].Item2.ToString();
+        for (int i = 1; i < strs.Length; i++)
+        {
+            var (s, n) = strs[i];
+            strx += ",\n\n\t" + s + times + n;
+        }
+        var scriptText = $@"race {str0}{{
+            consti = {strx}
+        }}";
+        using (var _ = new USING_STRUCT(scriptText, out var buffer))
+        {
+            AreEqual(_.script.RaceParserTempData.Length, 1);
+            ref var tree = ref _.script.RaceParserTempData.Values[0];
+            AreEqual(tree.Length, 1);
+            AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
+            AreEqual(tree.ParentName.Length, 0);
+            var (value, type) = _.script.ASTValueTypePairList[tree.Start];
+            AreEqual(value, 0);
+            AreEqual((RaceTree.Kind)type, RaceTree.Kind.consti);
+            AreEqual(_.script.RaceParserTempData.ConstiLength, 1);
+            var expression = _.script.RaceParserTempData.Constis[value];
+            AreEqual(expression.ScenarioVariant.Length, 0);
+            AreEqual(expression.Start, 0);
+            AreEqual(expression.Length, 1);
+            var pairs = _.script.RaceParserTempData.IdentifierNumberPairs;
+            AreEqual(pairs.Length, 1);
+            for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
+            {
+                var p = pairs.Values[i];
+                var (s, n) = strs[i - expression.Start];
+                AreEqual(buffer.Clear().AppendPrimitive(_.file, p.Span).ToString(), s);
+                AreEqual(p.Number, n);
+            }
+        }
+    }
+    [Test]
+    public void race_consti_success_0_space()
+    {
+        var str0 = "o0_21uruse021902e";
+        var scriptText = $@"race {str0}{{
+
+            consti =      @
+
+
+        }}";
+        using (var _ = new USING_STRUCT(scriptText, out var buffer))
+        {
+            AreEqual(_.script.RaceParserTempData.Length, 1);
+            ref var tree = ref _.script.RaceParserTempData.Values[0];
+            AreEqual(tree.Length, 1);
+            AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
+            AreEqual(tree.ParentName.Length, 0);
+            var (value, type) = _.script.ASTValueTypePairList[tree.Start];
+            AreEqual(value, 0);
+            AreEqual((RaceTree.Kind)type, RaceTree.Kind.consti);
+            AreEqual(_.script.RaceParserTempData.ConstiLength, 1);
+            var expression = _.script.RaceParserTempData.Constis[value];
+            AreEqual(expression.ScenarioVariant.Length, 0);
+            AreEqual(expression.Start, 0);
+            AreEqual(expression.Length, 0);
+        }
+    }
+    [Test]
+    public void race_movetype_fail()
+    {
+        var str0 = "o0_21uruse021902e";
+        var str1 = "絶対に許早苗！！！！！！";
+        var scriptText = $@"race {str0}{{
+            movetype = {str1}
+        }}";
+        using (var _ = new USING_STRUCT(scriptText, out var buffer))
+        {
+            AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
+            AreEqual(_.commonData.LastParentNameSpan.Length, 0);
+            AreEqual(_.commonData.LastStructKind, Location.Race);
+            AreEqual(_.commonData.Result.DataIndex, ErrorSentence.InvalidIdentifierError);
+            AreEqual(_.commonData.Result.Status, InterpreterStatus.Error);
+            AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.Result.Span).ToString(), str1[0].ToString());
+        }
+    }
+
+    [Test]
+    public void race_movetype_success_1()
+    {
+        var str0 = "o0_21uruse021902e";
+        var str1 = "jitunikitanaihatugenwomatikamaeteitahitobito";
+        var scriptText = $@"race {str0}{{
+            movetype = {str1}
+        }}";
+        using (var _ = new USING_STRUCT(scriptText, out var buffer))
+        {
+            AreEqual(_.script.RaceParserTempData.Length, 1);
+            ref var tree = ref _.script.RaceParserTempData.Values[0];
+            AreEqual(tree.Length, 1);
+            AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
+            AreEqual(tree.ParentName.Length, 0);
+            var (value, type) = _.script.ASTValueTypePairList[tree.Start];
+            AreEqual(value, 0);
+            AreEqual((RaceTree.Kind)type, RaceTree.Kind.movetype);
+            AreEqual(_.script.RaceParserTempData.MovetypeLength, 1);
+            var expression = _.script.RaceParserTempData.Movetypes[value];
+            AreEqual(expression.ScenarioVariant.Length, 0);
+            AreEqual(buffer.Clear().AppendPrimitive(_.file, expression.Value).ToString(), str1);
+        }
+    }
+    [Test]
+    public void race_movetype_success_0()
+    {
+        var str0 = "o0_21uruse021902e";
+        var scriptText = $@"race {str0}{{
+            movetype = @
+        }}";
+        using (var _ = new USING_STRUCT(scriptText, out var buffer))
+        {
+            AreEqual(_.script.RaceParserTempData.Length, 1);
+            ref var tree = ref _.script.RaceParserTempData.Values[0];
+            AreEqual(tree.Length, 1);
+            AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
+            AreEqual(tree.ParentName.Length, 0);
+            var (value, type) = _.script.ASTValueTypePairList[tree.Start];
+            AreEqual(value, 0);
+            AreEqual((RaceTree.Kind)type, RaceTree.Kind.movetype);
+            AreEqual(_.script.RaceParserTempData.MovetypeLength, 1);
+            var expression = _.script.RaceParserTempData.Movetypes[value];
+            AreEqual(expression.ScenarioVariant.Length, 0);
+            AreEqual(expression.Value, new Span(0, 1, 23, 0));
+        }
+    }
+    [Test]
+    public void race_brave_success()
+    {
+        var str0 = "o0_21uruse021902e";
+        var num0 = 100;
+        var scriptText = $@"race {str0}{{
+            brave = {num0}
+        }}";
+        using (var _ = new USING_STRUCT(scriptText, out var buffer))
+        {
+            AreEqual(_.script.RaceParserTempData.Length, 1);
+            ref var tree = ref _.script.RaceParserTempData.Values[0];
+            AreEqual(tree.Length, 1);
+            AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
+            AreEqual(tree.ParentName.Length, 0);
+            var (value, type) = _.script.ASTValueTypePairList[tree.Start];
+            AreEqual(value, 0);
+            AreEqual((RaceTree.Kind)type, RaceTree.Kind.brave);
+            AreEqual(_.script.RaceParserTempData.BraveLength, 1);
+            var expression = _.script.RaceParserTempData.Braves[value];
+            AreEqual(expression.ScenarioVariant.Length, 0);
+            AreEqual(expression.Value, num0);
+        }
+    }
+    [Test]
+    public void race_align_fail_lessthan0()
+    {
+        var str0 = "o0_21uruse021902e";
+        var num0 = -1;
+        var scriptText = $@"race {str0}{{
+            brave = {num0}
+        }}";
+        using (var _ = new USING_STRUCT(scriptText, out var buffer))
+        {
+            AreEqual(_.script.RaceParserTempData.Length, 0);
+            AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
+            AreEqual(_.commonData.LastParentNameSpan.Length, 0);
+            AreEqual(_.commonData.LastStructKind, Location.Race);
+            AreEqual(_.commonData.Result.DataIndex, ErrorSentence.OutOfRangeError);
+            AreEqual(_.commonData.Result.Status, InterpreterStatus.Error);
+            AreEqual(_.commonData.Result.Span, new Span(0, 1, 20, 2));
+        }
+    }
+    [Test]
+    public void race_brave_fail_greaterthan100()
+    {
+        var str0 = "o0_21uruse021902e";
+        var num0 = 1000;
+        var scriptText = $@"race {str0}{{
+            brave = {num0}
+        }}";
+        using (var _ = new USING_STRUCT(scriptText, out var buffer))
+        {
+            AreEqual(_.script.RaceParserTempData.Length, 0);
+            AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
+            AreEqual(_.commonData.LastParentNameSpan.Length, 0);
+            AreEqual(_.commonData.LastStructKind, Location.Race);
+            AreEqual(_.commonData.Result.DataIndex, ErrorSentence.OutOfRangeError);
+            AreEqual(_.commonData.Result.Status, InterpreterStatus.Error);
+            AreEqual(_.commonData.Result.Span, new Span(0, 1, 20, 4));
+        }
+    }
+    [Test]
+    public void race_brave_fail_lessthan0()
+    {
+        var str0 = "o0_21uruse021902e";
+        var num0 = -1;
+        var scriptText = $@"race {str0}{{
+            align = {num0}
+        }}";
+        using (var _ = new USING_STRUCT(scriptText, out var buffer))
+        {
+            AreEqual(_.script.RaceParserTempData.Length, 0);
+            AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
+            AreEqual(_.commonData.LastParentNameSpan.Length, 0);
+            AreEqual(_.commonData.LastStructKind, Location.Race);
+            AreEqual(_.commonData.Result.DataIndex, ErrorSentence.OutOfRangeError);
+            AreEqual(_.commonData.Result.Status, InterpreterStatus.Error);
+            AreEqual(_.commonData.Result.Span, new Span(0, 1, 20, 2));
+        }
+    }
+    [Test]
+    public void race_align_fail_greaterthan100()
+    {
+        var str0 = "o0_21uruse021902e";
+        var num0 = 94218747;
+        var scriptText = $@"race {str0}{{
+            align = {num0}
+        }}";
+        using (var _ = new USING_STRUCT(scriptText, out var buffer))
+        {
+            AreEqual(_.script.RaceParserTempData.Length, 0);
+            AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
+            AreEqual(_.commonData.LastParentNameSpan.Length, 0);
+            AreEqual(_.commonData.LastStructKind, Location.Race);
+            AreEqual(_.commonData.Result.DataIndex, ErrorSentence.OutOfRangeError);
+            AreEqual(_.commonData.Result.Status, InterpreterStatus.Error);
+            AreEqual(_.commonData.Result.Span, new Span(0, 1, 20, 8));
+        }
+    }
+    [Test]
+    public void race_align_success()
+    {
+        var str0 = "o0_21uruse021902e";
+        var num0 = 100;
+        var scriptText = $@"race {str0}{{
+            align = {num0}
+        }}";
+        using (var _ = new USING_STRUCT(scriptText, out var buffer))
+        {
+            AreEqual(_.script.RaceParserTempData.Length, 1);
+            ref var tree = ref _.script.RaceParserTempData.Values[0];
+            AreEqual(tree.Length, 1);
+            AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
+            AreEqual(tree.ParentName.Length, 0);
+            var (value, type) = _.script.ASTValueTypePairList[tree.Start];
+            AreEqual(value, 0);
+            AreEqual((RaceTree.Kind)type, RaceTree.Kind.align);
+            AreEqual(_.script.RaceParserTempData.AlignLength, 1);
+            var expression = _.script.RaceParserTempData.Aligns[value];
+            AreEqual(expression.ScenarioVariant.Length, 0);
+            AreEqual(expression.Value, num0);
+        }
+    }
     [Test]
     public void race_name_success()
     {
@@ -83,9 +430,9 @@ public unsafe class UnitTest
             AreEqual(value, 0);
             AreEqual((RaceTree.Kind)type, RaceTree.Kind.name);
             AreEqual(_.script.RaceParserTempData.NameLength, 1);
-            var nameAssignExpression = _.script.RaceParserTempData.Names[value];
-            AreEqual(nameAssignExpression.ScenarioVariant.Length, 0);
-            AreEqual(buffer.Clear().AppendPrimitive(_.file, nameAssignExpression.Value).ToString(), str1);
+            var expression = _.script.RaceParserTempData.Names[value];
+            AreEqual(expression.ScenarioVariant.Length, 0);
+            AreEqual(buffer.Clear().AppendPrimitive(_.file, expression.Value).ToString(), str1);
         }
     }
 
