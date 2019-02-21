@@ -64,7 +64,7 @@ namespace pcysl5edgo.Wahren.AST
         private static StringBuilder Append(this StringBuilder buffer, TextFile* files, in RaceTree.BraveAssignExpression expression)
         => buffer.AppendExtension(files, "brave", expression.ScenarioVariant, expression.Value);
 
-        private static StringBuilder Append(this StringBuilder buffer, TextFile* files, in RaceTree.MoveTypeAssignExpression expression)
+        private static StringBuilder Append(this StringBuilder buffer, TextFile* files, in RaceTree.MovetypeAssignExpression expression)
         => buffer.AppendExtension(files, "movetype", expression.ScenarioVariant, expression.Value);
 
         private static StringBuilder Append(this StringBuilder buffer, TextFile* files, in RaceTree.NameAssignExpression expression)
@@ -96,7 +96,7 @@ namespace pcysl5edgo.Wahren.AST
                             buffer.Append(files, tempData.Constis[pair.Value], tempData.IdentifierNumberPairs);
                             break;
                         case RaceTree.Kind.movetype:
-                            buffer.Append(files, tempData.MoveTypes[pair.Value]);
+                            buffer.Append(files, tempData.Movetypes[pair.Value]);
                             break;
                     }
                 }
