@@ -84,7 +84,7 @@ namespace pcysl5edgo.Wahren.AST
                         }
                         return;
                     case Location.Movetype:
-                        CommonPtr->Result = File.TryParseMovetypeStructMultiThread(ref ScriptPtr->MoveTypeParserTempData, ref ScriptPtr->ASTValueTypePairList, CommonPtr->LastNameSpan, CommonPtr->LastParentNameSpan, currentCaret, out currentCaret, out _);
+                        CommonPtr->Result = File.TryParseMovetypeStructMultiThread(ref ScriptPtr->MovetypeParserTempData, ref ScriptPtr->ASTValueTypePairList, CommonPtr->LastNameSpan, CommonPtr->LastParentNameSpan, currentCaret, out currentCaret, out _);
                         if (CommonPtr->Result)
                         {
                             SaveSuccess(ref currentCaret);

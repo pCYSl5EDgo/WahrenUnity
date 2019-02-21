@@ -33,7 +33,7 @@ unsafe struct USING_STRUCT : System.IDisposable
                 ASTValueTypePairList = new ASTValueTypePairList(4),
                 FileLength = 1,
                 Files = (TextFile*)Unity.Collections.LowLevel.Unsafe.UnsafeUtility.Malloc(sizeof(System.IntPtr), 4, Unity.Collections.Allocator.Persistent),
-                MoveTypeParserTempData = new MovetypeParserTempData(1),
+                MovetypeParserTempData = new MovetypeParserTempData(1),
                 RaceParserTempData = new RaceParserTempData(1),
             };
             *script.Files = file;
@@ -50,7 +50,18 @@ unsafe struct USING_STRUCT : System.IDisposable
             if (result.Status == InterpreterStatus.Pending)
             {
                 var (location, reason) = result;
-                script.RaceParserTempData.Lengthen(ref script.ASTValueTypePairList, result, false);
+                switch (location)
+                {
+                    case Location.Race:
+                        script.RaceParserTempData.Lengthen(ref script.ASTValueTypePairList, result, false);
+                        break;
+                    case Location.Movetype:
+                        script.MovetypeParserTempData.Lengthen(ref script.ASTValueTypePairList, result, false);
+                        break;
+                    default:
+                        Assert.Fail();
+                        break;
+                }
                 result = default;
                 token = default;
                 goto PARSE;
