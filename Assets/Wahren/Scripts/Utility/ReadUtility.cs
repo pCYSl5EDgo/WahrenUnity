@@ -3,6 +3,11 @@ using Unity.Collections.LowLevel.Unsafe;
 
 namespace pcysl5edgo.Wahren.AST
 {
+    public struct AssignExpressionStruct_Range
+    {
+        public Span ScenarioVariant;
+        public int Start, Length;
+    }
     public static unsafe class ReadUtility
     {
         public static Span ReadLine(this ref TextFile file, Caret current) => new Span(current, file.CurrentLineLength(current) - current.Column);
@@ -16,7 +21,8 @@ namespace pcysl5edgo.Wahren.AST
                 length = 0;
                 return new TryInterpretReturnValue(new Span(current, 1), SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Success);
             }
-            var tmpList = IdentifierNumberPairList.MallocTemp(4);
+            IdentifierNumberPairList tempList;
+            tempList.Values = ListUtility.MallocTemp<IdentifierNumberPair>(tempList.Capacity = 4, out tempList.Length);
             int state = 0;
             ref var raw = ref current.Line;
             ref var column = ref current.Column;
@@ -24,15 +30,17 @@ namespace pcysl5edgo.Wahren.AST
             Span numberSpan = new Span { File = file.FilePathId };
             long number = defaultValue;
             bool isOnlyDigit = true;
+            TryInterpretReturnValue answer;
             for (; raw < file.LineCount; raw++, column = 0)
             {
                 for (; column < file.LineLengths[raw]; column++)
                 {
+                    var c = (file.Contents + file.LineStarts[raw])[column];
                 PARSE:
                     switch (state)
                     {
                         case 0: // Seek for the first char of the identifier.
-                            switch ((file.Contents + file.LineStarts[raw])[column])
+                            switch (c)
                             {
                                 #region Alphabet
                                 case (ushort)'a':
@@ -92,9 +100,9 @@ namespace pcysl5edgo.Wahren.AST
                                     state = 1;
                                     span = new Span(current, 1);
                                     isOnlyDigit = false;
-                                    if (++tmpList.Length > tmpList.Capacity)
+                                    if (++tempList.Length > tempList.Capacity)
                                     {
-                                        tmpList.Lengthen(Allocator.Temp);
+                                        tempList.Lengthen(Allocator.Temp);
                                     }
                                     break;
                                 #region Digit
@@ -112,9 +120,9 @@ namespace pcysl5edgo.Wahren.AST
                                     state = 1;
                                     isOnlyDigit = true;
                                     span = new Span(current, 1);
-                                    if (++tmpList.Length > tmpList.Capacity)
+                                    if (++tempList.Length > tempList.Capacity)
                                     {
-                                        tmpList.Lengthen(Allocator.Temp);
+                                        tempList.Lengthen(Allocator.Temp);
                                     }
                                     break;
                                 case (ushort)' ':
@@ -125,7 +133,7 @@ namespace pcysl5edgo.Wahren.AST
                             }
                             break;
                         case 1: // Seek for the rest chars of the identifier.
-                            switch ((file.Contents + file.LineStarts[raw])[column])
+                            switch (c)
                             {
                                 #region Alphabet
                                 case (ushort)'a':
@@ -201,24 +209,24 @@ namespace pcysl5edgo.Wahren.AST
                                     break;
                                 case (ushort)' ':
                                 case (ushort)'\t':
-                                    tmpList.Values[tmpList.Length - 1].Span = span;
+                                    tempList.Values[tempList.Length - 1].Span = span;
                                     state = 2;
                                     break;
                                 case (ushort)'*':
-                                    tmpList.Values[tmpList.Length - 1].Span = span;
+                                    tempList.Values[tempList.Length - 1].Span = span;
                                     state = 3;
                                     if (isOnlyDigit)
                                     {
                                         start = 0;
                                         length = 0;
-                                        IdentifierNumberPairList.FreeTemp(ref tmpList);
-                                        return new TryInterpretReturnValue(current, ErrorSentence.IdentifierCannotBeNumberError, InterpreterStatus.Error);
+                                        answer = new TryInterpretReturnValue(current, ErrorSentence.IdentifierCannotBeNumberError, InterpreterStatus.Error);
+                                        goto RETURN;
                                     }
                                     column++;
                                     file.SkipWhiteSpace(ref current);
                                     goto PARSE;
                                 case (ushort)',':
-                                    tmpList.Values[tmpList.Length - 1] = new IdentifierNumberPair(span, 0, numberSpan);
+                                    tempList.Values[tempList.Length - 1] = new IdentifierNumberPair(span, 0, numberSpan);
                                     state = 0;
                                     column++;
                                     file.SkipWhiteSpace(ref current);
@@ -228,7 +236,7 @@ namespace pcysl5edgo.Wahren.AST
                             }
                             break;
                         case 2: // Seek for '*'.
-                            switch ((file.Contents + file.LineStarts[raw])[column])
+                            switch (c)
                             {
                                 case (ushort)' ':
                                 case (ushort)'\t':
@@ -239,8 +247,8 @@ namespace pcysl5edgo.Wahren.AST
                                     file.SkipWhiteSpace(ref current);
                                     goto PARSE;
                                 case (ushort)',':
-                                    tmpList.Values[tmpList.Length - 1].Number = 0;
-                                    tmpList.Values[tmpList.Length - 1].NumberSpan = new Span { Start = current, Length = 0 };
+                                    tempList.Values[tempList.Length - 1].Number = 0;
+                                    tempList.Values[tempList.Length - 1].NumberSpan = new Span { Start = current, Length = 0 };
                                     state = 0;
                                     column++;
                                     file.SkipWhiteSpace(ref current);
@@ -250,7 +258,7 @@ namespace pcysl5edgo.Wahren.AST
                             }
                             break;
                         case 3: // Seek for the first digit or '-' of the number.
-                            switch ((file.Contents + file.LineStarts[raw])[column])
+                            switch (c)
                             {
                                 #region Digit
                                 case (ushort)'0':
@@ -265,7 +273,7 @@ namespace pcysl5edgo.Wahren.AST
                                 case (ushort)'9':
                                     #endregion
                                     state = 4;
-                                    number = (file.Contents + file.LineStarts[raw])[column] - '0';
+                                    number = c - '0';
                                     numberSpan.Start = current;
                                     numberSpan.Length = 1;
                                     break;
@@ -282,7 +290,7 @@ namespace pcysl5edgo.Wahren.AST
                             }
                             break;
                         case 4: // Seek for the rest digit of the number.
-                            switch ((file.Contents + file.LineStarts[raw])[column])
+                            switch (c)
                             {
                                 #region Digit
                                 case (ushort)'0':
@@ -297,28 +305,28 @@ namespace pcysl5edgo.Wahren.AST
                                 case (ushort)'9':
                                     #endregion
                                     number *= 10;
-                                    number += (file.Contents + file.LineStarts[raw])[column] - '0';
+                                    number += c - '0';
                                     numberSpan.Length++;
                                     break;
                                 case (ushort)' ':
                                 case (ushort)'\t':
                                     state = 6;
-                                    tmpList.Values[tmpList.Length - 1].Number = number;
-                                    tmpList.Values[tmpList.Length - 1].NumberSpan = numberSpan;
+                                    tempList.Values[tempList.Length - 1].Number = number;
+                                    tempList.Values[tempList.Length - 1].NumberSpan = numberSpan;
                                     break;
                                 case (ushort)',':
-                                    tmpList.Values[tmpList.Length - 1].Number = number;
+                                    tempList.Values[tempList.Length - 1].Number = number;
                                     state = 0;
                                     column++;
                                     file.SkipWhiteSpace(ref current);
-                                    tmpList.Values[tmpList.Length - 1].NumberSpan = numberSpan;
+                                    tempList.Values[tempList.Length - 1].NumberSpan = numberSpan;
                                     goto PARSE;
                                 default:
                                     goto ERROR;
                             }
                             break;
                         case 5: // Seek for the rest digit of the minus number.
-                            switch ((file.Contents + file.LineStarts[raw])[column])
+                            switch (c)
                             {
                                 #region Digit
                                 case (ushort)'1':
@@ -331,7 +339,7 @@ namespace pcysl5edgo.Wahren.AST
                                 case (ushort)'8':
                                 case (ushort)'9':
                                     #endregion
-                                    number = -(file.Contents + file.LineStarts[raw])[column] + '0';
+                                    number = -c + '0';
                                     state = 4;
                                     numberSpan.Length++;
                                     break;
@@ -340,7 +348,7 @@ namespace pcysl5edgo.Wahren.AST
                             }
                             break;
                         case 6: // Seek for ','
-                            switch ((file.Contents + file.LineStarts[raw])[column])
+                            switch (c)
                             {
                                 case (ushort)',':
                                     state = 0;
@@ -368,37 +376,41 @@ namespace pcysl5edgo.Wahren.AST
                     case 1:
                         start = 0;
                         length = 0;
-                        IdentifierNumberPairList.FreeTemp(ref tmpList);
-                        return new TryInterpretReturnValue(span, ErrorSentence.InvalidEndOfLineError, InterpreterStatus.Error);
+                        answer = new TryInterpretReturnValue(span, ErrorSentence.InvalidEndOfLineError, InterpreterStatus.Error);
+                        goto RETURN;
                     case 5:
                         start = 0;
                         length = 0;
-                        IdentifierNumberPairList.FreeTemp(ref tmpList);
-                        return new TryInterpretReturnValue(span, ErrorSentence.InvalidMinusNumberError, InterpreterStatus.Error);
-                    case 4:
-                        tmpList.Values[tmpList.Length - 1].Number = number;
-                        tmpList.Values[tmpList.Length - 1].NumberSpan = numberSpan;
-                        span = new Span(current, 0);
+                        answer = new TryInterpretReturnValue(span, ErrorSentence.InvalidMinusNumberError, InterpreterStatus.Error);
                         goto RETURN;
+                    case 4:
+                        tempList.Values[tempList.Length - 1].Number = number;
+                        tempList.Values[tempList.Length - 1].NumberSpan = numberSpan;
+                        span = new Span(current, 0);
+                        goto SUCCESS;
                     case 6:
                         span = new Span(current, 0);
-                        goto RETURN;
+                        goto SUCCESS;
                 }
             }
-        RETURN:
-            length = tmpList.Length;
-            if (pairList.TryAddMultiThread(tmpList.Values, tmpList.Length, out start))
+        SUCCESS:
+            length = tempList.Length;
+            if (ListUtility.TryAddBulkToMultiThread(tempList.Values, length, pairList.Values, ref pairList.Length, pairList.Capacity, out start))
             {
-                IdentifierNumberPairList.FreeTemp(ref tmpList);
-                return new TryInterpretReturnValue(span, SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Success);
+                answer = new TryInterpretReturnValue(span, SuccessSentence.AssignmentInterpretationSuccess, InterpreterStatus.Success);
             }
-            IdentifierNumberPairList.FreeTemp(ref tmpList);
-            return TryInterpretReturnValue.CreatePending(span, location, PendingReason.IdentifierNumberPairListCapacityShortage, tmpList.Length);
+            else
+            {
+                answer = TryInterpretReturnValue.CreatePending(span, location, PendingReason.IdentifierNumberPairListCapacityShortage, tempList.Length);
+            }
+            goto RETURN;
         ERROR:
             start = 0;
             length = 0;
-            IdentifierNumberPairList.FreeTemp(ref tmpList);
-            return new TryInterpretReturnValue(current, ErrorSentence.NotExpectedCharacterError, InterpreterStatus.Error);
+            answer = TryInterpretReturnValue.CreateNotExpectedCharacter(current);
+        RETURN:
+            ListUtility.FreeTemp(ref tempList.Values, ref tempList.Capacity, ref tempList.Length);
+            return answer;
         }
         public static TryInterpretReturnValue TryReadIdentifierNotEmpty(ushort* lineCharPointer, int thisLineLength, int filePathId, int line, int column)
         {
