@@ -19,7 +19,7 @@ unsafe struct USING_STRUCT : System.IDisposable
         {
             UnsafeUtility.MemCpy(file.Contents, p, input.Length * sizeof(char));
         }
-        file.Split();
+        file.Split(allocator);
         buffer = new System.Text.StringBuilder(256);
         var token = InterpreterStatus.None;
         var cdata = new ParseJob.CommonData

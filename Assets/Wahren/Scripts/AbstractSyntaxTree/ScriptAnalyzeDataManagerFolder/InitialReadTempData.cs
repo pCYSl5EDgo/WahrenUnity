@@ -8,9 +8,9 @@ using Unity.IO.LowLevel.Unsafe;
 
 namespace pcysl5edgo.Wahren.AST
 {
-    partial class ScriptAnalyzeDataManager : IDisposable
+    partial class ScriptAnalyzeDataManager
     {
-        private unsafe struct InitialReadTempData : IDisposable
+        private unsafe struct InitialReadTempData
         {
             private RawTextFile* RawFiles;
             private TextFile** FilesPtr;
@@ -27,6 +27,8 @@ namespace pcysl5edgo.Wahren.AST
             private Stage _currentStage;
             public Stage CurrentStage => _currentStage;
             private int Length;
+
+            private const Allocator allocator = Allocator.Persistent;
 
             public void Complete()
             {
@@ -50,7 +52,7 @@ namespace pcysl5edgo.Wahren.AST
                 {
                     DeleteCommentJobHandles[i].Complete();
                 }
-                UnsafeUtility.Free(DeleteCommentJobHandles, Allocator.Persistent);
+                UnsafeUtility.Free(DeleteCommentJobHandles, allocator);
                 DeleteCommentJobHandles = null;
                 _currentStage = Stage.Done;
             }
@@ -64,12 +66,12 @@ namespace pcysl5edgo.Wahren.AST
                     ReadHandles[i].Dispose();
                     if (IsUtf16)
                     {
-                        FilesPtr[0][i] = TextFile.FromRawTextFileUtf16(RawFiles[i]);
+                        FilesPtr[0][i] = TextFile.FromRawTextFileUtf16(RawFiles[i], allocator);
                         DeleteCommentJobHandles[i] = DeleteCommentJob.Schedule(FilesPtr[0] + i, IsDebug);
                     }
                     else
                     {
-                        FilesPtr[0][i] = TextFile.FromRawTextFileCp932(RawFiles[i]);
+                        FilesPtr[0][i] = TextFile.FromRawTextFileCp932(RawFiles[i], allocator);
                         DeleteCommentJobHandles[i] = DeleteCommentJob.Schedule(FilesPtr[0] + i, IsDebug);
                     }
                 }
@@ -109,7 +111,7 @@ namespace pcysl5edgo.Wahren.AST
                 if (isAnyRunning) return;
                 if (DeleteCommentJobHandles != null)
                 {
-                    UnsafeUtility.Free(DeleteCommentJobHandles, Allocator.Persistent);
+                    UnsafeUtility.Free(DeleteCommentJobHandles, allocator);
                     DeleteCommentJobHandles = null;
                 }
                 _currentStage = Stage.Done;
@@ -128,12 +130,12 @@ namespace pcysl5edgo.Wahren.AST
                             ReadHandles[i].Dispose();
                             if (IsUtf16)
                             {
-                                FilesPtr[0][i] = TextFile.FromRawTextFileUtf16(RawFiles[i]);
+                                FilesPtr[0][i] = TextFile.FromRawTextFileUtf16(RawFiles[i], allocator);
                                 DeleteCommentJobHandles[i] = DeleteCommentJob.Schedule(FilesPtr[0] + i, IsDebug);
                             }
                             else
                             {
-                                FilesPtr[0][i] = TextFile.FromRawTextFileCp932(RawFiles[i]);
+                                FilesPtr[0][i] = TextFile.FromRawTextFileCp932(RawFiles[i], allocator);
                                 DeleteCommentJobHandles[i] = DeleteCommentJob.Schedule(FilesPtr[0] + i, IsDebug);
                             }
                             break;
@@ -151,7 +153,7 @@ namespace pcysl5edgo.Wahren.AST
                 {
                     if (IsUtf16)
                     {
-                        UnsafeUtility.Free(RawFiles, Allocator.Persistent);
+                        UnsafeUtility.Free(RawFiles, allocator);
                     }
                     else
                     {
@@ -159,18 +161,18 @@ namespace pcysl5edgo.Wahren.AST
                         {
                             RawFiles[i].Dispose();
                         }
-                        UnsafeUtility.Free(RawFiles, Allocator.Persistent);
+                        UnsafeUtility.Free(RawFiles, allocator);
                     }
                     RawFiles = null;
                 }
                 if (ReadHandles != null)
                 {
-                    UnsafeUtility.Free(ReadHandles, Allocator.Persistent);
+                    UnsafeUtility.Free(ReadHandles, allocator);
                     ReadHandles = null;
                 }
                 if (ReadCommands != null)
                 {
-                    UnsafeUtility.Free(ReadCommands, Allocator.Persistent);
+                    UnsafeUtility.Free(ReadCommands, allocator);
                     ReadCommands = null;
                 }
             }
@@ -193,18 +195,18 @@ namespace pcysl5edgo.Wahren.AST
 
             public static InitialReadTempData* CreatePtr(FileInfo[] infos, int fileLength, TextFile** filesPtr, bool isUtf16, bool isDebug)
             {
-                var ptr = (InitialReadTempData*)UnsafeUtility.Malloc(sizeof(InitialReadTempData), 4, Allocator.Persistent);
+                var ptr = (InitialReadTempData*)UnsafeUtility.Malloc(sizeof(InitialReadTempData), 4, allocator);
                 *ptr = new InitialReadTempData
                 {
                     _isDebug = isDebug ? 1 : 0,
                     _isUtf16 = isUtf16 ? 2 : 0,
                     _currentStage = Stage.None,
                     Length = fileLength,
-                    RawFiles = (RawTextFile*)UnsafeUtility.Malloc(sizeof(RawTextFile) * fileLength, 4, Allocator.Persistent),
+                    RawFiles = (RawTextFile*)UnsafeUtility.Malloc(sizeof(RawTextFile) * fileLength, 4, allocator),
                     FilesPtr = filesPtr,
-                    ReadHandles = (ReadHandle*)UnsafeUtility.Malloc(sizeof(ReadHandle) * fileLength, 4, Allocator.Persistent),
-                    ReadCommands = (ReadCommand*)UnsafeUtility.Malloc(sizeof(ReadCommand) * fileLength, 4, Allocator.Persistent),
-                    DeleteCommentJobHandles = (JobHandle*)UnsafeUtility.Malloc(sizeof(JobHandle) * fileLength, 4, Allocator.Persistent),
+                    ReadHandles = (ReadHandle*)UnsafeUtility.Malloc(sizeof(ReadHandle) * fileLength, 4, allocator),
+                    ReadCommands = (ReadCommand*)UnsafeUtility.Malloc(sizeof(ReadCommand) * fileLength, 4, allocator),
+                    DeleteCommentJobHandles = (JobHandle*)UnsafeUtility.Malloc(sizeof(JobHandle) * fileLength, 4, allocator),
                 };
                 return ptr;
             }
@@ -213,13 +215,13 @@ namespace pcysl5edgo.Wahren.AST
             {
                 if (DeleteCommentJobHandles != null)
                 {
-                    UnsafeUtility.Free(DeleteCommentJobHandles, Allocator.Persistent);
+                    UnsafeUtility.Free(DeleteCommentJobHandles, allocator);
                 }
                 if (RawFiles != null)
                 {
                     if (IsUtf16)
                     {
-                        UnsafeUtility.Free(RawFiles, Allocator.Persistent);
+                        UnsafeUtility.Free(RawFiles, allocator);
                     }
                     else
                     {
@@ -227,16 +229,16 @@ namespace pcysl5edgo.Wahren.AST
                         {
                             RawFiles[i].Dispose();
                         }
-                        UnsafeUtility.Free(RawFiles, Allocator.Persistent);
+                        UnsafeUtility.Free(RawFiles, allocator);
                     }
                 }
                 if (ReadHandles != null)
                 {
-                    UnsafeUtility.Free(ReadHandles, Allocator.Persistent);
+                    UnsafeUtility.Free(ReadHandles, allocator);
                 }
                 if (ReadCommands != null)
                 {
-                    UnsafeUtility.Free(ReadCommands, Allocator.Persistent);
+                    UnsafeUtility.Free(ReadCommands, allocator);
                 }
                 this = default;
             }

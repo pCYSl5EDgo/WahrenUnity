@@ -5,10 +5,11 @@ using Unity.Collections.LowLevel.Unsafe;
 
 namespace pcysl5edgo.Wahren.AST
 {
-    unsafe partial class ScriptAnalyzeDataManager
+    unsafe partial class ScriptAnalyzeDataManager : IDisposable
     {
         public System.IO.FileInfo[] FileInfos;
         public string[] FullPaths, Names;
+        private Allocator allocator;
 
         public enum Stage
         {
@@ -17,13 +18,14 @@ namespace pcysl5edgo.Wahren.AST
 
         public Stage CurrentStage => currentStage;
 
-        public ScriptAnalyzeDataManager(System.IO.FileInfo[] fileInfos, bool isUtf16, bool isDebug
 #if UNITY_EDITOR
-        , bool showLog
+        public ScriptAnalyzeDataManager(System.IO.FileInfo[] fileInfos, bool isUtf16, bool isDebug, Allocator allocator, bool showLog)
+#else
+        public ScriptAnalyzeDataManager(System.IO.FileInfo[] fileInfos, bool isUtf16, bool isDebug, Allocator allocator)
 #endif
-        )
         {
             if (fileInfos is null) throw new ArgumentNullException();
+            this.allocator = allocator;
 #if UNITY_EDITOR
             ShowLog = showLog;
 #endif
@@ -35,12 +37,12 @@ namespace pcysl5edgo.Wahren.AST
                 FullPaths[i] = FileInfos[i].FullName;
                 Names[i] = FileInfos[i].Name;
             }
-            ScriptPtr = ScriptAnalyzeDataManager_Internal.CreatePtr(FullPaths.Length, Allocator.Persistent);
-            Status = (InterpreterStatus*)UnsafeUtility.Malloc(sizeof(InterpreterStatus), 4, Allocator.Persistent);
-            handles = new NativeList<JobHandle>(FullPaths.Length, Allocator.Persistent);
-            jobs = new NativeArray<ParseJob>(FullPaths.Length, Allocator.Persistent);
-            commonDatas = new NativeArray<ParseJob.CommonData>(FullPaths.Length, Allocator.Persistent);
-            RaceOldLengths = (RaceParserTempData.OldLengths*)UnsafeUtility.Malloc(sizeof(RaceParserTempData.OldLengths), 4, Allocator.Persistent);
+            ScriptPtr = ScriptAnalyzeDataManager_Internal.CreatePtr(FullPaths.Length, allocator);
+            Status = (InterpreterStatus*)UnsafeUtility.Malloc(sizeof(InterpreterStatus), 4, allocator);
+            handles = new NativeList<JobHandle>(FullPaths.Length, allocator);
+            jobs = new NativeArray<ParseJob>(FullPaths.Length, allocator);
+            commonDatas = new NativeArray<ParseJob.CommonData>(FullPaths.Length, allocator);
+            RaceOldLengths = (RaceParserTempData.OldLengths*)UnsafeUtility.Malloc(sizeof(RaceParserTempData.OldLengths), 4, allocator);
             InitialReadTempDataPtr = InitialReadTempData.CreatePtr(FileInfos, ScriptPtr->FileLength, &ScriptPtr->Files, isUtf16, isDebug);
             currentStage = Stage.PreLoading;
         }
@@ -98,21 +100,21 @@ namespace pcysl5edgo.Wahren.AST
             if (commonDatas.IsCreated)
                 commonDatas.Dispose();
             if (Status != null)
-                UnsafeUtility.Free(Status, Allocator.Persistent);
+                UnsafeUtility.Free(Status, allocator);
             if (RaceOldLengths != null)
-                UnsafeUtility.Free(RaceOldLengths, Allocator.Persistent);
+                UnsafeUtility.Free(RaceOldLengths, allocator);
             FullPaths = null;
             Names = null;
             if (ScriptPtr != null)
             {
-                ScriptPtr->Dispose(Allocator.Persistent);
-                UnsafeUtility.Free(ScriptPtr, Allocator.Persistent);
+                ScriptPtr->Dispose(allocator);
+                UnsafeUtility.Free(ScriptPtr, allocator);
                 ScriptPtr = null;
             }
             if (InitialReadTempDataPtr != null)
             {
                 InitialReadTempDataPtr->Dispose();
-                UnsafeUtility.Free(InitialReadTempDataPtr, Allocator.Persistent);
+                UnsafeUtility.Free(InitialReadTempDataPtr, allocator);
                 InitialReadTempDataPtr = null;
             }
         }

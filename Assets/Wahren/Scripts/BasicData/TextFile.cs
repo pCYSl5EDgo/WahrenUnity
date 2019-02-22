@@ -31,7 +31,7 @@ namespace pcysl5edgo.Wahren.AST
             }
         }
 
-        public static TextFile FromRawTextFileUtf16(RawTextFile file)
+        public static TextFile FromRawTextFileUtf16(RawTextFile file, Allocator allocator)
         {
             var answer = new TextFile
             {
@@ -39,18 +39,18 @@ namespace pcysl5edgo.Wahren.AST
                 Length = (int)(file.Length / 2),
                 FilePathId = file.FilePathId,
             };
-            answer.Split();
+            answer.Split(allocator);
             return answer;
         }
 
-        public static TextFile FromRawTextFileCp932(RawTextFile file)
+        public static TextFile FromRawTextFileCp932(RawTextFile file, Allocator allocator)
         {
             if (file.IsCreated)
             {
                 var rawFileLength = (ulong)file.Length;
                 var answer = new TextFile(file.FilePathId, (int)pcysl5edgo.BurstEncoding.Cp932Decoder.GetCharCount(file.Contents, rawFileLength), Allocator.Persistent);
                 BurstEncoding.Cp932Decoder.GetChars(file.Contents, rawFileLength, answer.Contents);
-                answer.Split();
+                answer.Split(allocator);
                 return answer;
             }
             return new TextFile
@@ -59,7 +59,7 @@ namespace pcysl5edgo.Wahren.AST
             };
         }
 
-        internal void Split()
+        internal void Split(Allocator allocator)
         {
             if (Length == 0) return;
             LineCount = 1;
@@ -73,7 +73,7 @@ namespace pcysl5edgo.Wahren.AST
                 }
             }
             int size = sizeof(int) * 2 * LineCount;
-            LineStarts = (int*)UnsafeUtility.Malloc(size, 4, Allocator.Persistent);
+            LineStarts = (int*)UnsafeUtility.Malloc(size, 4, allocator);
             LineStarts[0] = 0;
             LineLengths = LineStarts + LineCount;
             UnsafeUtility.MemClear(LineStarts, size);

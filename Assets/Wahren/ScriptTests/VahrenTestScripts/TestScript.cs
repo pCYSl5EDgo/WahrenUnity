@@ -19,7 +19,7 @@ public class TestScript
         const bool IsUtf16 = false;
         const bool IsDebug = false;
         var buffer = new StringBuilder(1024);
-        using (var scriptManager = new ScriptAnalyzeDataManager(new System.IO.DirectoryInfo(ScriptDirectoryFullPath).GetFiles("*.dat", System.IO.SearchOption.AllDirectories), IsUtf16, IsDebug, false))
+        using (var scriptManager = new ScriptAnalyzeDataManager(new System.IO.DirectoryInfo(ScriptDirectoryFullPath).GetFiles("*.dat", System.IO.SearchOption.AllDirectories), IsUtf16, IsDebug, Allocator.Persistent, false))
         {
             yield return null;
             foreach (var _ in PreparationLoop(scriptManager))
@@ -85,7 +85,7 @@ public class TestScript
         const bool IsUtf16 = false;
         const bool IsDebug = false;
         var buffer = new StringBuilder(1024);
-        using (var scriptManager = new ScriptAnalyzeDataManager(new System.IO.DirectoryInfo(ScriptDirectoryFullPath).GetFiles("*.dat", System.IO.SearchOption.AllDirectories), IsUtf16, IsDebug, false))
+        using (var scriptManager = new ScriptAnalyzeDataManager(new System.IO.DirectoryInfo(ScriptDirectoryFullPath).GetFiles("*.dat", System.IO.SearchOption.AllDirectories), IsUtf16, IsDebug, Allocator.Persistent, false))
         {
             yield return null;
             foreach (var _ in PreparationLoop(scriptManager))

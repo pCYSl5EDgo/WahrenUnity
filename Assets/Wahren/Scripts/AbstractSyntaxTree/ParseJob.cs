@@ -5,7 +5,6 @@ using Unity.Collections.LowLevel.Unsafe;
 
 namespace pcysl5edgo.Wahren.AST
 {
-    [BurstCompile]
     public unsafe struct ParseJob : IJob
     {
         public struct CommonData
