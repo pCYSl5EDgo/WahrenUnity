@@ -19,6 +19,10 @@ namespace pcysl5edgo.Wahren.AST
         public MovetypeTree.NameAssignExpression* Names;
         public MovetypeTree.HelpAssignExpression* Helps;
         public MovetypeTree.ConstiAssignExpression* Constis;
+        public ListLinkedList Values2;
+        public ListLinkedList Names2;
+        public ListLinkedList Helps2;
+        public ListLinkedList Constis2;
         public IdentifierNumberPairList IdentifierNumberPairs;
 
         public MovetypeParserTempData(int capacity, Allocator allocator)
@@ -32,6 +36,10 @@ namespace pcysl5edgo.Wahren.AST
                 Names = (MovetypeTree.NameAssignExpression*)UnsafeUtility.Malloc(sizeof(MovetypeTree.NameAssignExpression) * capacity, 4, allocator);
                 Helps = (MovetypeTree.HelpAssignExpression*)UnsafeUtility.Malloc(sizeof(MovetypeTree.HelpAssignExpression) * capacity, 4, allocator);
                 Constis = (MovetypeTree.ConstiAssignExpression*)UnsafeUtility.Malloc(sizeof(MovetypeTree.ConstiAssignExpression) * capacity, 4, allocator);
+                Names2 = new ListLinkedList(capacity, allocator);
+                Helps2 = new ListLinkedList(capacity, allocator);
+                Constis2 = new ListLinkedList(capacity, allocator);
+                Values2 = new ListLinkedList(capacity, allocator);
             }
             else
             {
@@ -39,6 +47,7 @@ namespace pcysl5edgo.Wahren.AST
                 Names = null;
                 Helps = null;
                 Constis = null;
+                Values2 = Names2 = Helps2 = Constis2 = default;
             }
         }
 
@@ -53,6 +62,10 @@ namespace pcysl5edgo.Wahren.AST
             if (Capacity != 0)
                 UnsafeUtility.Free(Values, allocator);
             IdentifierNumberPairs.Dispose(allocator);
+            Values2.Dispose(allocator);
+            Names2.Dispose(allocator);
+            Helps2.Dispose(allocator);
+            Constis2.Dispose(allocator);
             this = default;
         }
 
