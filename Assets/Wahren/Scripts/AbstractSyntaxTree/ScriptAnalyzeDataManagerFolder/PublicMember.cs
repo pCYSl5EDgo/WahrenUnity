@@ -13,7 +13,7 @@ namespace pcysl5edgo.Wahren.AST
 
         public enum Stage
         {
-            None, PreLoading, Loading, PreParsing, Parsing, GarbageCollecting, Done,
+            None, PreLoading, Loading, PreParsing, Parsing, Done,
         }
 
         public Stage CurrentStage => currentStage;
@@ -42,7 +42,6 @@ namespace pcysl5edgo.Wahren.AST
             handles = new NativeList<JobHandle>(FullPaths.Length, allocator);
             jobs = new NativeArray<ParseJob>(FullPaths.Length, allocator);
             commonDatas = new NativeArray<ParseJob.CommonData>(FullPaths.Length, allocator);
-            RaceOldLengths = (RaceParserTempData.OldLengths*)UnsafeUtility.Malloc(sizeof(RaceParserTempData.OldLengths), 4, allocator);
             InitialReadTempDataPtr = InitialReadTempData.CreatePtr(FileInfos, ScriptPtr->FileLength, &ScriptPtr->Files, isUtf16, isDebug);
             currentStage = Stage.PreLoading;
         }
@@ -85,9 +84,6 @@ namespace pcysl5edgo.Wahren.AST
                 case Stage.Parsing:
                     ParseUpdate();
                     break;
-                case Stage.GarbageCollecting:
-                    GCUpdate();
-                    break;
             }
         }
 
@@ -101,8 +97,6 @@ namespace pcysl5edgo.Wahren.AST
                 commonDatas.Dispose();
             if (Status != null)
                 UnsafeUtility.Free(Status, allocator);
-            if (RaceOldLengths != null)
-                UnsafeUtility.Free(RaceOldLengths, allocator);
             FullPaths = null;
             Names = null;
             if (ScriptPtr != null)

@@ -11,9 +11,6 @@ namespace pcysl5edgo.Wahren.AST
         private InterpreterStatus* Status;
         private ScriptAnalyzeDataManager_Internal* ScriptPtr;
 
-        private RaceParserTempData.OldLengths* RaceOldLengths;
-        private int OldASTValueTypePairListLength;
-
         private NativeList<JobHandle> handles;
         private NativeArray<ParseJob> jobs;
         private NativeArray<ParseJob.CommonData> commonDatas;
@@ -29,8 +26,6 @@ namespace pcysl5edgo.Wahren.AST
                 handles.Add(jobs[i].Schedule());
             }
             currentStage = Stage.Parsing;
-            UnsafeUtility.MemCpy(RaceOldLengths, &ScriptPtr->RaceParserTempData, sizeof(RaceParserTempData.OldLengths));
-            OldASTValueTypePairListLength = ScriptPtr->ASTValueTypePairList.Length;
             *Status = InterpreterStatus.None;
         }
 
@@ -49,26 +44,6 @@ namespace pcysl5edgo.Wahren.AST
                     InitialReadTempDataPtr->Update();
                     break;
             }
-        }
-
-        private void GCUpdate()
-        {
-            bool isAnyFail = false;
-            for (int i = handles.Length; --i >= 0;)
-            {
-                var jobHandle = handles[i];
-                if (jobHandle.IsCompleted)
-                {
-                    jobHandle.Complete();
-                    handles.RemoveAtSwapBack(i);
-                }
-                else
-                {
-                    isAnyFail = true;
-                }
-            }
-            if (isAnyFail) return;
-            ScheduleParsing();
         }
 
         private void ParseUpdate()

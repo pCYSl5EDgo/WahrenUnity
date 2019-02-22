@@ -70,10 +70,6 @@ public class TestScript
                     scriptManager.Update();
                     yield return null;
                     break;
-                case ScriptAnalyzeDataManager.Stage.GarbageCollecting:
-                    scriptManager.Update();
-                    yield return null;
-                    break;
             }
         }
     }

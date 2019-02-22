@@ -5,18 +5,6 @@ namespace pcysl5edgo.Wahren.AST
 {
     public unsafe struct MovetypeParserTempData : IParserTempData
     {
-        internal struct OldLengths
-        {
-#pragma warning disable CS0649
-            public int Length;
-            public int NameLength;
-            public int HelpLength;
-            public int ConstiLength;
-#pragma warning restore
-
-            public static bool IsChanged(OldLengths* left, MovetypeParserTempData* right)
-            => UnsafeUtility.MemCmp(left, right, sizeof(OldLengths)) == 0;
-        }
         public int Length;
         public int NameLength;
         public int HelpLength;
