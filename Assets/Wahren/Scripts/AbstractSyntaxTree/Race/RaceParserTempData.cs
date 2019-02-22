@@ -43,7 +43,7 @@ namespace pcysl5edgo.Wahren.AST
         {
             Length = NameLength = AlignLength = BraveLength = ConstiLength = MovetypeLength = 0;
             Capacity = NameCapacity = AlignCapacity = BraveCapacity = ConstiCapacity = MovetypeCapacity = capacity;
-            IdentifierNumberPairs = new IdentifierNumberPairList(capacity);
+            IdentifierNumberPairs = new IdentifierNumberPairList(capacity, Allocator.Persistent);
             if (capacity != 0)
             {
                 Values = (RaceTree*)UnsafeUtility.Malloc(sizeof(RaceTree) * capacity, 4, Allocator.Persistent);
@@ -78,7 +78,7 @@ namespace pcysl5edgo.Wahren.AST
                 UnsafeUtility.Free(Constis, Allocator.Persistent);
             if (Capacity != 0)
                 UnsafeUtility.Free(Values, Allocator.Persistent);
-            IdentifierNumberPairs.Dispose();
+            IdentifierNumberPairs.Dispose(Allocator.Persistent);
             this = default;
         }
 
@@ -109,7 +109,7 @@ namespace pcysl5edgo.Wahren.AST
                         UnityEngine.Debug.Log(prefix + " identifier number pair lengthen\n" + result.ToString() + "\nCapacity: " + identifierNumberPairs.Capacity + " , Length: " + identifierNumberPairs.Length);
                     }
 #endif
-                    identifierNumberPairs.Lengthen();
+                    identifierNumberPairs.Lengthen(Allocator.Persistent);
                     break;
                 case PendingReason.SectionListCapacityShortage:
                     switch ((RaceTree.Kind)result.SubDataIndex)

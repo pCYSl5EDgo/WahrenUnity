@@ -37,7 +37,7 @@ namespace pcysl5edgo.Wahren.AST
         {
             Length = NameLength = HelpLength = ConstiLength = 0;
             Capacity = NameCapacity = HelpCapacity = ConstiCapacity = capacity;
-            IdentifierNumberPairs = new IdentifierNumberPairList(capacity);
+            IdentifierNumberPairs = new IdentifierNumberPairList(capacity, Allocator.Persistent);
             if (capacity != 0)
             {
                 Values = (MovetypeTree*)UnsafeUtility.Malloc(sizeof(MovetypeTree) * capacity, 4, Allocator.Persistent);
@@ -64,7 +64,7 @@ namespace pcysl5edgo.Wahren.AST
                 UnsafeUtility.Free(Constis, Allocator.Persistent);
             if (Capacity != 0)
                 UnsafeUtility.Free(Values, Allocator.Persistent);
-            IdentifierNumberPairs.Dispose();
+            IdentifierNumberPairs.Dispose(Allocator.Persistent);
             this = default;
         }
 
@@ -95,7 +95,7 @@ namespace pcysl5edgo.Wahren.AST
                         UnityEngine.Debug.Log(prefix + " identifier number pair lengthen\n" + result.ToString() + "\n" + identifierNumberPairs.Capacity);
                     }
 #endif
-                    identifierNumberPairs.Lengthen();
+                    identifierNumberPairs.Lengthen(Allocator.Persistent);
                     break;
                 case PendingReason.SectionListCapacityShortage:
                     switch ((MovetypeTree.Kind)result.SubDataIndex)
