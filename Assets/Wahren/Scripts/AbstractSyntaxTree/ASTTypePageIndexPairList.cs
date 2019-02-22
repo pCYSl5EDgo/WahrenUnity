@@ -1,17 +1,16 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 
 namespace pcysl5edgo.Wahren.AST
 {
-    public unsafe struct ASTValueTypePairList : IDisposable
+    public unsafe struct ASTTypePageIndexPairList
     {
+        public ASTTypePageIndexPair* Values;
         public int Capacity;
         public int Length;
-        public ASTValueTypePair* Values;
 
-        public ASTValueTypePairList(int capacity)
+        public ASTTypePageIndexPairList(int capacity)
         {
             if (capacity == 0)
             {
@@ -20,10 +19,10 @@ namespace pcysl5edgo.Wahren.AST
             }
             Capacity = capacity;
             Length = 0;
-            Values = (ASTValueTypePair*)UnsafeUtility.Malloc(sizeof(ASTValueTypePair) * capacity, 4, Allocator.Persistent);
+            Values = (ASTTypePageIndexPair*)UnsafeUtility.Malloc(sizeof(ASTTypePageIndexPair) * capacity, 4, Allocator.Persistent);
         }
 
-        public ref ASTValueTypePair this[int index]
+        public ref ASTTypePageIndexPair this[int index]
         {
             get
             {
@@ -35,7 +34,7 @@ namespace pcysl5edgo.Wahren.AST
             }
         }
 
-        public int TryAddBulkMultiThread(in ASTValueTypePairList list, out int length)
+        public int TryAddBulkMultiThread(in ASTTypePageIndexPairList list, out int length)
         {
             if (list.Length == 0)
             {
@@ -53,7 +52,7 @@ namespace pcysl5edgo.Wahren.AST
                     return -1;
                 }
             } while (start != Interlocked.CompareExchange(ref Length, start + length, start));
-            UnsafeUtility.MemCpy(Values + start, list.Values, sizeof(ASTValueTypePair) * length);
+            UnsafeUtility.MemCpy(Values + start, list.Values, sizeof(ASTTypePageIndexPair) * length);
             return start;
         }
 
@@ -64,14 +63,14 @@ namespace pcysl5edgo.Wahren.AST
             this = default;
         }
 
-        public static ASTValueTypePairList MallocTemp(int capacity)
-        => new ASTValueTypePairList
+        public static ASTTypePageIndexPairList MallocTemp(int capacity)
+        => new ASTTypePageIndexPairList
         {
             Capacity = capacity,
             Length = 0,
-            Values = (ASTValueTypePair*)UnsafeUtility.Malloc(sizeof(ASTValueTypePair) * capacity, 4, Allocator.Temp),
+            Values = (ASTTypePageIndexPair*)UnsafeUtility.Malloc(sizeof(ASTTypePageIndexPair) * capacity, 4, Allocator.Temp),
         };
-        public static void FreeTemp(ref ASTValueTypePairList list)
+        public static void FreeTemp(ref ASTTypePageIndexPairList list)
         {
             if (list.Capacity != 0)
                 UnsafeUtility.Free(list.Values, Allocator.Temp);

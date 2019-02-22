@@ -82,7 +82,7 @@ namespace pcysl5edgo.Wahren.AST
             this = default;
         }
 
-        public void Lengthen(ref ASTValueTypePairList astValueTypePairList, in TryInterpretReturnValue result
+        public void Lengthen(ref ASTTypePageIndexPairList astValueTypePairList, in TryInterpretReturnValue result
 #if UNITY_EDITOR
         , bool ShowLog
 #endif

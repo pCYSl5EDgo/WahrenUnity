@@ -2,10 +2,10 @@
 {
     internal struct InitialProc_USING_STRUCT : System.IDisposable
     {
-        public ASTValueTypePairList list;
+        public ASTTypePageIndexPairList list;
         public InitialProc_USING_STRUCT(int capacity, in TextFile file, in Caret left, out Caret right, out TryInterpretReturnValue answer, out int treeIndex)
         {
-            list = ASTValueTypePairList.MallocTemp(capacity);
+            list = ASTTypePageIndexPairList.MallocTemp(capacity);
             treeIndex = -1;
             right = left;
             file.SkipWhiteSpace(ref right);
@@ -16,7 +16,7 @@
         }
         public void Dispose()
         {
-            ASTValueTypePairList.FreeTemp(ref list);
+            ASTTypePageIndexPairList.FreeTemp(ref list);
         }
     }
 }

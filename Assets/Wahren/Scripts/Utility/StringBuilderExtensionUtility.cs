@@ -73,7 +73,7 @@ namespace pcysl5edgo.Wahren.AST
         private static StringBuilder Append(this StringBuilder buffer, TextFile* files, in RaceTree.ConstiAssignExpression expression, in IdentifierNumberPairList list)
         => buffer.AppendExtension(files, "consti", expression.ScenarioVariant, list, expression.Start, expression.Length);
 
-        public static StringBuilder AppendEx(this StringBuilder buffer, in RaceTree tree, TextFile* files, in RaceParserTempData tempData, in ASTValueTypePairList astValueTypePairList)
+        public static StringBuilder AppendEx(this StringBuilder buffer, in RaceTree tree, TextFile* files, in RaceParserTempData tempData, in ASTTypePageIndexPairList astValueTypePairList)
         {
             using (new ClosingStruct(buffer, files, "race", tree.Name, tree.ParentName))
             {
@@ -84,19 +84,19 @@ namespace pcysl5edgo.Wahren.AST
                     switch ((RaceTree.Kind)pair.Type)
                     {
                         case RaceTree.Kind.name:
-                            buffer.Append(files, tempData.Names[pair.Value]);
+                            buffer.Append(files, tempData.Names[pair.Index]);
                             break;
                         case RaceTree.Kind.align:
-                            buffer.Append(files, tempData.Aligns[pair.Value]);
+                            buffer.Append(files, tempData.Aligns[pair.Index]);
                             break;
                         case RaceTree.Kind.brave:
-                            buffer.Append(files, tempData.Braves[pair.Value]);
+                            buffer.Append(files, tempData.Braves[pair.Index]);
                             break;
                         case RaceTree.Kind.consti:
-                            buffer.Append(files, tempData.Constis[pair.Value], tempData.IdentifierNumberPairs);
+                            buffer.Append(files, tempData.Constis[pair.Index], tempData.IdentifierNumberPairs);
                             break;
                         case RaceTree.Kind.movetype:
-                            buffer.Append(files, tempData.Movetypes[pair.Value]);
+                            buffer.Append(files, tempData.Movetypes[pair.Index]);
                             break;
                     }
                 }
@@ -113,7 +113,7 @@ namespace pcysl5edgo.Wahren.AST
         private static StringBuilder Append(this StringBuilder buffer, TextFile* files, MovetypeTree.ConstiAssignExpression expression, in IdentifierNumberPairList list)
         => buffer.AppendExtension(files, "consti", expression.ScenarioVariant, list, expression.Start, expression.Length);
 
-        public static StringBuilder AppendEx(this StringBuilder buffer, in MovetypeTree tree, TextFile* files, in MovetypeParserTempData tempData, in ASTValueTypePairList astValueTypePairList)
+        public static StringBuilder AppendEx(this StringBuilder buffer, in MovetypeTree tree, TextFile* files, in MovetypeParserTempData tempData, in ASTTypePageIndexPairList astValueTypePairList)
         {
             using (new ClosingStruct(buffer, files, "movetype", tree.Name, tree.ParentName))
             {
@@ -124,13 +124,13 @@ namespace pcysl5edgo.Wahren.AST
                     switch ((MovetypeTree.Kind)pair.Type)
                     {
                         case MovetypeTree.Kind.name:
-                            buffer.Append(files, tempData.Names[pair.Value]);
+                            buffer.Append(files, tempData.Names[pair.Index]);
                             break;
                         case MovetypeTree.Kind.consti:
-                            buffer.Append(files, tempData.Constis[pair.Value], tempData.IdentifierNumberPairs);
+                            buffer.Append(files, tempData.Constis[pair.Index], tempData.IdentifierNumberPairs);
                             break;
                         case MovetypeTree.Kind.help:
-                            buffer.Append(files, tempData.Helps[pair.Value]);
+                            buffer.Append(files, tempData.Helps[pair.Index]);
                             break;
                     }
                 }

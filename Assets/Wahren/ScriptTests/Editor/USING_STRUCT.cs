@@ -30,7 +30,7 @@ unsafe struct USING_STRUCT : System.IDisposable
         {
             script = new ScriptAnalyzeDataManager_Internal
             {
-                ASTValueTypePairList = new ASTValueTypePairList(4),
+                ASTValueTypePairList = new ASTTypePageIndexPairList(4),
                 FileLength = 1,
                 Files = (TextFile*)Unity.Collections.LowLevel.Unsafe.UnsafeUtility.Malloc(sizeof(System.IntPtr), 4, Unity.Collections.Allocator.Persistent),
                 MovetypeParserTempData = new MovetypeParserTempData(1),

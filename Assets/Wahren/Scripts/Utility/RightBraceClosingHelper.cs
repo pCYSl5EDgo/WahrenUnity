@@ -9,7 +9,7 @@ namespace pcysl5edgo.Wahren.AST
 {
     public static class RightBraceClosingHelper
     {
-        public static unsafe TryInterpretReturnValue CloseBrace<TTree>(this ref TTree tree, ref int treeStart, out int treeLength, ref ASTValueTypePairList astValueTypePairList, in ASTValueTypePairList tmpList, ref TTree* dataValues, int dataCapacity, ref int dataLength, Location location, SuccessSentence.Kind successKind, ref int treeIndex, Caret nextToLeftBrace, ref Caret nextToRightBrace)
+        public static unsafe TryInterpretReturnValue CloseBrace<TTree>(this ref TTree tree, ref int treeStart, out int treeLength, ref ASTTypePageIndexPairList astValueTypePairList, in ASTTypePageIndexPairList tmpList, ref TTree* dataValues, int dataCapacity, ref int dataLength, Location location, SuccessSentence.Kind successKind, ref int treeIndex, Caret nextToLeftBrace, ref Caret nextToRightBrace)
         where TTree : unmanaged, INameStruct
         {
             nextToRightBrace.Column++;

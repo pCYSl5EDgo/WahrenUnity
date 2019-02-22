@@ -2,7 +2,7 @@
 {
     public static unsafe class MovetypeParser
     {
-        public static TryInterpretReturnValue TryParseMovetypeStructMultiThread(this ref TextFile file, ref MovetypeParserTempData tempData, ref ASTValueTypePairList astValueTypePairList, Span name, Span parentName, Caret nextToLeftBrace, out Caret nextToRightBrace, out int treeIndex)
+        public static TryInterpretReturnValue TryParseMovetypeStructMultiThread(this ref TextFile file, ref MovetypeParserTempData tempData, ref ASTTypePageIndexPairList astValueTypePairList, Span name, Span parentName, Caret nextToLeftBrace, out Caret nextToRightBrace, out int treeIndex)
         {
             var tree = CreateNameTreeHelper.Create<MovetypeTree>(name, parentName);
             var _ = new InitialProc_USING_STRUCT(3, file, nextToLeftBrace, out nextToRightBrace, out var answer, out treeIndex);
@@ -46,7 +46,7 @@
             return answer;
         }
 
-        private static TryInterpretReturnValue HelpDetect(ref TextFile file, ref MovetypeParserTempData tempData, ref Caret current, ASTValueTypePairList* list)
+        private static TryInterpretReturnValue HelpDetect(ref TextFile file, ref MovetypeParserTempData tempData, ref Caret current, ASTTypePageIndexPairList* list)
         {
             var expression = new MovetypeTree.HelpAssignExpression();
             var cs = stackalloc ushort[] { 'e', 'l', 'p' };
@@ -66,7 +66,7 @@
         RETURN:
             return answer;
         }
-        private static TryInterpretReturnValue NameDetect(ref TextFile file, ref MovetypeParserTempData tempData, ref Caret current, ASTValueTypePairList* list)
+        private static TryInterpretReturnValue NameDetect(ref TextFile file, ref MovetypeParserTempData tempData, ref Caret current, ASTTypePageIndexPairList* list)
         {
             var expression = new MovetypeTree.NameAssignExpression();
             var cs = stackalloc ushort[] { 'a', 'm', 'e' };
@@ -87,7 +87,7 @@
             return answer;
         }
 
-        private static TryInterpretReturnValue ConstiDetect(ref TextFile file, ref MovetypeParserTempData tempData, ref Caret current, ASTValueTypePairList* list)
+        private static TryInterpretReturnValue ConstiDetect(ref TextFile file, ref MovetypeParserTempData tempData, ref Caret current, ASTTypePageIndexPairList* list)
         {
             var expression = new MovetypeTree.ConstiAssignExpression();
             var cs = stackalloc ushort[] { 'o', 'n', 's', 't', 'i' };

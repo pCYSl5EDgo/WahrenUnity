@@ -4,7 +4,7 @@ namespace pcysl5edgo.Wahren.AST
 {
     public static unsafe class RaceParser
     {
-        public static TryInterpretReturnValue TryParseRaceStructMultiThread(this ref TextFile file, ref RaceParserTempData tempData, ref ASTValueTypePairList astValueTypePairList, Span name, Span parentName, Caret nextToLeftBrace, out Caret nextToRightBrace, out int treeIndex)
+        public static TryInterpretReturnValue TryParseRaceStructMultiThread(this ref TextFile file, ref RaceParserTempData tempData, ref ASTTypePageIndexPairList astValueTypePairList, Span name, Span parentName, Caret nextToLeftBrace, out Caret nextToRightBrace, out int treeIndex)
         {
             var tree = CreateNameTreeHelper.Create<RaceTree>(name, parentName);
             var _ = new InitialProc_USING_STRUCT(4, file, nextToLeftBrace, out nextToRightBrace, out TryInterpretReturnValue answer, out treeIndex);
@@ -58,7 +58,7 @@ namespace pcysl5edgo.Wahren.AST
             return answer;
         }
 
-        private static TryInterpretReturnValue NameDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTValueTypePairList* list)
+        private static TryInterpretReturnValue NameDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTTypePageIndexPairList* list)
         {
             var expression = new RaceTree.NameAssignExpression();
             var cs = stackalloc ushort[] { 'a', 'm', 'e' };
@@ -79,7 +79,7 @@ namespace pcysl5edgo.Wahren.AST
             return answer;
         }
 
-        private static TryInterpretReturnValue MoveTypeDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTValueTypePairList* list)
+        private static TryInterpretReturnValue MoveTypeDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTTypePageIndexPairList* list)
         {
             var expression = new RaceTree.MovetypeAssignExpression();
             var cs = stackalloc ushort[] { 'o', 'v', 'e', 't', 'y', 'p', 'e' };
@@ -103,7 +103,7 @@ namespace pcysl5edgo.Wahren.AST
             return answer;
         }
 
-        private static TryInterpretReturnValue ConstiDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTValueTypePairList* list)
+        private static TryInterpretReturnValue ConstiDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTTypePageIndexPairList* list)
         {
             var expression = new RaceTree.ConstiAssignExpression();
             var cs = stackalloc ushort[] { 'o', 'n', 's', 't', 'i' };
@@ -141,7 +141,7 @@ namespace pcysl5edgo.Wahren.AST
             return new TryInterpretReturnValue(span, default, default, InterpreterStatus.Success);
         }
 
-        private static TryInterpretReturnValue BraveDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTValueTypePairList* list)
+        private static TryInterpretReturnValue BraveDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTTypePageIndexPairList* list)
         {
             var expression = new RaceTree.BraveAssignExpression();
             var cs = stackalloc ushort[] { 'r', 'a', 'v', 'e' };
@@ -165,7 +165,7 @@ namespace pcysl5edgo.Wahren.AST
             return answer;
         }
 
-        private static TryInterpretReturnValue AlignDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTValueTypePairList* list)
+        private static TryInterpretReturnValue AlignDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTTypePageIndexPairList* list)
         {
             var expression = new RaceTree.AlignAssignExpression();
             var cs = stackalloc ushort[] { 'l', 'i', 'g', 'n' };

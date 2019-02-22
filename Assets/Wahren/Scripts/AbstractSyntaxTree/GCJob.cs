@@ -41,7 +41,7 @@ namespace pcysl5edgo.Wahren.AST
             }
         }
 
-        private static void GC_ASTPairList(RaceParserTempData.OldLengths Old, ref RaceParserTempData raceParserTempData, ref ASTValueTypePairList astPairList)
+        private static void GC_ASTPairList(RaceParserTempData.OldLengths Old, ref RaceParserTempData raceParserTempData, ref ASTTypePageIndexPairList astPairList)
         {
             for (int descendingIndex = raceParserTempData.Length; --descendingIndex >= Old.Length && descendingIndex > 0;)
             {

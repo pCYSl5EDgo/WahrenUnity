@@ -4,7 +4,7 @@
     {
         public static TryInterpretReturnValue CreatePending(this RaceTree.Kind kind, Span span)
         => TryInterpretReturnValue.CreatePending(span, Location.Race, PendingReason.SectionListCapacityShortage, (int)kind);
-        public static ASTValueTypePair CreateASTPair(this RaceTree.Kind kind)
-        => new ASTValueTypePair((int)kind);
+        public static ASTTypePageIndexPair CreateASTPair(this RaceTree.Kind kind)
+        => new ASTTypePageIndexPair((int)kind);
     }
 }

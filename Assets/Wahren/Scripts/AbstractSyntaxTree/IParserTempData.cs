@@ -2,7 +2,7 @@
 {
     public interface IParserTempData : System.IDisposable
     {
-        void Lengthen(ref ASTValueTypePairList astValueTypePairList, in TryInterpretReturnValue result
+        void Lengthen(ref ASTTypePageIndexPairList astValueTypePairList, in TryInterpretReturnValue result
 #if UNITY_EDITOR
         , bool ShowLog
 #endif
