@@ -8,7 +8,7 @@ using Unity.Collections;
 
 public unsafe class UnitTest
 {
-    static readonly Allocator ALLOCATOR = Allocator.Persistent;
+    static readonly Allocator allocator = Allocator.Persistent;
     [Test]
     public void movetype_consti_success_4()
     {
@@ -24,7 +24,7 @@ public unsafe class UnitTest
         var scriptText = $@"movetype {str0}{{
             consti = {strx}
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(_.script.MovetypeParserTempData.Length, 1);
             ref var tree = ref _.script.MovetypeParserTempData.Values[0];
@@ -65,7 +65,7 @@ public unsafe class UnitTest
         var scriptText = $@"movetype {str0}{{
             consti = {strx}
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(_.script.MovetypeParserTempData.Length, 1);
             ref var tree = ref _.script.MovetypeParserTempData.Values[0];
@@ -98,7 +98,7 @@ public unsafe class UnitTest
         var scriptText = $@"movetype {str0}{{
             consti = @
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(_.script.MovetypeParserTempData.Length, 1);
             ref var tree = ref _.script.MovetypeParserTempData.Values[0];
@@ -130,7 +130,7 @@ public unsafe class UnitTest
         var scriptText = $@"movetype {str0}{{
             consti = {strx}
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(_.script.MovetypeParserTempData.Length, 1);
             ref var tree = ref _.script.MovetypeParserTempData.Values[0];
@@ -171,7 +171,7 @@ public unsafe class UnitTest
         var scriptText = $@"movetype {str0}{{
             consti = {strx}
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(_.script.MovetypeParserTempData.Length, 1);
             ref var tree = ref _.script.MovetypeParserTempData.Values[0];
@@ -207,7 +207,7 @@ public unsafe class UnitTest
 
 
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(_.script.MovetypeParserTempData.Length, 1);
             ref var tree = ref _.script.MovetypeParserTempData.Values[0];
@@ -232,7 +232,7 @@ public unsafe class UnitTest
         var scriptText = $@"movetype {str0}{{
             help = {str1}
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(_.script.MovetypeParserTempData.Length, 1);
             ref var tree = ref _.script.MovetypeParserTempData.Values[0];
@@ -257,7 +257,7 @@ public unsafe class UnitTest
         var scriptText = $@"movetype {str0}{{
             help = {str1}
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(_.script.MovetypeParserTempData.Length, 0);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
@@ -276,7 +276,7 @@ public unsafe class UnitTest
         var scriptText = $@"movetype {str0}{{
             name = {str1}
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(_.script.MovetypeParserTempData.Length, 1);
             ref var tree = ref _.script.MovetypeParserTempData.Values[0];
@@ -301,7 +301,7 @@ public unsafe class UnitTest
         var scriptText = $@"movetype {str0}{{
             name = {str1}
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(_.script.MovetypeParserTempData.Length, 0);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
@@ -327,7 +327,7 @@ public unsafe class UnitTest
         var scriptText = $@"race {str0}{{
             consti = {strx}
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(_.script.RaceParserTempData.Length, 1);
             ref var tree = ref _.script.RaceParserTempData.Values[0];
@@ -368,7 +368,7 @@ public unsafe class UnitTest
         var scriptText = $@"race {str0}{{
             consti = {strx}
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(_.script.RaceParserTempData.Length, 1);
             ref var tree = ref _.script.RaceParserTempData.Values[0];
@@ -401,7 +401,7 @@ public unsafe class UnitTest
         var scriptText = $@"race {str0}{{
             consti = @
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(_.script.RaceParserTempData.Length, 1);
             ref var tree = ref _.script.RaceParserTempData.Values[0];
@@ -433,7 +433,7 @@ public unsafe class UnitTest
         var scriptText = $@"race {str0}{{
             consti = {strx}
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(_.script.RaceParserTempData.Length, 1);
             ref var tree = ref _.script.RaceParserTempData.Values[0];
@@ -474,7 +474,7 @@ public unsafe class UnitTest
         var scriptText = $@"race {str0}{{
             consti = {strx}
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(_.script.RaceParserTempData.Length, 1);
             ref var tree = ref _.script.RaceParserTempData.Values[0];
@@ -510,7 +510,7 @@ public unsafe class UnitTest
 
 
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(_.script.RaceParserTempData.Length, 1);
             ref var tree = ref _.script.RaceParserTempData.Values[0];
@@ -535,7 +535,7 @@ public unsafe class UnitTest
         var scriptText = $@"race {str0}{{
             movetype = {str1}
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
             AreEqual(_.commonData.LastParentNameSpan.Length, 0);
@@ -554,7 +554,7 @@ public unsafe class UnitTest
         var scriptText = $@"race {str0}{{
             movetype = {str1}
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(_.script.RaceParserTempData.Length, 1);
             ref var tree = ref _.script.RaceParserTempData.Values[0];
@@ -577,7 +577,7 @@ public unsafe class UnitTest
         var scriptText = $@"race {str0}{{
             movetype = @
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(_.script.RaceParserTempData.Length, 1);
             ref var tree = ref _.script.RaceParserTempData.Values[0];
@@ -601,7 +601,7 @@ public unsafe class UnitTest
         var scriptText = $@"race {str0}{{
             brave = {num0}
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(_.script.RaceParserTempData.Length, 1);
             ref var tree = ref _.script.RaceParserTempData.Values[0];
@@ -625,7 +625,7 @@ public unsafe class UnitTest
         var scriptText = $@"race {str0}{{
             brave = {num0}
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(_.script.RaceParserTempData.Length, 0);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
@@ -644,7 +644,7 @@ public unsafe class UnitTest
         var scriptText = $@"race {str0}{{
             brave = {num0}
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(_.script.RaceParserTempData.Length, 0);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
@@ -663,7 +663,7 @@ public unsafe class UnitTest
         var scriptText = $@"race {str0}{{
             align = {num0}
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(_.script.RaceParserTempData.Length, 0);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
@@ -682,7 +682,7 @@ public unsafe class UnitTest
         var scriptText = $@"race {str0}{{
             align = {num0}
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(_.script.RaceParserTempData.Length, 0);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
@@ -701,7 +701,7 @@ public unsafe class UnitTest
         var scriptText = $@"race {str0}{{
             align = {num0}
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(_.script.RaceParserTempData.Length, 1);
             ref var tree = ref _.script.RaceParserTempData.Values[0];
@@ -725,7 +725,7 @@ public unsafe class UnitTest
         var scriptText = $@"race {str0}{{
             name = {str1}
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(_.script.RaceParserTempData.Length, 1);
             ref var tree = ref _.script.RaceParserTempData.Values[0];
@@ -750,7 +750,7 @@ public unsafe class UnitTest
         var scriptText = $@"race {str0}{{
             name = {str1}
         }}";
-        using (var _ = new USING_STRUCT(scriptText, ALLOCATOR, out var buffer))
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
             AreEqual(_.script.RaceParserTempData.Length, 0);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);

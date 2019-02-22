@@ -112,7 +112,7 @@ namespace pcysl5edgo.Wahren.AST
                 }
                 else if (result.IsPending)
                 {
-                    ReSchedule(ref job);
+                    ReSchedule(ref job, Allocator.Persistent);
                     isNonePending = false;
                 }
             }
@@ -122,7 +122,7 @@ namespace pcysl5edgo.Wahren.AST
             }
         }
 
-        private void ReSchedule(ref ParseJob job)
+        private void ReSchedule(ref ParseJob job, Allocator allocator)
         {
             ref var result = ref job.CommonPtr->Result;
             var (location, reason) = result;
@@ -131,14 +131,14 @@ namespace pcysl5edgo.Wahren.AST
                 switch (location)
                 {
                     case Location.Race:
-                        RaceParserTempData.Lengthen(ref ASTValueTypePairList, result
+                        RaceParserTempData.Lengthen(ref ASTValueTypePairList, result, allocator
 #if UNITY_EDITOR
                         , ShowLog
 #endif
                         );
                         break;
                     case Location.Movetype:
-                        MovetypeParserTempData.Lengthen(ref ASTValueTypePairList, result
+                        MovetypeParserTempData.Lengthen(ref ASTValueTypePairList, result, allocator
 #if UNITY_EDITOR
                         , ShowLog
 #endif

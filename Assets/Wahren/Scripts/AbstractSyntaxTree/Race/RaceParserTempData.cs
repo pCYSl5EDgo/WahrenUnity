@@ -82,7 +82,7 @@ namespace pcysl5edgo.Wahren.AST
             this = default;
         }
 
-        public void Lengthen(ref ASTTypePageIndexPairList astValueTypePairList, in TryInterpretReturnValue result
+        public void Lengthen(ref ASTTypePageIndexPairList astValueTypePairList, in TryInterpretReturnValue result, Allocator allocator
 #if UNITY_EDITOR
         , bool ShowLog
 #endif
@@ -100,7 +100,7 @@ namespace pcysl5edgo.Wahren.AST
                         UnityEngine.Debug.Log(prefix + " ast value type pair lengthen\n" + result.ToString());
                     }
 #endif
-                    ListUtility.Lengthen(ref astValueTypePairList.Values, ref astValueTypePairList.Capacity);
+                    ListUtility.Lengthen(ref astValueTypePairList.Values, ref astValueTypePairList.Capacity, allocator);
                     break;
                 case PendingReason.IdentifierNumberPairListCapacityShortage:
 #if UNITY_EDITOR
@@ -109,7 +109,7 @@ namespace pcysl5edgo.Wahren.AST
                         UnityEngine.Debug.Log(prefix + " identifier number pair lengthen\n" + result.ToString() + "\nCapacity: " + identifierNumberPairs.Capacity + " , Length: " + identifierNumberPairs.Length);
                     }
 #endif
-                    identifierNumberPairs.Lengthen(Allocator.Persistent);
+                    identifierNumberPairs.Lengthen(allocator);
                     break;
                 case PendingReason.SectionListCapacityShortage:
                     switch ((RaceTree.Kind)result.SubDataIndex)
@@ -121,7 +121,7 @@ namespace pcysl5edgo.Wahren.AST
                                 UnityEngine.Debug.Log(prefix + " name lengthen\n" + result.ToString());
                             }
 #endif
-                            ListUtility.Lengthen(ref Names, ref NameCapacity);
+                            ListUtility.Lengthen(ref Names, ref NameCapacity, allocator);
                             break;
                         case RaceTree.Kind.align: // align
 #if UNITY_EDITOR
@@ -130,7 +130,7 @@ namespace pcysl5edgo.Wahren.AST
                                 UnityEngine.Debug.Log(prefix + " align lengthen\n" + result.ToString());
                             }
 #endif
-                            ListUtility.Lengthen(ref Aligns, ref AlignCapacity);
+                            ListUtility.Lengthen(ref Aligns, ref AlignCapacity, allocator);
                             break;
                         case RaceTree.Kind.brave: // brave
 #if UNITY_EDITOR
@@ -139,7 +139,7 @@ namespace pcysl5edgo.Wahren.AST
                                 UnityEngine.Debug.Log(prefix + " brave lengthen\n" + result.ToString());
                             }
 #endif
-                            ListUtility.Lengthen(ref Braves, ref BraveCapacity);
+                            ListUtility.Lengthen(ref Braves, ref BraveCapacity, allocator);
                             break;
                         case RaceTree.Kind.consti: //consti
 #if UNITY_EDITOR
@@ -148,7 +148,7 @@ namespace pcysl5edgo.Wahren.AST
                                 UnityEngine.Debug.Log(prefix + " consti lengthen\n" + result.ToString());
                             }
 #endif
-                            ListUtility.Lengthen(ref Constis, ref ConstiCapacity);
+                            ListUtility.Lengthen(ref Constis, ref ConstiCapacity, allocator);
                             break;
                         case RaceTree.Kind.movetype: // movetype
 #if UNITY_EDITOR
@@ -157,7 +157,7 @@ namespace pcysl5edgo.Wahren.AST
                                 UnityEngine.Debug.Log(prefix + " movetype lengthen\n" + result.ToString());
                             }
 #endif
-                            ListUtility.Lengthen(ref Movetypes, ref MovetypeCapacity);
+                            ListUtility.Lengthen(ref Movetypes, ref MovetypeCapacity, allocator);
                             break;
                     }
                     break;
@@ -168,7 +168,7 @@ namespace pcysl5edgo.Wahren.AST
                         UnityEngine.Debug.Log(prefix + " lengthen\n" + result.ToString());
                     }
 #endif
-                    ListUtility.Lengthen(ref Values, ref Capacity);
+                    ListUtility.Lengthen(ref Values, ref Capacity, allocator);
                     break;
             }
         }

@@ -13,7 +13,7 @@ namespace pcysl5edgo.Wahren.AST
             listLength -= sourceIndex - destinationIndex;
         }
 
-        public static void Lengthen<T>(ref T* ptr, ref int currentCapacity, Allocator allocator = Allocator.Persistent) where T : unmanaged
+        public static void Lengthen<T>(ref T* ptr, ref int currentCapacity, Allocator allocator) where T : unmanaged
         {
             if (currentCapacity < 0) throw new ArgumentOutOfRangeException(nameof(currentCapacity) + " : " + currentCapacity);
             if (currentCapacity == 0) return;

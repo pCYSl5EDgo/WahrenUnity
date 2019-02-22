@@ -57,10 +57,10 @@ unsafe struct USING_STRUCT : System.IDisposable
                 switch (location)
                 {
                     case Location.Race:
-                        script.RaceParserTempData.Lengthen(ref script.ASTValueTypePairList, result, false);
+                        script.RaceParserTempData.Lengthen(ref script.ASTValueTypePairList, result, allocator, false);
                         break;
                     case Location.Movetype:
-                        script.MovetypeParserTempData.Lengthen(ref script.ASTValueTypePairList, result, false);
+                        script.MovetypeParserTempData.Lengthen(ref script.ASTValueTypePairList, result, allocator, false);
                         break;
                     default:
                         Assert.Fail();

@@ -1,11 +1,13 @@
-﻿namespace pcysl5edgo.Wahren.AST
+﻿using Unity.Collections;
+
+namespace pcysl5edgo.Wahren.AST
 {
     public interface IParserTempData
     {
-        void Lengthen(ref ASTTypePageIndexPairList astValueTypePairList, in TryInterpretReturnValue result
 #if UNITY_EDITOR
-        , bool ShowLog
+        void Lengthen(ref ASTTypePageIndexPairList astValueTypePairList, in TryInterpretReturnValue result, Allocator allocator, bool ShowLog);
+#else
+        void Lengthen(ref ASTTypePageIndexPairList astValueTypePairList, in TryInterpretReturnValue result, Allocator allocator);
 #endif
-        );
     }
 }

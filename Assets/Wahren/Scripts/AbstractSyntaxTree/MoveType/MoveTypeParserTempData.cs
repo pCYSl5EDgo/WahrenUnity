@@ -68,7 +68,7 @@ namespace pcysl5edgo.Wahren.AST
             this = default;
         }
 
-        public void Lengthen(ref ASTTypePageIndexPairList astValueTypePairList, in TryInterpretReturnValue result
+        public void Lengthen(ref ASTTypePageIndexPairList astValueTypePairList, in TryInterpretReturnValue result, Allocator allocator
 #if UNITY_EDITOR
         , bool ShowLog
 #endif
@@ -86,7 +86,7 @@ namespace pcysl5edgo.Wahren.AST
                         UnityEngine.Debug.Log(prefix + " ast value type pair lengthen\n" + result.ToString());
                     }
 #endif
-                    ListUtility.Lengthen(ref astValueTypePairList.Values, ref astValueTypePairList.Capacity);
+                    ListUtility.Lengthen(ref astValueTypePairList.Values, ref astValueTypePairList.Capacity, allocator);
                     break;
                 case PendingReason.IdentifierNumberPairListCapacityShortage:
 #if UNITY_EDITOR
@@ -95,7 +95,7 @@ namespace pcysl5edgo.Wahren.AST
                         UnityEngine.Debug.Log(prefix + " identifier number pair lengthen\n" + result.ToString() + "\n" + identifierNumberPairs.Capacity);
                     }
 #endif
-                    identifierNumberPairs.Lengthen(Allocator.Persistent);
+                    identifierNumberPairs.Lengthen(allocator);
                     break;
                 case PendingReason.SectionListCapacityShortage:
                     switch ((MovetypeTree.Kind)result.SubDataIndex)
@@ -107,7 +107,7 @@ namespace pcysl5edgo.Wahren.AST
                                 UnityEngine.Debug.Log(prefix + " name lengthen\n" + result.ToString());
                             }
 #endif
-                            ListUtility.Lengthen(ref Names, ref NameCapacity);
+                            ListUtility.Lengthen(ref Names, ref NameCapacity, allocator);
                             break;
                         case MovetypeTree.Kind.help: // help
 #if UNITY_EDITOR
@@ -116,7 +116,7 @@ namespace pcysl5edgo.Wahren.AST
                                 UnityEngine.Debug.Log(prefix + " help lengthen\n" + result.ToString());
                             }
 #endif
-                            ListUtility.Lengthen(ref Helps, ref HelpCapacity);
+                            ListUtility.Lengthen(ref Helps, ref HelpCapacity, allocator);
                             break;
                         case MovetypeTree.Kind.consti: // consti
 #if UNITY_EDITOR
@@ -125,7 +125,7 @@ namespace pcysl5edgo.Wahren.AST
                                 UnityEngine.Debug.Log(prefix + " consti lengthen\n" + result.ToString());
                             }
 #endif
-                            ListUtility.Lengthen(ref Constis, ref ConstiCapacity);
+                            ListUtility.Lengthen(ref Constis, ref ConstiCapacity, allocator);
                             break;
                     }
                     break;
@@ -136,7 +136,7 @@ namespace pcysl5edgo.Wahren.AST
                         UnityEngine.Debug.Log(prefix + " lengthen\n" + result.ToString());
                     }
 #endif
-                    ListUtility.Lengthen(ref Values, ref Capacity);
+                    ListUtility.Lengthen(ref Values, ref Capacity, allocator);
                     break;
             }
         }
