@@ -21,8 +21,7 @@ namespace pcysl5edgo.Wahren.AST
                 length = 0;
                 return new TryInterpretReturnValue(new Span(current, 1), SuccessSentence.Kind.AssignmentInterpretationSuccess);
             }
-            IdentifierNumberPairList tempList;
-            tempList.Values = ListUtility.MallocTemp<IdentifierNumberPair>(tempList.Capacity = 4, out tempList.Length);
+            var tempList = new IdentifierNumberPairList(4, Allocator.Temp);
             int state = 0;
             ref var raw = ref current.Line;
             ref var column = ref current.Column;
