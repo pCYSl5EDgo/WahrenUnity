@@ -5,7 +5,7 @@ using Unity.Collections.LowLevel.Unsafe;
 
 namespace pcysl5edgo.Wahren.AST
 {
-    public unsafe struct TextFile : IDisposable
+    public unsafe struct TextFile
     {
         public int FilePathId;
         public int Length;
@@ -14,7 +14,7 @@ namespace pcysl5edgo.Wahren.AST
         [NativeDisableUnsafePtrRestriction] public int* LineStarts;
         public int LineCount;
 
-        public TextFile(int filePathId, int length)
+        public TextFile(int filePathId, int length, Allocator allocator)
         {
             FilePathId = filePathId;
             Length = length;
@@ -27,14 +27,9 @@ namespace pcysl5edgo.Wahren.AST
             }
             else
             {
-                Contents = (ushort*)UnsafeUtility.Malloc(sizeof(char) * length, 1, Allocator.Persistent);
+                Contents = (ushort*)UnsafeUtility.Malloc(sizeof(char) * length, 1, allocator);
             }
         }
-
-        public static TextFile CreateEmptyFile(int filePathId) => new TextFile
-        {
-            FilePathId = filePathId,
-        };
 
         public static TextFile FromRawTextFileUtf16(RawTextFile file)
         {
@@ -53,12 +48,15 @@ namespace pcysl5edgo.Wahren.AST
             if (file.IsCreated)
             {
                 var rawFileLength = (ulong)file.Length;
-                var answer = new TextFile(file.FilePathId, (int)pcysl5edgo.BurstEncoding.Cp932Decoder.GetCharCount(file.Contents, rawFileLength));
+                var answer = new TextFile(file.FilePathId, (int)pcysl5edgo.BurstEncoding.Cp932Decoder.GetCharCount(file.Contents, rawFileLength), Allocator.Persistent);
                 BurstEncoding.Cp932Decoder.GetChars(file.Contents, rawFileLength, answer.Contents);
                 answer.Split();
                 return answer;
             }
-            return CreateEmptyFile(file.FilePathId);
+            return new TextFile
+            {
+                FilePathId = file.FilePathId,
+            };
         }
 
         internal void Split()
@@ -95,12 +93,12 @@ namespace pcysl5edgo.Wahren.AST
             }
         }
 
-        public void Dispose()
+        public void Dispose(Allocator allocator)
         {
             if (Contents != null)
-                UnsafeUtility.Free(Contents, Allocator.Persistent);
+                UnsafeUtility.Free(Contents, allocator);
             if (LineStarts != null)
-                UnsafeUtility.Free(LineStarts, Allocator.Persistent);
+                UnsafeUtility.Free(LineStarts, allocator);
             this = default;
         }
     }

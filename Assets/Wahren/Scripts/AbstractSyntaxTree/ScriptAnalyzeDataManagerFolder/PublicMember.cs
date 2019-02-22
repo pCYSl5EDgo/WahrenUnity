@@ -35,7 +35,7 @@ namespace pcysl5edgo.Wahren.AST
                 FullPaths[i] = FileInfos[i].FullName;
                 Names[i] = FileInfos[i].Name;
             }
-            ScriptPtr = ScriptAnalyzeDataManager_Internal.CreatePtr(FullPaths.Length);
+            ScriptPtr = ScriptAnalyzeDataManager_Internal.CreatePtr(FullPaths.Length, Allocator.Persistent);
             Status = (InterpreterStatus*)UnsafeUtility.Malloc(sizeof(InterpreterStatus), 4, Allocator.Persistent);
             handles = new NativeList<JobHandle>(FullPaths.Length, Allocator.Persistent);
             jobs = new NativeArray<ParseJob>(FullPaths.Length, Allocator.Persistent);
@@ -105,7 +105,7 @@ namespace pcysl5edgo.Wahren.AST
             Names = null;
             if (ScriptPtr != null)
             {
-                ScriptPtr->Dispose();
+                ScriptPtr->Dispose(Allocator.Persistent);
                 UnsafeUtility.Free(ScriptPtr, Allocator.Persistent);
                 ScriptPtr = null;
             }

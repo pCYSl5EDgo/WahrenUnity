@@ -10,7 +10,7 @@ namespace pcysl5edgo.Wahren.AST
         public int Capacity;
         public int Length;
 
-        public ASTTypePageIndexPairList(int capacity)
+        public ASTTypePageIndexPairList(int capacity, Allocator allocator)
         {
             if (capacity == 0)
             {
@@ -19,7 +19,7 @@ namespace pcysl5edgo.Wahren.AST
             }
             Capacity = capacity;
             Length = 0;
-            Values = (ASTTypePageIndexPair*)UnsafeUtility.Malloc(sizeof(ASTTypePageIndexPair) * capacity, 4, Allocator.Persistent);
+            Values = (ASTTypePageIndexPair*)UnsafeUtility.Malloc(sizeof(ASTTypePageIndexPair) * capacity, 4, allocator);
         }
 
         public ref ASTTypePageIndexPair this[int index]
@@ -56,10 +56,10 @@ namespace pcysl5edgo.Wahren.AST
             return start;
         }
 
-        public void Dispose()
+        public void Dispose(Allocator allocator)
         {
             if (Capacity != 0)
-                UnsafeUtility.Free(Values, Allocator.Persistent);
+                UnsafeUtility.Free(Values, allocator);
             this = default;
         }
 

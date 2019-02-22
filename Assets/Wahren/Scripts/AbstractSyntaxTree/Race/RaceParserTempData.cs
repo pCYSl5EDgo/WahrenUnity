@@ -39,19 +39,19 @@ namespace pcysl5edgo.Wahren.AST
         public RaceTree.MovetypeAssignExpression* Movetypes;
         public IdentifierNumberPairList IdentifierNumberPairs;
 
-        public RaceParserTempData(int capacity)
+        public RaceParserTempData(int capacity, Allocator allocator)
         {
             Length = NameLength = AlignLength = BraveLength = ConstiLength = MovetypeLength = 0;
             Capacity = NameCapacity = AlignCapacity = BraveCapacity = ConstiCapacity = MovetypeCapacity = capacity;
-            IdentifierNumberPairs = new IdentifierNumberPairList(capacity, Allocator.Persistent);
+            IdentifierNumberPairs = new IdentifierNumberPairList(capacity, allocator);
             if (capacity != 0)
             {
-                Values = (RaceTree*)UnsafeUtility.Malloc(sizeof(RaceTree) * capacity, 4, Allocator.Persistent);
-                Names = (RaceTree.NameAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.NameAssignExpression) * capacity, 4, Allocator.Persistent);
-                Aligns = (RaceTree.AlignAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.AlignAssignExpression) * capacity, 4, Allocator.Persistent);
-                Braves = (RaceTree.BraveAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.BraveAssignExpression) * capacity, 4, Allocator.Persistent);
-                Constis = (RaceTree.ConstiAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.ConstiAssignExpression) * capacity, 4, Allocator.Persistent);
-                Movetypes = (RaceTree.MovetypeAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.MovetypeAssignExpression) * capacity, 4, Allocator.Persistent);
+                Values = (RaceTree*)UnsafeUtility.Malloc(sizeof(RaceTree) * capacity, 4, allocator);
+                Names = (RaceTree.NameAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.NameAssignExpression) * capacity, 4, allocator);
+                Aligns = (RaceTree.AlignAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.AlignAssignExpression) * capacity, 4, allocator);
+                Braves = (RaceTree.BraveAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.BraveAssignExpression) * capacity, 4, allocator);
+                Constis = (RaceTree.ConstiAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.ConstiAssignExpression) * capacity, 4, allocator);
+                Movetypes = (RaceTree.MovetypeAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.MovetypeAssignExpression) * capacity, 4, allocator);
             }
             else
             {
@@ -64,21 +64,21 @@ namespace pcysl5edgo.Wahren.AST
             }
         }
 
-        public void Dispose()
+        public void Dispose(Allocator allocator)
         {
             if (NameCapacity != 0)
-                UnsafeUtility.Free(Names, Allocator.Persistent);
+                UnsafeUtility.Free(Names, allocator);
             if (AlignCapacity != 0)
-                UnsafeUtility.Free(Aligns, Allocator.Persistent);
+                UnsafeUtility.Free(Aligns, allocator);
             if (BraveCapacity != 0)
-                UnsafeUtility.Free(Braves, Allocator.Persistent);
+                UnsafeUtility.Free(Braves, allocator);
             if (MovetypeCapacity != 0)
-                UnsafeUtility.Free(Movetypes, Allocator.Persistent);
+                UnsafeUtility.Free(Movetypes, allocator);
             if (ConstiCapacity != 0)
-                UnsafeUtility.Free(Constis, Allocator.Persistent);
+                UnsafeUtility.Free(Constis, allocator);
             if (Capacity != 0)
-                UnsafeUtility.Free(Values, Allocator.Persistent);
-            IdentifierNumberPairs.Dispose(Allocator.Persistent);
+                UnsafeUtility.Free(Values, allocator);
+            IdentifierNumberPairs.Dispose(allocator);
             this = default;
         }
 

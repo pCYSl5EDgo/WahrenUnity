@@ -33,17 +33,17 @@ namespace pcysl5edgo.Wahren.AST
         public MovetypeTree.ConstiAssignExpression* Constis;
         public IdentifierNumberPairList IdentifierNumberPairs;
 
-        public MovetypeParserTempData(int capacity)
+        public MovetypeParserTempData(int capacity, Allocator allocator)
         {
             Length = NameLength = HelpLength = ConstiLength = 0;
             Capacity = NameCapacity = HelpCapacity = ConstiCapacity = capacity;
-            IdentifierNumberPairs = new IdentifierNumberPairList(capacity, Allocator.Persistent);
+            IdentifierNumberPairs = new IdentifierNumberPairList(capacity, allocator);
             if (capacity != 0)
             {
-                Values = (MovetypeTree*)UnsafeUtility.Malloc(sizeof(MovetypeTree) * capacity, 4, Allocator.Persistent);
-                Names = (MovetypeTree.NameAssignExpression*)UnsafeUtility.Malloc(sizeof(MovetypeTree.NameAssignExpression) * capacity, 4, Allocator.Persistent);
-                Helps = (MovetypeTree.HelpAssignExpression*)UnsafeUtility.Malloc(sizeof(MovetypeTree.HelpAssignExpression) * capacity, 4, Allocator.Persistent);
-                Constis = (MovetypeTree.ConstiAssignExpression*)UnsafeUtility.Malloc(sizeof(MovetypeTree.ConstiAssignExpression) * capacity, 4, Allocator.Persistent);
+                Values = (MovetypeTree*)UnsafeUtility.Malloc(sizeof(MovetypeTree) * capacity, 4, allocator);
+                Names = (MovetypeTree.NameAssignExpression*)UnsafeUtility.Malloc(sizeof(MovetypeTree.NameAssignExpression) * capacity, 4, allocator);
+                Helps = (MovetypeTree.HelpAssignExpression*)UnsafeUtility.Malloc(sizeof(MovetypeTree.HelpAssignExpression) * capacity, 4, allocator);
+                Constis = (MovetypeTree.ConstiAssignExpression*)UnsafeUtility.Malloc(sizeof(MovetypeTree.ConstiAssignExpression) * capacity, 4, allocator);
             }
             else
             {
@@ -54,17 +54,17 @@ namespace pcysl5edgo.Wahren.AST
             }
         }
 
-        public void Dispose()
+        public void Dispose(Allocator allocator)
         {
             if (NameCapacity != 0)
-                UnsafeUtility.Free(Names, Allocator.Persistent);
+                UnsafeUtility.Free(Names, allocator);
             if (HelpCapacity != 0)
-                UnsafeUtility.Free(Helps, Allocator.Persistent);
+                UnsafeUtility.Free(Helps, allocator);
             if (ConstiCapacity != 0)
-                UnsafeUtility.Free(Constis, Allocator.Persistent);
+                UnsafeUtility.Free(Constis, allocator);
             if (Capacity != 0)
-                UnsafeUtility.Free(Values, Allocator.Persistent);
-            IdentifierNumberPairs.Dispose(Allocator.Persistent);
+                UnsafeUtility.Free(Values, allocator);
+            IdentifierNumberPairs.Dispose(allocator);
             this = default;
         }
 

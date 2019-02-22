@@ -11,24 +11,24 @@ namespace pcysl5edgo.Wahren.AST
         public MovetypeParserTempData MovetypeParserTempData;
         public ASTTypePageIndexPairList ASTValueTypePairList;
 
-        public static ScriptAnalyzeDataManager_Internal* CreatePtr(int length)
+        public static ScriptAnalyzeDataManager_Internal* CreatePtr(int length, Allocator allocator)
         {
-            var answer = (ScriptAnalyzeDataManager_Internal*)UnsafeUtility.Malloc(sizeof(ScriptAnalyzeDataManager_Internal), 4, Allocator.Persistent);
-            answer[0] = new ScriptAnalyzeDataManager_Internal(length);
+            var answer = (ScriptAnalyzeDataManager_Internal*)UnsafeUtility.Malloc(sizeof(ScriptAnalyzeDataManager_Internal), 4, allocator);
+            answer[0] = new ScriptAnalyzeDataManager_Internal(length, allocator);
             return answer;
         }
-        private ScriptAnalyzeDataManager_Internal(int length)
+        private ScriptAnalyzeDataManager_Internal(int length, Allocator allocator)
         {
             FileLength = length;
             long size = sizeof(TextFile) * FileLength;
-            Files = (TextFile*)UnsafeUtility.Malloc(size, 4, Allocator.Persistent);
+            Files = (TextFile*)UnsafeUtility.Malloc(size, 4, allocator);
             UnsafeUtility.MemClear(Files, size);
-            RaceParserTempData = new RaceParserTempData(16);
-            MovetypeParserTempData = new MovetypeParserTempData(16);
-            ASTValueTypePairList = new ASTTypePageIndexPairList(1024);
+            RaceParserTempData = new RaceParserTempData(16, allocator);
+            MovetypeParserTempData = new MovetypeParserTempData(16, allocator);
+            ASTValueTypePairList = new ASTTypePageIndexPairList(1024, allocator);
         }
 
-        public void Dispose()
+        public void Dispose(Allocator allocator)
         {
             if (FileLength != 0)
             {
@@ -36,18 +36,18 @@ namespace pcysl5edgo.Wahren.AST
                 {
                     if (Files + i != null)
                     {
-                        Files[i].Dispose();
+                        Files[i].Dispose(allocator);
                     }
                 }
                 if (Files != null)
                 {
-                    UnsafeUtility.Free(Files, Allocator.Persistent);
+                    UnsafeUtility.Free(Files, allocator);
                     Files = null;
                 }
             }
-            RaceParserTempData.Dispose();
-            MovetypeParserTempData.Dispose();
-            ASTValueTypePairList.Dispose();
+            RaceParserTempData.Dispose(allocator);
+            MovetypeParserTempData.Dispose(allocator);
+            ASTValueTypePairList.Dispose(allocator);
             this = default;
         }
     }

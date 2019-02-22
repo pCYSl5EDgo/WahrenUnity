@@ -1,5 +1,7 @@
 ﻿using NUnit.Framework;
 using pcysl5edgo.Wahren.AST;
+using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 
 using static UnityEngine.Assertions.Assert;
 
@@ -8,12 +10,14 @@ unsafe struct USING_STRUCT : System.IDisposable
     public TextFile file;
     public ScriptAnalyzeDataManager_Internal script;
     public ParseJob.CommonData commonData;
-    public USING_STRUCT(string input, out System.Text.StringBuilder buffer)
+    private Allocator allocator;
+    public USING_STRUCT(string input, Allocator allocator, out System.Text.StringBuilder buffer)
     {
-        file = new TextFile(0, input.Length);
+        this.allocator = allocator;
+        file = new TextFile(0, input.Length, allocator);
         fixed (char* p = input)
         {
-            Unity.Collections.LowLevel.Unsafe.UnsafeUtility.MemCpy(file.Contents, p, input.Length * sizeof(char));
+            UnsafeUtility.MemCpy(file.Contents, p, input.Length * sizeof(char));
         }
         file.Split();
         buffer = new System.Text.StringBuilder(256);
@@ -30,11 +34,11 @@ unsafe struct USING_STRUCT : System.IDisposable
         {
             script = new ScriptAnalyzeDataManager_Internal
             {
-                ASTValueTypePairList = new ASTTypePageIndexPairList(4),
+                ASTValueTypePairList = new ASTTypePageIndexPairList(4, allocator),
                 FileLength = 1,
-                Files = (TextFile*)Unity.Collections.LowLevel.Unsafe.UnsafeUtility.Malloc(sizeof(System.IntPtr), 4, Unity.Collections.Allocator.Persistent),
-                MovetypeParserTempData = new MovetypeParserTempData(1),
-                RaceParserTempData = new RaceParserTempData(1),
+                Files = (TextFile*)UnsafeUtility.Malloc(sizeof(System.IntPtr), 4, allocator),
+                MovetypeParserTempData = new MovetypeParserTempData(1, allocator),
+                RaceParserTempData = new RaceParserTempData(1, allocator),
             };
             *script.Files = file;
             var job = new ParseJob
@@ -71,6 +75,6 @@ unsafe struct USING_STRUCT : System.IDisposable
     }
     public void Dispose()
     {
-        script.Dispose();
+        script.Dispose(this.allocator);
     }
 }
