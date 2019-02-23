@@ -36,10 +36,10 @@ namespace pcysl5edgo.Wahren.AST
                 Names = (MovetypeTree.NameAssignExpression*)UnsafeUtility.Malloc(sizeof(MovetypeTree.NameAssignExpression) * capacity, 4, allocator);
                 Helps = (MovetypeTree.HelpAssignExpression*)UnsafeUtility.Malloc(sizeof(MovetypeTree.HelpAssignExpression) * capacity, 4, allocator);
                 Constis = (MovetypeTree.ConstiAssignExpression*)UnsafeUtility.Malloc(sizeof(MovetypeTree.ConstiAssignExpression) * capacity, 4, allocator);
-                Names2 = new ListLinkedList(capacity, allocator);
-                Helps2 = new ListLinkedList(capacity, allocator);
-                Constis2 = new ListLinkedList(capacity, allocator);
-                Values2 = new ListLinkedList(capacity, allocator);
+                Names2 = new ListLinkedList(capacity, sizeof(MovetypeTree.NameAssignExpression), allocator);
+                Helps2 = new ListLinkedList(capacity, sizeof(MovetypeTree.HelpAssignExpression),allocator);
+                Constis2 = new ListLinkedList(capacity, sizeof(MovetypeTree.ConstiAssignExpression), allocator);
+                Values2 = new ListLinkedList(capacity, sizeof(MovetypeTree),allocator);
             }
             else
             {
@@ -87,13 +87,13 @@ namespace pcysl5edgo.Wahren.AST
                         UnityEngine.Debug.Log(prefix + " ast value type pair lengthen\n" + result.ToString());
                     }
 #endif
-                    ListUtility.Lengthen(ref astValueTypePairList.Values, ref astValueTypePairList.Capacity, allocator);
+                    ListUtility.Lengthen(ref astValueTypePairList.This.Values, ref astValueTypePairList.This.Capacity, allocator);
                     break;
                 case PendingReason.IdentifierNumberPairListCapacityShortage:
 #if UNITY_EDITOR
                     if (ShowLog)
                     {
-                        UnityEngine.Debug.Log(prefix + " identifier number pair lengthen\n" + result.ToString() + "\n" + identifierNumberPairs.Capacity);
+                        UnityEngine.Debug.Log(prefix + " identifier number pair lengthen\n" + result.ToString() + "\n" + identifierNumberPairs.This.Capacity);
                     }
 #endif
                     identifierNumberPairs.Lengthen(allocator);

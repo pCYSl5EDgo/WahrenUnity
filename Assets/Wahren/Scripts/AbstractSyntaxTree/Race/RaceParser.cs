@@ -69,7 +69,7 @@ namespace pcysl5edgo.Wahren.AST
             var ast = RaceTree.Kind.name.CreateASTPair();
             if (ast.TryAddAST(tempData.Names, expression, tempData.NameCapacity, ref tempData.NameLength))
             {
-                ast.AddToTempJob(ref list->Values, ref list->Capacity, ref list->Length, out _);
+                ast.AddToTempJob(ref list->This.Values, ref list->This.Capacity, ref list->This.Length, out _);
             }
             else
             {
@@ -93,7 +93,7 @@ namespace pcysl5edgo.Wahren.AST
             var ast = RaceTree.Kind.movetype.CreateASTPair();
             if (ast.TryAddAST(tempData.Movetypes, expression, tempData.MovetypeCapacity, ref tempData.MovetypeLength))
             {
-                ast.AddToTempJob(ref list->Values, ref list->Capacity, ref list->Length, out _);
+                ast.AddToTempJob(ref list->This.Values, ref list->This.Capacity, ref list->This.Length, out _);
             }
             else
             {
@@ -120,7 +120,7 @@ namespace pcysl5edgo.Wahren.AST
             var ast = RaceTree.Kind.consti.CreateASTPair();
             if (ast.TryAddAST(tempData.Constis, expression, tempData.ConstiCapacity, ref tempData.ConstiLength))
             {
-                ast.AddToTempJob(ref list->Values, ref list->Capacity, ref list->Length, out _);
+                ast.AddToTempJob(ref list->This.Values, ref list->This.Capacity, ref list->This.Length, out _);
             }
             else
             {
@@ -134,7 +134,7 @@ namespace pcysl5edgo.Wahren.AST
         {
             for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
             {
-                ref IdentifierNumberPair val = ref list.Values[i];
+                ref IdentifierNumberPair val = ref list.This.Values[i];
                 if (val.Span.Length == 0 || val.Number < 0 || val.Number > 10)
                     return new TryInterpretReturnValue(val.NumberSpan, ErrorSentence.Kind.OutOfRangeError);
             }
@@ -155,7 +155,7 @@ namespace pcysl5edgo.Wahren.AST
             var ast = RaceTree.Kind.brave.CreateASTPair();
             if (ast.TryAddAST(tempData.Braves, expression, tempData.BraveCapacity, ref tempData.BraveLength))
             {
-                ast.AddToTempJob(ref list->Values, ref list->Capacity, ref list->Length, out _);
+                ast.AddToTempJob(ref list->This.Values, ref list->This.Capacity, ref list->This.Length, out _);
             }
             else
             {
@@ -179,7 +179,7 @@ namespace pcysl5edgo.Wahren.AST
             var ast = RaceTree.Kind.align.CreateASTPair();
             if (ast.TryAddAST(tempData.Aligns, expression, tempData.AlignCapacity, ref tempData.AlignLength))
             {
-                ast.AddToTempJob(ref list->Values, ref list->Capacity, ref list->Length, out _);
+                ast.AddToTempJob(ref list->This.Values, ref list->This.Capacity, ref list->This.Length, out _);
             }
             else
             {

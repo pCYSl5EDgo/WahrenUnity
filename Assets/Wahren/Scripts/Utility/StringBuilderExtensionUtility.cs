@@ -52,9 +52,9 @@ namespace pcysl5edgo.Wahren.AST
             buffer.Append(" = ");
             if (length == 0)
                 return buffer.Append('@');
-            buffer.AppendPrimitive(files, list.Values[0].Span).Append('*').Append(list.Values[0].Number);
+            buffer.AppendPrimitive(files, list.This.Values[0].Span).Append('*').Append(list.This.Values[0].Number);
             for (int i = start + 1, end = start + length; i < end; i++)
-                buffer.Append(", ").AppendPrimitive(files, list.Values[i].Span).Append('*').Append(list.Values[i].Number);
+                buffer.Append(", ").AppendPrimitive(files, list.This.Values[i].Span).Append('*').Append(list.This.Values[i].Number);
             return buffer;
         }
 
@@ -79,7 +79,7 @@ namespace pcysl5edgo.Wahren.AST
             {
                 for (int i = tree.Start, end = tree.Start + tree.Length; i < end; i++)
                 {
-                    var pair = astValueTypePairList.Values[i];
+                    var pair = astValueTypePairList.This.Values[i];
                     buffer.Append("\n  ");
                     switch ((RaceTree.Kind)pair.Type)
                     {
@@ -119,7 +119,7 @@ namespace pcysl5edgo.Wahren.AST
             {
                 for (int i = tree.Start, end = tree.Start + tree.Length; i < end; i++)
                 {
-                    var pair = astValueTypePairList.Values[i];
+                    var pair = astValueTypePairList.This.Values[i];
                     buffer.Append("\n  ");
                     switch ((MovetypeTree.Kind)pair.Type)
                     {

@@ -57,7 +57,7 @@
             var ast = MovetypeTree.Kind.help.CreateASTPair();
             if (ast.TryAddAST(tempData.Helps, expression, tempData.HelpCapacity, ref tempData.HelpLength))
             {
-                ast.AddToTempJob(ref list->Values, ref list->Capacity, ref list->Length, out _);
+                ast.AddToTempJob(ref list->This.Values, ref list->This.Capacity, ref list->This.Length, out _);
             }
             else
             {
@@ -77,7 +77,7 @@
             var ast = MovetypeTree.Kind.name.CreateASTPair();
             if (ast.TryAddAST(tempData.Names, expression, tempData.NameCapacity, ref tempData.NameLength))
             {
-                ast.AddToTempJob(ref list->Values, ref list->Capacity, ref list->Length, out _);
+                ast.AddToTempJob(ref list->This.Values, ref list->This.Capacity, ref list->This.Length, out _);
             }
             else
             {
@@ -104,7 +104,7 @@
             var ast = MovetypeTree.Kind.consti.CreateASTPair();
             if (ast.TryAddAST(tempData.Constis, expression, tempData.ConstiCapacity, ref tempData.ConstiLength))
             {
-                ast.AddToTempJob(ref list->Values, ref list->Capacity, ref list->Length, out _);
+                ast.AddToTempJob(ref list->This.Values, ref list->This.Capacity, ref list->This.Length, out _);
             }
             else
             {
@@ -118,7 +118,7 @@
         {
             for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
             {
-                ref IdentifierNumberPair val = ref list.Values[i];
+                ref IdentifierNumberPair val = ref list.This.Values[i];
                 if (val.Span.Length == 0 || val.Number < 0 || val.Number > 10)
                     return new TryInterpretReturnValue(val.NumberSpan, ErrorSentence.Kind.OutOfRangeError);
             }

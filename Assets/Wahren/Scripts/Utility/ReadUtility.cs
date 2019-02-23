@@ -99,7 +99,7 @@ namespace pcysl5edgo.Wahren.AST
                                     state = 1;
                                     span = new Span(current, 1);
                                     isOnlyDigit = false;
-                                    if (++tempList.Length > tempList.Capacity)
+                                    if (++tempList.This.Length > tempList.This.Capacity)
                                     {
                                         tempList.Lengthen(Allocator.Temp);
                                     }
@@ -119,7 +119,7 @@ namespace pcysl5edgo.Wahren.AST
                                     state = 1;
                                     isOnlyDigit = true;
                                     span = new Span(current, 1);
-                                    if (++tempList.Length > tempList.Capacity)
+                                    if (++tempList.This.Length > tempList.This.Capacity)
                                     {
                                         tempList.Lengthen(Allocator.Temp);
                                     }
@@ -208,11 +208,11 @@ namespace pcysl5edgo.Wahren.AST
                                     break;
                                 case (ushort)' ':
                                 case (ushort)'\t':
-                                    tempList.Values[tempList.Length - 1].Span = span;
+                                    tempList.This.Values[tempList.This.Length - 1].Span = span;
                                     state = 2;
                                     break;
                                 case (ushort)'*':
-                                    tempList.Values[tempList.Length - 1].Span = span;
+                                    tempList.This.Values[tempList.This.Length - 1].Span = span;
                                     state = 3;
                                     if (isOnlyDigit)
                                     {
@@ -225,7 +225,7 @@ namespace pcysl5edgo.Wahren.AST
                                     file.SkipWhiteSpace(ref current);
                                     goto PARSE;
                                 case (ushort)',':
-                                    tempList.Values[tempList.Length - 1] = new IdentifierNumberPair(span, 0, numberSpan);
+                                    tempList.This.Values[tempList.This.Length - 1] = new IdentifierNumberPair(span, 0, numberSpan);
                                     state = 0;
                                     column++;
                                     file.SkipWhiteSpace(ref current);
@@ -246,8 +246,8 @@ namespace pcysl5edgo.Wahren.AST
                                     file.SkipWhiteSpace(ref current);
                                     goto PARSE;
                                 case (ushort)',':
-                                    tempList.Values[tempList.Length - 1].Number = 0;
-                                    tempList.Values[tempList.Length - 1].NumberSpan = new Span { Start = current, Length = 0 };
+                                    tempList.This.Values[tempList.This.Length - 1].Number = 0;
+                                    tempList.This.Values[tempList.This.Length - 1].NumberSpan = new Span { Start = current, Length = 0 };
                                     state = 0;
                                     column++;
                                     file.SkipWhiteSpace(ref current);
@@ -310,15 +310,15 @@ namespace pcysl5edgo.Wahren.AST
                                 case (ushort)' ':
                                 case (ushort)'\t':
                                     state = 6;
-                                    tempList.Values[tempList.Length - 1].Number = number;
-                                    tempList.Values[tempList.Length - 1].NumberSpan = numberSpan;
+                                    tempList.This.Values[tempList.This.Length - 1].Number = number;
+                                    tempList.This.Values[tempList.This.Length - 1].NumberSpan = numberSpan;
                                     break;
                                 case (ushort)',':
-                                    tempList.Values[tempList.Length - 1].Number = number;
+                                    tempList.This.Values[tempList.This.Length - 1].Number = number;
                                     state = 0;
                                     column++;
                                     file.SkipWhiteSpace(ref current);
-                                    tempList.Values[tempList.Length - 1].NumberSpan = numberSpan;
+                                    tempList.This.Values[tempList.This.Length - 1].NumberSpan = numberSpan;
                                     goto PARSE;
                                 default:
                                     goto ERROR;
@@ -383,8 +383,8 @@ namespace pcysl5edgo.Wahren.AST
                         answer = new TryInterpretReturnValue(span, ErrorSentence.Kind.InvalidMinusNumberError);
                         goto RETURN;
                     case 4:
-                        tempList.Values[tempList.Length - 1].Number = number;
-                        tempList.Values[tempList.Length - 1].NumberSpan = numberSpan;
+                        tempList.This.Values[tempList.This.Length - 1].Number = number;
+                        tempList.This.Values[tempList.This.Length - 1].NumberSpan = numberSpan;
                         span = new Span(current, 0);
                         goto SUCCESS;
                     case 6:
@@ -393,14 +393,14 @@ namespace pcysl5edgo.Wahren.AST
                 }
             }
         SUCCESS:
-            length = tempList.Length;
-            if (ListUtility.TryAddBulkToMultiThread(tempList.Values, length, pairList.Values, ref pairList.Length, pairList.Capacity, out start))
+            length = tempList.This.Length;
+            if (ListUtility.TryAddBulkToMultiThread(tempList.This.Values, length, pairList.This.Values, ref pairList.This.Length, pairList.This.Capacity, out start))
             {
                 answer = new TryInterpretReturnValue(span, SuccessSentence.Kind.AssignmentInterpretationSuccess);
             }
             else
             {
-                answer = TryInterpretReturnValue.CreatePending(span, location, PendingReason.IdentifierNumberPairListCapacityShortage, tempList.Length);
+                answer = TryInterpretReturnValue.CreatePending(span, location, PendingReason.IdentifierNumberPairListCapacityShortage, tempList.This.Length);
             }
             goto RETURN;
         ERROR:
@@ -408,7 +408,7 @@ namespace pcysl5edgo.Wahren.AST
             length = 0;
             answer = TryInterpretReturnValue.CreateNotExpectedCharacter(current);
         RETURN:
-            ListUtility.FreeTemp(ref tempList.Values, ref tempList.Capacity, ref tempList.Length);
+            ListUtility.FreeTemp(ref tempList.This.Values, ref tempList.This.Capacity, ref tempList.This.Length);
             return answer;
         }
         public static TryInterpretReturnValue TryReadIdentifierNotEmpty(ushort* lineCharPointer, int thisLineLength, int filePathId, int line, int column)

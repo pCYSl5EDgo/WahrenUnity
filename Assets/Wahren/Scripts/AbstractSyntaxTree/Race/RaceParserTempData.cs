@@ -86,13 +86,13 @@ namespace pcysl5edgo.Wahren.AST
                         UnityEngine.Debug.Log(prefix + " ast value type pair lengthen\n" + result.ToString());
                     }
 #endif
-                    ListUtility.Lengthen(ref astValueTypePairList.Values, ref astValueTypePairList.Capacity, allocator);
+                    ListUtility.Lengthen(ref astValueTypePairList.This.Values, ref astValueTypePairList.This.Capacity, allocator);
                     break;
                 case PendingReason.IdentifierNumberPairListCapacityShortage:
 #if UNITY_EDITOR
                     if (ShowLog)
                     {
-                        UnityEngine.Debug.Log(prefix + " identifier number pair lengthen\n" + result.ToString() + "\nCapacity: " + identifierNumberPairs.Capacity + " , Length: " + identifierNumberPairs.Length);
+                        UnityEngine.Debug.Log(prefix + " identifier number pair lengthen\n" + result.ToString() + "\nCapacity: " + identifierNumberPairs.This.Capacity + " , Length: " + identifierNumberPairs.This.Length);
                     }
 #endif
                     identifierNumberPairs.Lengthen(allocator);

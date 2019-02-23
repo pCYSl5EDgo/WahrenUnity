@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading;
-using System.Runtime.InteropServices;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 
@@ -16,17 +15,12 @@ namespace pcysl5edgo.Wahren.AST
         bool TryAdd(TValue* values, int length, out int start);
         void Dispose(Allocator allocator);
     }
-    [StructLayout(LayoutKind.Explicit)]
-    public unsafe struct ListLinkedListNode : ILinkedListNode<byte, ListLinkedListNode>
+    public unsafe struct ListLinkedListNode
     {
-        [FieldOffset(0)]
-        public volatile IntPtr NextNodePtr;
-        [FieldOffset(8)]
-        public volatile void* Values;
-        [FieldOffset(16)]
-        public volatile int Capacity;
-        [FieldOffset(20)]
-        public volatile int Length;
+        public IntPtr NextNodePtr;
+        public void* Values;
+        public int Capacity;
+        public int Length;
 
         public ListLinkedListNode(void* values, int capacity)
         {
@@ -53,8 +47,6 @@ namespace pcysl5edgo.Wahren.AST
 
         public ref T GetRef<T>(int index) where T : unmanaged => ref ((T*)Values)[index];
         public T* GetPointer<T>(int index) where T : unmanaged => (T*)Values + index;
-        public ref byte GetRef(int index) => ref GetRef<byte>(index);
-        public byte* GetPointer(int index) => GetPointer(index);
         public ListLinkedListNode* Next
         {
             get => (ListLinkedListNode*)NextNodePtr.ToPointer();

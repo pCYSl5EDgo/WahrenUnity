@@ -40,10 +40,10 @@ public unsafe class UnitTest
             AreEqual(expression.Start, 0);
             AreEqual(expression.Length, strs.Length);
             var pairs = _.script.MovetypeParserTempData.IdentifierNumberPairs;
-            AreEqual(pairs.Length, strs.Length);
+            AreEqual(pairs.This.Length, strs.Length);
             for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
             {
-                var p = pairs.Values[i];
+                var p = pairs.This.Values[i];
                 var (s, n) = strs[i - expression.Start];
                 AreEqual(buffer.Clear().AppendPrimitive(_.file, p.Span).ToString(), s);
                 AreEqual(p.Number, n);
@@ -81,10 +81,10 @@ public unsafe class UnitTest
             AreEqual(expression.Start, 0);
             AreEqual(expression.Length, 1);
             var pairs = _.script.MovetypeParserTempData.IdentifierNumberPairs;
-            AreEqual(pairs.Length, 1);
+            AreEqual(pairs.This.Length, 1);
             for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
             {
-                var p = pairs.Values[i];
+                var p = pairs.This.Values[i];
                 var (s, n) = strs[i - expression.Start];
                 AreEqual(buffer.Clear().AppendPrimitive(_.file, p.Span).ToString(), s);
                 AreEqual(p.Number, n);
@@ -146,10 +146,10 @@ public unsafe class UnitTest
             AreEqual(expression.Start, 0);
             AreEqual(expression.Length, strs.Length);
             var pairs = _.script.MovetypeParserTempData.IdentifierNumberPairs;
-            AreEqual(pairs.Length, strs.Length);
+            AreEqual(pairs.This.Length, strs.Length);
             for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
             {
-                var p = pairs.Values[i];
+                var p = pairs.This.Values[i];
                 var (s, n) = strs[i - expression.Start];
                 AreEqual(buffer.Clear().AppendPrimitive(_.file, p.Span).ToString(), s);
                 AreEqual(p.Number, n);
@@ -187,10 +187,10 @@ public unsafe class UnitTest
             AreEqual(expression.Start, 0);
             AreEqual(expression.Length, 1);
             var pairs = _.script.MovetypeParserTempData.IdentifierNumberPairs;
-            AreEqual(pairs.Length, 1);
+            AreEqual(pairs.This.Length, 1);
             for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
             {
-                var p = pairs.Values[i];
+                var p = pairs.This.Values[i];
                 var (s, n) = strs[i - expression.Start];
                 AreEqual(buffer.Clear().AppendPrimitive(_.file, p.Span).ToString(), s);
                 AreEqual(p.Number, n);
@@ -343,10 +343,10 @@ public unsafe class UnitTest
             AreEqual(expression.Start, 0);
             AreEqual(expression.Length, strs.Length);
             var pairs = _.script.RaceParserTempData.IdentifierNumberPairs;
-            AreEqual(pairs.Length, strs.Length);
+            AreEqual(pairs.This.Length, strs.Length);
             for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
             {
-                var p = pairs.Values[i];
+                var p = pairs.This.Values[i];
                 var (s, n) = strs[i - expression.Start];
                 AreEqual(buffer.Clear().AppendPrimitive(_.file, p.Span).ToString(), s);
                 AreEqual(p.Number, n);
@@ -384,10 +384,10 @@ public unsafe class UnitTest
             AreEqual(expression.Start, 0);
             AreEqual(expression.Length, 1);
             var pairs = _.script.RaceParserTempData.IdentifierNumberPairs;
-            AreEqual(pairs.Length, 1);
+            AreEqual(pairs.This.Length, 1);
             for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
             {
-                var p = pairs.Values[i];
+                var p = pairs.This.Values[i];
                 var (s, n) = strs[i - expression.Start];
                 AreEqual(buffer.Clear().AppendPrimitive(_.file, p.Span).ToString(), s);
                 AreEqual(p.Number, n);
@@ -449,10 +449,10 @@ public unsafe class UnitTest
             AreEqual(expression.Start, 0);
             AreEqual(expression.Length, strs.Length);
             var pairs = _.script.RaceParserTempData.IdentifierNumberPairs;
-            AreEqual(pairs.Length, strs.Length);
+            AreEqual(pairs.This.Length, strs.Length);
             for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
             {
-                var p = pairs.Values[i];
+                var p = pairs.This.Values[i];
                 var (s, n) = strs[i - expression.Start];
                 AreEqual(buffer.Clear().AppendPrimitive(_.file, p.Span).ToString(), s);
                 AreEqual(p.Number, n);
@@ -490,10 +490,10 @@ public unsafe class UnitTest
             AreEqual(expression.Start, 0);
             AreEqual(expression.Length, 1);
             var pairs = _.script.RaceParserTempData.IdentifierNumberPairs;
-            AreEqual(pairs.Length, 1);
+            AreEqual(pairs.This.Length, 1);
             for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
             {
-                var p = pairs.Values[i];
+                var p = pairs.This.Values[i];
                 var (s, n) = strs[i - expression.Start];
                 AreEqual(buffer.Clear().AppendPrimitive(_.file, p.Span).ToString(), s);
                 AreEqual(p.Number, n);

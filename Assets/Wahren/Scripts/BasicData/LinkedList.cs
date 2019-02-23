@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading;
-using System.Runtime.InteropServices;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 
@@ -14,19 +13,16 @@ namespace pcysl5edgo.Wahren.AST
         void AddRange(TValue* values, int length, out TNode* page, out int start, Allocator allocator);
     }
 
-    [StructLayout(LayoutKind.Explicit)]
-    public unsafe struct ListLinkedList : ILinkedList<byte, ListLinkedListNode>
+    public unsafe struct ListLinkedList
     {
-        [FieldOffset(0)]
         public volatile ListLinkedListNode* First;
-        [FieldOffset(8)]
         public volatile int NodeCapacity;
 
-        public ListLinkedList(int capacity, Allocator allocator)
+        public ListLinkedList(int capacity, int size, Allocator allocator)
         {
             if (capacity < 1) throw new ArgumentOutOfRangeException(capacity.ToString() + " must be greater than 0");
             First = (ListLinkedListNode*)UnsafeUtility.Malloc(sizeof(ListLinkedListNode), 4, allocator);
-            UnsafeUtility.MemClear(First, sizeof(ListLinkedListNode));
+            *First = new ListLinkedListNode(capacity, size, allocator);
             NodeCapacity = capacity;
         }
 
