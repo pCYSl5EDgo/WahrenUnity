@@ -14,54 +14,33 @@ public unsafe class UnitTest
     {
         var str0 = "o0_21uruse021902e";
         var strs = new[] { ("lawsuit", 7), ("death", 10), ("wind", 1), ("earth", 0) };
-        var strx = strs[0].Item1 + "*" + strs[0].Item2.ToString();
         var times = "*";
-        for (int i = 1; i < strs.Length; i++)
-        {
-            var (s, n) = strs[i];
-            strx += ", " + s + times + n;
-        }
-        var scriptText = $@"movetype {str0}{{
-            consti = {strx}
-        }}";
-        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
-        {
-            AreEqual(_.script.MovetypeParserTempData.Length, 1);
-            ref var tree = ref _.script.MovetypeParserTempData.Values[0];
-            AreEqual(tree.Length, 1);
-            AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
-            AreEqual(tree.ParentName.Length, 0);
-            var (type, page, value) = _.script.ASTValueTypePairList[tree.Start];
-            AreEqual(value, 0);
-            AreEqual((MovetypeTree.Kind)type, MovetypeTree.Kind.consti);
-            AreEqual(_.script.MovetypeParserTempData.ConstiLength, 1);
-            var expression = _.script.MovetypeParserTempData.Constis[value];
-            AreEqual(expression.ScenarioVariant.Length, 0);
-            AreEqual(expression.Start, 0);
-            AreEqual(expression.Length, strs.Length);
-            var pairs = _.script.MovetypeParserTempData.IdentifierNumberPairs;
-            AreEqual(pairs.This.Length, strs.Length);
-            for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
-            {
-                var p = pairs.This.Values[i];
-                var (s, n) = strs[i - expression.Start];
-                AreEqual(buffer.Clear().AppendPrimitive(_.file, p.Span).ToString(), s);
-                AreEqual(p.Number, n);
-            }
-        }
+        movetype_consti_success_many(str0, strs, times);
     }
     [Test]
     public void movetype_consti_success_1()
     {
         var str0 = "o0_21uruse021902e";
         var strs = new[] { ("lawsuit", 7) };
-        var strx = strs[0].Item1 + "*" + strs[0].Item2.ToString();
-        var times = "*";
-        for (int i = 1; i < strs.Length; i++)
+        movetype_consti_success_many(str0, strs, "*");
+    }
+    private void movetype_consti_success_many(string str0, (string, int)[] strs, string times)
+    {
+        string strx;
+        if (strs != null && strs.Length > 0)
         {
-            var (s, n) = strs[i];
-            strx += ", " + s + times + n;
+            strx = strs[0].Item1 + times + strs[0].Item2.ToString();
+            for (int i = 1; i < strs.Length; i++)
+            {
+                var (s, n) = strs[i];
+                strx += ", " + s + times + n;
+            }
         }
+        else
+        {
+            strx = "@";
+        }
+        var itemLength = strs?.Length ?? 0;
         var scriptText = $@"movetype {str0}{{
             consti = {strx}
         }}";
@@ -72,16 +51,17 @@ public unsafe class UnitTest
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
-            var (type, page, value) = _.script.ASTValueTypePairList[tree.Start];
+            ref var ast = ref _.script.ASTValueTypePairList[tree.Start];
+            var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((MovetypeTree.Kind)type, MovetypeTree.Kind.consti);
-            AreEqual(_.script.MovetypeParserTempData.ConstiLength, 1);
-            var expression = _.script.MovetypeParserTempData.Constis[value];
+            AreEqual(_.script.MovetypeParserTempData.Constis2.Length, 1);
+            var expression = ast.GetRef<MovetypeTree.ConstiAssignExpression>();
             AreEqual(expression.ScenarioVariant.Length, 0);
             AreEqual(expression.Start, 0);
-            AreEqual(expression.Length, 1);
+            AreEqual(expression.Length, itemLength);
             var pairs = _.script.MovetypeParserTempData.IdentifierNumberPairs;
-            AreEqual(pairs.This.Length, 1);
+            AreEqual(pairs.This.Length, itemLength);
             for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
             {
                 var p = pairs.This.Values[i];
@@ -95,25 +75,7 @@ public unsafe class UnitTest
     public void movetype_consti_success_0()
     {
         var str0 = "o0_21uruse021902e";
-        var scriptText = $@"movetype {str0}{{
-            consti = @
-        }}";
-        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
-        {
-            AreEqual(_.script.MovetypeParserTempData.Length, 1);
-            ref var tree = ref _.script.MovetypeParserTempData.Values[0];
-            AreEqual(tree.Length, 1);
-            AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
-            AreEqual(tree.ParentName.Length, 0);
-            var (type, page, value) = _.script.ASTValueTypePairList[tree.Start];
-            AreEqual(value, 0);
-            AreEqual((MovetypeTree.Kind)type, MovetypeTree.Kind.consti);
-            AreEqual(_.script.MovetypeParserTempData.ConstiLength, 1);
-            var expression = _.script.MovetypeParserTempData.Constis[value];
-            AreEqual(expression.ScenarioVariant.Length, 0);
-            AreEqual(expression.Start, 0);
-            AreEqual(expression.Length, 0);
-        }
+        movetype_consti_success_many(str0, null, "*");
     }
     [Test]
     public void movetype_consti_success_4_space()
@@ -121,40 +83,7 @@ public unsafe class UnitTest
         var str0 = "o0_21uruse021902e";
         var strs = new[] { ("lawsuit", 7), ("death", 10), ("wind", 1), ("earth", 0) };
         var times = "  \t\t  *    \t\t\t";
-        var strx = strs[0].Item1 + times + strs[0].Item2.ToString();
-        for (int i = 1; i < strs.Length; i++)
-        {
-            var (s, n) = strs[i];
-            strx += "," + s + times + n;
-        }
-        var scriptText = $@"movetype {str0}{{
-            consti = {strx}
-        }}";
-        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
-        {
-            AreEqual(_.script.MovetypeParserTempData.Length, 1);
-            ref var tree = ref _.script.MovetypeParserTempData.Values[0];
-            AreEqual(tree.Length, 1);
-            AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
-            AreEqual(tree.ParentName.Length, 0);
-            var (type, page, value) = _.script.ASTValueTypePairList[tree.Start];
-            AreEqual(value, 0);
-            AreEqual((MovetypeTree.Kind)type, MovetypeTree.Kind.consti);
-            AreEqual(_.script.MovetypeParserTempData.ConstiLength, 1);
-            var expression = _.script.MovetypeParserTempData.Constis[value];
-            AreEqual(expression.ScenarioVariant.Length, 0);
-            AreEqual(expression.Start, 0);
-            AreEqual(expression.Length, strs.Length);
-            var pairs = _.script.MovetypeParserTempData.IdentifierNumberPairs;
-            AreEqual(pairs.This.Length, strs.Length);
-            for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
-            {
-                var p = pairs.This.Values[i];
-                var (s, n) = strs[i - expression.Start];
-                AreEqual(buffer.Clear().AppendPrimitive(_.file, p.Span).ToString(), s);
-                AreEqual(p.Number, n);
-            }
-        }
+        movetype_consti_success_many(str0, strs, times);
     }
     [Test]
     public void movetype_consti_success_1_space()
@@ -162,67 +91,13 @@ public unsafe class UnitTest
         var str0 = "o0_21uruse021902e";
         var strs = new[] { ("lawsuit", 7) };
         var times = "  \t\t  *    \t\t\t";
-        var strx = strs[0].Item1 + times + strs[0].Item2.ToString();
-        for (int i = 1; i < strs.Length; i++)
-        {
-            var (s, n) = strs[i];
-            strx += ",\n\n\t" + s + times + n;
-        }
-        var scriptText = $@"movetype {str0}{{
-            consti = {strx}
-        }}";
-        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
-        {
-            AreEqual(_.script.MovetypeParserTempData.Length, 1);
-            ref var tree = ref _.script.MovetypeParserTempData.Values[0];
-            AreEqual(tree.Length, 1);
-            AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
-            AreEqual(tree.ParentName.Length, 0);
-            var (type, page, value) = _.script.ASTValueTypePairList[tree.Start];
-            AreEqual(value, 0);
-            AreEqual((MovetypeTree.Kind)type, MovetypeTree.Kind.consti);
-            AreEqual(_.script.MovetypeParserTempData.ConstiLength, 1);
-            var expression = _.script.MovetypeParserTempData.Constis[value];
-            AreEqual(expression.ScenarioVariant.Length, 0);
-            AreEqual(expression.Start, 0);
-            AreEqual(expression.Length, 1);
-            var pairs = _.script.MovetypeParserTempData.IdentifierNumberPairs;
-            AreEqual(pairs.This.Length, 1);
-            for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
-            {
-                var p = pairs.This.Values[i];
-                var (s, n) = strs[i - expression.Start];
-                AreEqual(buffer.Clear().AppendPrimitive(_.file, p.Span).ToString(), s);
-                AreEqual(p.Number, n);
-            }
-        }
+        movetype_consti_success_many(str0, strs, times);
     }
     [Test]
     public void movetype_consti_success_0_space()
     {
         var str0 = "o0_21uruse021902e";
-        var scriptText = $@"movetype {str0}{{
-
-            consti =      @
-
-
-        }}";
-        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
-        {
-            AreEqual(_.script.MovetypeParserTempData.Length, 1);
-            ref var tree = ref _.script.MovetypeParserTempData.Values[0];
-            AreEqual(tree.Length, 1);
-            AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
-            AreEqual(tree.ParentName.Length, 0);
-            var (type, page, value) = _.script.ASTValueTypePairList[tree.Start];
-            AreEqual(value, 0);
-            AreEqual((MovetypeTree.Kind)type, MovetypeTree.Kind.consti);
-            AreEqual(_.script.MovetypeParserTempData.ConstiLength, 1);
-            var expression = _.script.MovetypeParserTempData.Constis[value];
-            AreEqual(expression.ScenarioVariant.Length, 0);
-            AreEqual(expression.Start, 0);
-            AreEqual(expression.Length, 0);
-        }
+        movetype_consti_success_many(str0, null, "*");
     }
     [Test]
     public void movetype_help_success()
@@ -239,11 +114,12 @@ public unsafe class UnitTest
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
-            var (type, page, value) = _.script.ASTValueTypePairList[tree.Start];
+            ref var ast = ref _.script.ASTValueTypePairList[tree.Start];
+            var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((MovetypeTree.Kind)type, MovetypeTree.Kind.help);
-            AreEqual(_.script.MovetypeParserTempData.HelpLength, 1);
-            var expression = _.script.MovetypeParserTempData.Helps[value];
+            AreEqual(_.script.MovetypeParserTempData.Helps2.Length, 1);
+            var expression = ast.GetRef<MovetypeTree.HelpAssignExpression>();
             AreEqual(expression.ScenarioVariant.Length, 0);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, expression.Value).ToString(), str1);
         }
