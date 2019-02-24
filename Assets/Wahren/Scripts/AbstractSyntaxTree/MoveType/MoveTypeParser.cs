@@ -14,7 +14,7 @@
                     switch ((file.Contents + file.LineStarts[raw])[column])
                     {
                         case '}':
-                            answer = tree.CloseBrace<MovetypeTree>(ref tree.Start, out tree.Length, ref astValueTypePairList, _.list, ref tempData.Values2, Location.Movetype, SuccessSentence.Kind.MovetypeTreeInterpretSuccess, nextToLeftBrace, ref nextToRightBrace, allocator);
+                            answer = tree.CloseBrace<MovetypeTree>(ref tree.Start, out tree.Length, ref astValueTypePairList, _.list, ref tempData.Values, Location.Movetype, SuccessSentence.Kind.MovetypeTreeInterpretSuccess, nextToLeftBrace, ref nextToRightBrace, allocator);
                             goto RETURN;
                         case 'n':
                             if (!(answer = NameDetect(ref file, ref tempData, ref nextToRightBrace, ref _)))
@@ -55,7 +55,7 @@
             answer = new TryInterpretReturnValue(file.ReadLine(current), SuccessSentence.Kind.AssignmentInterpretationSuccess);
             expression.Value = answer.Span;
             var ast = MovetypeTree.Kind.help.CreateASTPair();
-            tempData.Helps2.Add(ref expression, out ast.Page, out ast.Index, proc.allocator);
+            tempData.Helps.Add(ref expression, out ast.Page, out ast.Index, proc.allocator);
             proc.Add(ast);
         RETURN:
             return answer;
@@ -69,7 +69,7 @@
             answer = new TryInterpretReturnValue(file.ReadLine(current), SuccessSentence.Kind.AssignmentInterpretationSuccess);
             expression.Value = answer.Span;
             var ast = MovetypeTree.Kind.name.CreateASTPair();
-            tempData.Names2.Add(ref expression, out ast.Page, out ast.Index, proc.allocator);
+            tempData.Names.Add(ref expression, out ast.Page, out ast.Index, proc.allocator);
             proc.Add(ast);
         RETURN:
             return answer;
@@ -90,7 +90,7 @@
             if (answer.IsError)
                 goto RETURN;
             var ast = MovetypeTree.Kind.consti.CreateASTPair();
-            tempData.Constis2.Add(ref expression, out ast.Page, out ast.Index, proc.allocator);
+            tempData.Constis.Add(ref expression, out ast.Page, out ast.Index, proc.allocator);
             proc.Add(ast);
         RETURN:
             return answer;

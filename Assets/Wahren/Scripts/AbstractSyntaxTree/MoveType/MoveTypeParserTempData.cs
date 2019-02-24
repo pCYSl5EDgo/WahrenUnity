@@ -5,10 +5,10 @@ namespace pcysl5edgo.Wahren.AST
 {
     public unsafe struct MovetypeParserTempData : IParserTempData
     {
-        public ListLinkedList Values2;
-        public ListLinkedList Names2;
-        public ListLinkedList Helps2;
-        public ListLinkedList Constis2;
+        public ListLinkedList Values;
+        public ListLinkedList Names;
+        public ListLinkedList Helps;
+        public ListLinkedList Constis;
         public IdentifierNumberPairList IdentifierNumberPairs;
         public IdentifierNumberPairListLinkedList IdentifierNumberPairs2;
 
@@ -18,14 +18,14 @@ namespace pcysl5edgo.Wahren.AST
             IdentifierNumberPairs2 = new IdentifierNumberPairListLinkedList(capacity, allocator);
             if (capacity != 0)
             {
-                Names2 = new ListLinkedList(capacity, sizeof(MovetypeTree.NameAssignExpression), allocator);
-                Helps2 = new ListLinkedList(capacity, sizeof(MovetypeTree.HelpAssignExpression), allocator);
-                Constis2 = new ListLinkedList(capacity, sizeof(MovetypeTree.ConstiAssignExpression), allocator);
-                Values2 = new ListLinkedList(capacity, sizeof(MovetypeTree), allocator);
+                Names = new ListLinkedList(capacity, sizeof(MovetypeTree.NameAssignExpression), allocator);
+                Helps = new ListLinkedList(capacity, sizeof(MovetypeTree.HelpAssignExpression), allocator);
+                Constis = new ListLinkedList(capacity, sizeof(MovetypeTree.ConstiAssignExpression), allocator);
+                Values = new ListLinkedList(capacity, sizeof(MovetypeTree), allocator);
             }
             else
             {
-                Values2 = Names2 = Helps2 = Constis2 = default;
+                Values = Names = Helps = Constis = default;
             }
         }
 
@@ -33,10 +33,10 @@ namespace pcysl5edgo.Wahren.AST
         {
             IdentifierNumberPairs.Dispose(allocator);
             IdentifierNumberPairs2.Dispose(allocator);
-            Values2.Dispose(allocator);
-            Names2.Dispose(allocator);
-            Helps2.Dispose(allocator);
-            Constis2.Dispose(allocator);
+            Values.Dispose(allocator);
+            Names.Dispose(allocator);
+            Helps.Dispose(allocator);
+            Constis.Dispose(allocator);
             this = default;
         }
 

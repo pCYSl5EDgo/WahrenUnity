@@ -46,8 +46,8 @@ public unsafe class UnitTest
         }}";
         using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
-            AreEqual(_.script.MovetypeParserTempData.Values2.Length, 1);
-            ref var tree = ref _.script.MovetypeParserTempData.Values2.GetRef<MovetypeTree>(0);
+            AreEqual(_.script.MovetypeParserTempData.Values.Length, 1);
+            ref var tree = ref _.script.MovetypeParserTempData.Values.GetRef<MovetypeTree>(0);
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
@@ -55,7 +55,7 @@ public unsafe class UnitTest
             var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((MovetypeTree.Kind)type, MovetypeTree.Kind.consti);
-            AreEqual(_.script.MovetypeParserTempData.Constis2.Length, 1);
+            AreEqual(_.script.MovetypeParserTempData.Constis.Length, 1);
             var expression = ast.GetRef<MovetypeTree.ConstiAssignExpression>();
             AreEqual(expression.ScenarioVariant.Length, 0);
             AreEqual(expression.Start, 0);
@@ -109,8 +109,8 @@ public unsafe class UnitTest
         }}";
         using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
-            AreEqual(_.script.MovetypeParserTempData.Values2.Length, 1);
-            ref var tree = ref _.script.MovetypeParserTempData.Values2.GetRef<MovetypeTree>(0);
+            AreEqual(_.script.MovetypeParserTempData.Values.Length, 1);
+            ref var tree = ref _.script.MovetypeParserTempData.Values.GetRef<MovetypeTree>(0);
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
@@ -118,7 +118,7 @@ public unsafe class UnitTest
             var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((MovetypeTree.Kind)type, MovetypeTree.Kind.help);
-            AreEqual(_.script.MovetypeParserTempData.Helps2.Length, 1);
+            AreEqual(_.script.MovetypeParserTempData.Helps.Length, 1);
             var expression = ast.GetRef<MovetypeTree.HelpAssignExpression>();
             AreEqual(expression.ScenarioVariant.Length, 0);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, expression.Value).ToString(), str1);
@@ -135,7 +135,7 @@ public unsafe class UnitTest
         }}";
         using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
-            AreEqual(_.script.MovetypeParserTempData.Values2.Length, 0);
+            AreEqual(_.script.MovetypeParserTempData.Values.Length, 0);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
             AreEqual(_.commonData.LastParentNameSpan.Length, 0);
             AreEqual(_.commonData.LastStructKind, Location.Movetype);
@@ -154,15 +154,15 @@ public unsafe class UnitTest
         }}";
         using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
-            AreEqual(_.script.MovetypeParserTempData.Values2.Length, 1);
-            ref var tree = ref _.script.MovetypeParserTempData.Values2.GetRef<MovetypeTree>(0);
+            AreEqual(_.script.MovetypeParserTempData.Values.Length, 1);
+            ref var tree = ref _.script.MovetypeParserTempData.Values.GetRef<MovetypeTree>(0);
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
             var (type, page, value) = _.script.ASTValueTypePairList[tree.Start];
             AreEqual(value, 0);
             AreEqual((MovetypeTree.Kind)type, MovetypeTree.Kind.name);
-            AreEqual(_.script.MovetypeParserTempData.Names2.Length, 1);
+            AreEqual(_.script.MovetypeParserTempData.Names.Length, 1);
             var expression = _.script.ASTValueTypePairList[tree.Start].GetRef<MovetypeTree.NameAssignExpression>();
             AreEqual(expression.ScenarioVariant.Length, 0);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, expression.Value).ToString(), str1);
@@ -179,7 +179,7 @@ public unsafe class UnitTest
         }}";
         using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
-            AreEqual(_.script.MovetypeParserTempData.Values2.Length, 0);
+            AreEqual(_.script.MovetypeParserTempData.Values.Length, 0);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
             AreEqual(_.commonData.LastParentNameSpan.Length, 0);
             AreEqual(_.commonData.LastStructKind, Location.Movetype);
