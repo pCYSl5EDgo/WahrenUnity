@@ -7,10 +7,9 @@ namespace pcysl5edgo.Wahren.AST
     internal unsafe struct InitialProc_USING_STRUCT
     {
         public ASTTypePageIndexPairList list;
-        public InitialProc_USING_STRUCT(int capacity, in TextFile file, in Caret left, out Caret right, out TryInterpretReturnValue answer, out int treeIndex)
+        public InitialProc_USING_STRUCT(int capacity, in TextFile file, in Caret left, out Caret right, out TryInterpretReturnValue answer)
         {
             list = new ASTTypePageIndexPairList(capacity, Allocator.Temp);
-            treeIndex = -1;
             right = left;
             file.SkipWhiteSpace(ref right);
             answer = new TryInterpretReturnValue
