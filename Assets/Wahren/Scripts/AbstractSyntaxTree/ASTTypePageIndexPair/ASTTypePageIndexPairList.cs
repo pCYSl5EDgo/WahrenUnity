@@ -68,13 +68,5 @@ namespace pcysl5edgo.Wahren.AST
                 UnsafeUtility.Free(This.Values, allocator);
             this = default;
         }
-
-        public static ASTTypePageIndexPairList MallocTemp(int capacity)
-        => new ASTTypePageIndexPairList(capacity, Allocator.Temp);
-        public static void FreeTemp(ref ASTTypePageIndexPairList list)
-        {
-            list.Node.Dispose(Allocator.Temp);
-            list = default;
-        }
     }
 }
