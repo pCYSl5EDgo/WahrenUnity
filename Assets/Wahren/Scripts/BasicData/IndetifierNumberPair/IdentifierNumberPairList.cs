@@ -46,6 +46,8 @@ namespace pcysl5edgo.Wahren.AST
 
         public IdentifierNumberPair* GetPointer(int index) => This.Values + index;
 
+        public bool IsFull => This.Capacity == This.Length;
+
         public bool TryAdd(IdentifierNumberPair* values, int length, out int start)
         {
             do

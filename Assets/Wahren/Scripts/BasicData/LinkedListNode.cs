@@ -14,6 +14,7 @@ namespace pcysl5edgo.Wahren.AST
         TNode* Next { get; set; }
         bool TryAdd(TValue* values, int length, out int start);
         void Dispose(Allocator allocator);
+        bool IsFull { get; }
     }
     public unsafe struct ListLinkedListNode
     {

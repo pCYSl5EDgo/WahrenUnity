@@ -36,6 +36,8 @@ namespace pcysl5edgo.Wahren.AST
         public ASTTypePageIndexPair* GetPointer(int index) => This.Values + index;
         public ASTTypePageIndexPairList* Next { get => This.NextNode; set => This.NextNode = value; }
 
+        public bool IsFull => This.Capacity == This.Length;
+
         public bool TryAdd(ASTTypePageIndexPair* values, int length, out int start) => Node.TryAdd(values, length, out start);
 
         public int TryAddBulkMultiThread(in ASTTypePageIndexPairList list, out int length)
