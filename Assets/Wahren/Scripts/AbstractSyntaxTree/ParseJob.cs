@@ -7,6 +7,14 @@ namespace pcysl5edgo.Wahren.AST
 {
     public unsafe struct ParseJob : IJob
     {
+        internal ParseJob(InterpreterStatus* cancellationTokenPtr, ScriptAnalyzeDataManager_Internal* scriptPtr, TextFile file, CommonData* commonDataPtr, Allocator allocator)
+        {
+            this.CancellationTokenPtr = cancellationTokenPtr;
+            this.ScriptPtr = scriptPtr;
+            this.File = file;
+            this.CommonPtr = commonDataPtr;
+            this.allocator = allocator;
+        }
         public struct CommonData
         {
             public Caret Caret;
@@ -18,6 +26,7 @@ namespace pcysl5edgo.Wahren.AST
         [NativeDisableUnsafePtrRestriction] internal ScriptAnalyzeDataManager_Internal* ScriptPtr;
         [NativeDisableUnsafePtrRestriction] public TextFile File;
         [NativeDisableUnsafePtrRestriction] public CommonData* CommonPtr;
+        public Allocator allocator;
         public void Execute()
         {
             File.SkipWhiteSpace(ref CommonPtr->Caret);
@@ -72,7 +81,7 @@ namespace pcysl5edgo.Wahren.AST
                 switch (CommonPtr->LastStructKind)
                 {
                     case Location.Race:
-                        if (CommonPtr->Result = File.TryParseRaceStructMultiThread(ref ScriptPtr->RaceParserTempData, ref ScriptPtr->ASTValueTypePairList, CommonPtr->LastNameSpan, CommonPtr->LastParentNameSpan, currentCaret, out currentCaret))
+                        if (CommonPtr->Result = File.TryParseRaceStructMultiThread(ref ScriptPtr->RaceParserTempData, ref ScriptPtr->ASTValueTypePairList, CommonPtr->LastNameSpan, CommonPtr->LastParentNameSpan, currentCaret, out currentCaret, allocator))
                         {
                             SaveSuccess(ref currentCaret);
                             continue;
@@ -83,7 +92,7 @@ namespace pcysl5edgo.Wahren.AST
                         }
                         return;
                     case Location.Movetype:
-                        CommonPtr->Result = File.TryParseMovetypeStructMultiThread(ref ScriptPtr->MovetypeParserTempData, ref ScriptPtr->ASTValueTypePairList, CommonPtr->LastNameSpan, CommonPtr->LastParentNameSpan, currentCaret, out currentCaret);
+                        CommonPtr->Result = File.TryParseMovetypeStructMultiThread(ref ScriptPtr->MovetypeParserTempData, ref ScriptPtr->ASTValueTypePairList, CommonPtr->LastNameSpan, CommonPtr->LastParentNameSpan, currentCaret, out currentCaret, allocator);
                         if (CommonPtr->Result)
                         {
                             SaveSuccess(ref currentCaret);

@@ -2,7 +2,7 @@
 {
     public static unsafe class MovetypeParser
     {
-        public static TryInterpretReturnValue TryParseMovetypeStructMultiThread(this ref TextFile file, ref MovetypeParserTempData tempData, ref ASTTypePageIndexPairList astValueTypePairList, Span name, Span parentName, Caret nextToLeftBrace, out Caret nextToRightBrace)
+        public static TryInterpretReturnValue TryParseMovetypeStructMultiThread(this ref TextFile file, ref MovetypeParserTempData tempData, ref ASTTypePageIndexPairList astValueTypePairList, Span name, Span parentName, Caret nextToLeftBrace, out Caret nextToRightBrace, Unity.Collections.Allocator allocator)
         {
             var tree = CreateNameTreeHelper.Create<MovetypeTree>(name, parentName);
             var _ = new InitialProc_USING_STRUCT(3, file, nextToLeftBrace, out nextToRightBrace, out var answer);

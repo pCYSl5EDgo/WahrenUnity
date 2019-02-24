@@ -135,13 +135,7 @@ namespace pcysl5edgo.Wahren.AST
             cdata->Caret = new Caret { File = file.FilePathId, Line = 0, Column = 0 };
             cdata->LastNameSpan = new Span(cdata->Caret, 0);
             cdata->Result = new TryInterpretReturnValue(cdata->LastNameSpan, 0, InterpreterStatus.None);
-            jobs[file.FilePathId] = new ParseJob
-            {
-                File = file,
-                CancellationTokenPtr = Status,
-                ScriptPtr = ScriptPtr,
-                CommonPtr = cdata,
-            };
+            jobs[file.FilePathId] = new ParseJob(Status, ScriptPtr, file, cdata, allocator);
         }
     }
 }

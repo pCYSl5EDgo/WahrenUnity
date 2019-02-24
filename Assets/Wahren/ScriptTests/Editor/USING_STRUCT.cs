@@ -41,13 +41,7 @@ unsafe struct USING_STRUCT : System.IDisposable
                 RaceParserTempData = new RaceParserTempData(1, allocator),
             };
             *script.Files = file;
-            var job = new ParseJob
-            {
-                CancellationTokenPtr = &token,
-                CommonPtr = &cdata,
-                File = file,
-                ScriptPtr = scriptPtr,
-            };
+            var job = new ParseJob(&token, scriptPtr, file, &cdata, allocator);
             ref var result = ref cdata.Result;
         PARSE:
             job.Execute();
