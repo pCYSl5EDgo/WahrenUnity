@@ -22,6 +22,8 @@ namespace pcysl5edgo.Wahren.AST
             index = Index;
         }
 
+        public ref T GetRef<T>() where T : unmanaged => ref Page->GetRef<T>(Index);
+
         public bool TryAddAST<T>(T* list, in T value, int capacity, ref int length) where T : unmanaged
         {
             do

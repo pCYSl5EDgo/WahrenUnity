@@ -18,6 +18,19 @@ namespace pcysl5edgo.Wahren.AST
         public volatile ListLinkedListNode* First;
         public volatile int NodeCapacity;
 
+        public int Length
+        {
+            get
+            {
+                int count = 0;
+                for (var node = First; node != null; node = node->Next)
+                {
+                    count += node->Length;
+                }
+                return count;
+            }
+        }
+
         public ListLinkedList(int capacity, int size, Allocator allocator)
         {
             if (capacity < 1) throw new ArgumentOutOfRangeException(capacity.ToString() + " must be greater than 0");

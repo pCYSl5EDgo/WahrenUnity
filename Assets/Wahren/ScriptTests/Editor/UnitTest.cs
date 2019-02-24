@@ -286,8 +286,8 @@ public unsafe class UnitTest
             var (type, page, value) = _.script.ASTValueTypePairList[tree.Start];
             AreEqual(value, 0);
             AreEqual((MovetypeTree.Kind)type, MovetypeTree.Kind.name);
-            AreEqual(_.script.MovetypeParserTempData.NameLength, 1);
-            var expression = _.script.MovetypeParserTempData.Names[value];
+            AreEqual(_.script.MovetypeParserTempData.Names2.Length, 1);
+            var expression = _.script.ASTValueTypePairList[tree.Start].GetRef<MovetypeTree.NameAssignExpression>();
             AreEqual(expression.ScenarioVariant.Length, 0);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, expression.Value).ToString(), str1);
         }

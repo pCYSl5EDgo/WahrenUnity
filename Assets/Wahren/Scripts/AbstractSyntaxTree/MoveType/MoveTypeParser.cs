@@ -75,14 +75,8 @@
             answer = new TryInterpretReturnValue(file.ReadLine(current), SuccessSentence.Kind.AssignmentInterpretationSuccess);
             expression.Value = answer.Span;
             var ast = MovetypeTree.Kind.name.CreateASTPair();
-            if (ast.TryAddAST(tempData.Names, expression, tempData.NameCapacity, ref tempData.NameLength))
-            {
-                proc.Add(ast);
-            }
-            else
-            {
-                answer = MovetypeTree.Kind.name.CreatePending(answer.Span);
-            }
+            tempData.Names2.Add(ref expression, out ast.Page, out ast.Index, proc.allocator);
+            proc.Add(ast);
         RETURN:
             return answer;
         }

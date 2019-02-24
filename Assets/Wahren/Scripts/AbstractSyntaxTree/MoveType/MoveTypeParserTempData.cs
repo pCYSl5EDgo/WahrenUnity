@@ -6,17 +6,14 @@ namespace pcysl5edgo.Wahren.AST
     public unsafe struct MovetypeParserTempData : IParserTempData
     {
         public int Length;
-        public int NameLength;
         public int HelpLength;
         public int ConstiLength;
 
         public int Capacity;
-        public int NameCapacity;
         public int HelpCapacity;
         public int ConstiCapacity;
 
         public MovetypeTree* Values;
-        public MovetypeTree.NameAssignExpression* Names;
         public MovetypeTree.HelpAssignExpression* Helps;
         public MovetypeTree.ConstiAssignExpression* Constis;
         public ListLinkedList Values2;
@@ -27,13 +24,12 @@ namespace pcysl5edgo.Wahren.AST
 
         public MovetypeParserTempData(int capacity, Allocator allocator)
         {
-            Length = NameLength = HelpLength = ConstiLength = 0;
-            Capacity = NameCapacity = HelpCapacity = ConstiCapacity = capacity;
+            Length  = HelpLength = ConstiLength = 0;
+            Capacity = HelpCapacity = ConstiCapacity = capacity;
             IdentifierNumberPairs = new IdentifierNumberPairList(capacity, allocator);
             if (capacity != 0)
             {
                 Values = (MovetypeTree*)UnsafeUtility.Malloc(sizeof(MovetypeTree) * capacity, 4, allocator);
-                Names = (MovetypeTree.NameAssignExpression*)UnsafeUtility.Malloc(sizeof(MovetypeTree.NameAssignExpression) * capacity, 4, allocator);
                 Helps = (MovetypeTree.HelpAssignExpression*)UnsafeUtility.Malloc(sizeof(MovetypeTree.HelpAssignExpression) * capacity, 4, allocator);
                 Constis = (MovetypeTree.ConstiAssignExpression*)UnsafeUtility.Malloc(sizeof(MovetypeTree.ConstiAssignExpression) * capacity, 4, allocator);
                 Names2 = new ListLinkedList(capacity, sizeof(MovetypeTree.NameAssignExpression), allocator);
@@ -44,7 +40,6 @@ namespace pcysl5edgo.Wahren.AST
             else
             {
                 Values = null;
-                Names = null;
                 Helps = null;
                 Constis = null;
                 Values2 = Names2 = Helps2 = Constis2 = default;
@@ -53,8 +48,6 @@ namespace pcysl5edgo.Wahren.AST
 
         public void Dispose(Allocator allocator)
         {
-            if (NameCapacity != 0)
-                UnsafeUtility.Free(Names, allocator);
             if (HelpCapacity != 0)
                 UnsafeUtility.Free(Helps, allocator);
             if (ConstiCapacity != 0)
@@ -102,14 +95,7 @@ namespace pcysl5edgo.Wahren.AST
                     switch ((MovetypeTree.Kind)result.SubDataIndex)
                     {
                         case MovetypeTree.Kind.name: // name
-#if UNITY_EDITOR
-                            if (ShowLog)
-                            {
-                                UnityEngine.Debug.Log(prefix + " name lengthen\n" + result.ToString());
-                            }
-#endif
-                            ListUtility.Lengthen(ref Names, ref NameCapacity, allocator);
-                            break;
+                            throw new System.Exception();
                         case MovetypeTree.Kind.help: // help
 #if UNITY_EDITOR
                             if (ShowLog)

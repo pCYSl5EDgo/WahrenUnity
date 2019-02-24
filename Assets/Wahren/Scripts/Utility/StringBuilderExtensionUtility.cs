@@ -124,7 +124,7 @@ namespace pcysl5edgo.Wahren.AST
                     switch ((MovetypeTree.Kind)pair.Type)
                     {
                         case MovetypeTree.Kind.name:
-                            buffer.Append(files, tempData.Names[pair.Index]);
+                            buffer.Append(files, pair.GetRef<MovetypeTree.NameAssignExpression>());
                             break;
                         case MovetypeTree.Kind.consti:
                             buffer.Append(files, tempData.Constis[pair.Index], tempData.IdentifierNumberPairs);
