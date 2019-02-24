@@ -29,13 +29,7 @@ namespace pcysl5edgo.Wahren.AST
             ref var @this = ref list.This;
             if (list.IsFull)
             {
-                long size = sizeof(ASTTypePageIndexPair) * @this.Capacity;
-                var t = Malloc(size * 2, 4, Allocator.Temp);
-                ref var node = ref list.Node;
-                MemCpy(t, node.Values, size);
-                @this.Capacity *= 2;
-                Free(node.Values, Allocator.Temp);
-                node.Values = t;
+                ListUtility.Lengthen(ref @this.Values, ref @this.Capacity, Allocator.Temp);
             }
             @this.Values[@this.Length++] = ast;
         }

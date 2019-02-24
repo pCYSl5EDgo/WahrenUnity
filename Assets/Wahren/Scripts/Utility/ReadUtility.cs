@@ -408,7 +408,7 @@ namespace pcysl5edgo.Wahren.AST
             length = 0;
             answer = TryInterpretReturnValue.CreateNotExpectedCharacter(current);
         RETURN:
-            ListUtility.FreeTemp(ref tempList.This.Values, ref tempList.This.Capacity, ref tempList.This.Length);
+            tempList.Dispose(Allocator.Temp);
             return answer;
         }
         public static TryInterpretReturnValue TryReadIdentifierNotEmpty(ushort* lineCharPointer, int thisLineLength, int filePathId, int line, int column)
