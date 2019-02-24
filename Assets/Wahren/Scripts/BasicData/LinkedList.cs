@@ -35,13 +35,12 @@ namespace pcysl5edgo.Wahren.AST
             }
             this = default;
         }
-        public void AddRange(byte* values, int length, out ListLinkedListNode* page, out int index, Allocator allocator) => AddRange<byte>(values, length, out page, out index, allocator);
-        public void Add<T>(T value, out ListLinkedListNode* page, out int index, Allocator allocator) where T : unmanaged
+        public void Add<T>(ref T value, out ListLinkedListNode* page, out int index, Allocator allocator) where T : unmanaged
         {
             var tryNode = First;
             while (true)
             {
-                if (tryNode->TryAdd(&value, 1, out index))
+                if (tryNode->TryAdd(ref value, out index))
                 {
                     page = tryNode;
                     return;

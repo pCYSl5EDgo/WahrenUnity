@@ -69,6 +69,18 @@ namespace pcysl5edgo.Wahren.AST
             this = default;
         }
 
+        public bool TryAdd<T>(ref T value, out int start) where T : unmanaged
+        {
+            do
+            {
+                start = Length;
+                if (start + 1 > Capacity)
+                    return false;
+            } while (start != Interlocked.CompareExchange(ref Length, start + 1, start));
+            GetRef<T>(start) = value;
+            return true;
+        }
+
         public bool TryAdd<T>(T* values, int length, out int start) where T : unmanaged
         {
             do
@@ -80,6 +92,5 @@ namespace pcysl5edgo.Wahren.AST
             UnsafeUtility.MemCpy(GetPointer<T>(start), values, sizeof(T) * length);
             return true;
         }
-        public bool TryAdd(byte* values, int length, out int start) => TryAdd<byte>(values, length, out start);
     }
 }
