@@ -4,11 +4,13 @@ using static Unity.Collections.LowLevel.Unsafe.UnsafeUtility;
 
 namespace pcysl5edgo.Wahren.AST
 {
-    internal unsafe struct InitialProc_USING_STRUCT
+    internal unsafe ref struct InitialProc_USING_STRUCT
     {
         public ASTTypePageIndexPairList list;
-        public InitialProc_USING_STRUCT(int capacity, in TextFile file, in Caret left, out Caret right, out TryInterpretReturnValue answer)
+        public Allocator allocator;
+        public InitialProc_USING_STRUCT(int capacity, in TextFile file, in Caret left, out Caret right, out TryInterpretReturnValue answer, Allocator allocator)
         {
+            this.allocator = allocator;
             list = new ASTTypePageIndexPairList(capacity, Allocator.Temp);
             right = left;
             file.SkipWhiteSpace(ref right);
