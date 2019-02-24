@@ -22,9 +22,9 @@ namespace pcysl5edgo.Wahren.AST
             public Span LastNameSpan, LastParentNameSpan;
             public TryInterpretReturnValue Result;
         }
-        [NativeDisableUnsafePtrRestriction] public InterpreterStatus* CancellationTokenPtr;
-        [NativeDisableUnsafePtrRestriction] internal ScriptAnalyzeDataManager_Internal* ScriptPtr;
-        [NativeDisableUnsafePtrRestriction] public TextFile File;
+        [NativeDisableUnsafePtrRestriction] private InterpreterStatus* CancellationTokenPtr;
+        [NativeDisableUnsafePtrRestriction] private ScriptAnalyzeDataManager_Internal* ScriptPtr;
+        [NativeDisableUnsafePtrRestriction] private TextFile File;
         [NativeDisableUnsafePtrRestriction] public CommonData* CommonPtr;
         public Allocator allocator;
         public void Execute()
