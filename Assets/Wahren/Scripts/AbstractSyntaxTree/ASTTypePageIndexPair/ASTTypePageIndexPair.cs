@@ -5,7 +5,7 @@ namespace pcysl5edgo.Wahren.AST
     public unsafe struct ASTTypePageIndexPair
     {
         public int Type;
-        public void* Page;
+        public ListLinkedListNode* Page;
         public int Index;
 
         public ASTTypePageIndexPair(int type)
@@ -15,7 +15,7 @@ namespace pcysl5edgo.Wahren.AST
             this.Index = default;
         }
 
-        public void Deconstruct(out int type, out void* page, out int index)
+        public void Deconstruct(out int type, out ListLinkedListNode* page, out int index)
         {
             type = Type;
             page = Page;
