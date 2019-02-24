@@ -1,8 +1,10 @@
 ﻿using Unity.Collections;
 
+using static Unity.Collections.LowLevel.Unsafe.UnsafeUtility;
+
 namespace pcysl5edgo.Wahren.AST
 {
-    internal struct InitialProc_USING_STRUCT : System.IDisposable
+    internal unsafe struct InitialProc_USING_STRUCT
     {
         public ASTTypePageIndexPairList list;
         public InitialProc_USING_STRUCT(int capacity, in TextFile file, in Caret left, out Caret right, out TryInterpretReturnValue answer, out int treeIndex)
@@ -20,6 +22,22 @@ namespace pcysl5edgo.Wahren.AST
         {
             list.Dispose(Allocator.Temp);
             this = default;
+        }
+
+        public void Add(ASTTypePageIndexPair ast)
+        {
+            ref var @this = ref list.This;
+            if (list.IsFull)
+            {
+                long size = sizeof(ASTTypePageIndexPair) * @this.Capacity;
+                var t = Malloc(size * 2, 4, Allocator.Temp);
+                ref var node = ref list.Node;
+                MemCpy(t, node.Values, size);
+                @this.Capacity *= 2;
+                Free(node.Values, Allocator.Temp);
+                node.Values = t;
+            }
+            @this.Values[@this.Length++] = ast;
         }
     }
 }

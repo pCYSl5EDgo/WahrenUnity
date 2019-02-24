@@ -5,49 +5,48 @@
         public static TryInterpretReturnValue TryParseMovetypeStructMultiThread(this ref TextFile file, ref MovetypeParserTempData tempData, ref ASTTypePageIndexPairList astValueTypePairList, Span name, Span parentName, Caret nextToLeftBrace, out Caret nextToRightBrace, out int treeIndex)
         {
             var tree = CreateNameTreeHelper.Create<MovetypeTree>(name, parentName);
-            using (var _ = new InitialProc_USING_STRUCT(3, file, nextToLeftBrace, out nextToRightBrace, out var answer, out treeIndex))
+            var _ = new InitialProc_USING_STRUCT(3, file, nextToLeftBrace, out nextToRightBrace, out var answer, out treeIndex);
+            ref var column = ref nextToRightBrace.Column;
+            for (ref var raw = ref nextToRightBrace.Line; raw < file.LineCount; raw++, column = 0)
             {
-                ref var column = ref nextToRightBrace.Column;
-                for (ref var raw = ref nextToRightBrace.Line; raw < file.LineCount; raw++, column = 0)
+                for (int lineLength = file.LineLengths[raw]; column < lineLength; column++)
                 {
-                    for (int lineLength = file.LineLengths[raw]; column < lineLength; column++)
+                    switch ((file.Contents + file.LineStarts[raw])[column])
                     {
-                        switch ((file.Contents + file.LineStarts[raw])[column])
-                        {
-                            case '}':
-                                answer = tree.CloseBrace(ref tree.Start, out tree.Length, ref astValueTypePairList, _.list, ref tempData.Values, tempData.Capacity, ref tempData.Length, Location.Movetype, SuccessSentence.Kind.MovetypeTreeInterpretSuccess, ref treeIndex, nextToLeftBrace, ref nextToRightBrace);
+                        case '}':
+                            answer = tree.CloseBrace(ref tree.Start, out tree.Length, ref astValueTypePairList, _.list, ref tempData.Values, tempData.Capacity, ref tempData.Length, Location.Movetype, SuccessSentence.Kind.MovetypeTreeInterpretSuccess, ref treeIndex, nextToLeftBrace, ref nextToRightBrace);
+                            goto RETURN;
+                        case 'n':
+                            if (!(answer = NameDetect(ref file, ref tempData, ref nextToRightBrace, ref _)))
                                 goto RETURN;
-                            case 'n':
-                                if (!(answer = NameDetect(ref file, ref tempData, ref nextToRightBrace, &_.list)))
-                                    goto RETURN;
-                                nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
-                                break;
-                            case 'h':
-                                if (!(answer = HelpDetect(ref file, ref tempData, ref nextToRightBrace, &_.list)))
-                                    goto RETURN;
-                                nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
-                                break;
-                            case 'c':
-                                if (!(answer = ConstiDetect(ref file, ref tempData, ref nextToRightBrace, &_.list)))
-                                    goto RETURN;
-                                nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
-                                break;
-                            case ' ':
-                            case '\t':
-                                break;
-                            default:
-                                answer = TryInterpretReturnValue.CreateNotExpectedCharacter(nextToRightBrace);
+                            nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
+                            break;
+                        case 'h':
+                            if (!(answer = HelpDetect(ref file, ref tempData, ref nextToRightBrace, ref _)))
                                 goto RETURN;
-                        }
+                            nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
+                            break;
+                        case 'c':
+                            if (!(answer = ConstiDetect(ref file, ref tempData, ref nextToRightBrace, ref _)))
+                                goto RETURN;
+                            nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
+                            break;
+                        case ' ':
+                        case '\t':
+                            break;
+                        default:
+                            answer = TryInterpretReturnValue.CreateNotExpectedCharacter(nextToRightBrace);
+                            goto RETURN;
                     }
                 }
-                answer = TryInterpretReturnValue.CreateRightBraceNotFound(nextToRightBrace);
-            RETURN:
-                return answer;
             }
+            answer = TryInterpretReturnValue.CreateRightBraceNotFound(nextToRightBrace);
+        RETURN:
+            _.Dispose();
+            return answer;
         }
 
-        private static TryInterpretReturnValue HelpDetect(ref TextFile file, ref MovetypeParserTempData tempData, ref Caret current, ASTTypePageIndexPairList* list)
+        private static TryInterpretReturnValue HelpDetect(ref TextFile file, ref MovetypeParserTempData tempData, ref Caret current, ref InitialProc_USING_STRUCT proc)
         {
             var expression = new MovetypeTree.HelpAssignExpression();
             var cs = stackalloc ushort[] { 'e', 'l', 'p' };
@@ -58,7 +57,7 @@
             var ast = MovetypeTree.Kind.help.CreateASTPair();
             if (ast.TryAddAST(tempData.Helps, expression, tempData.HelpCapacity, ref tempData.HelpLength))
             {
-                ast.AddToTempJob(ref list->This.Values, ref list->This.Capacity, ref list->This.Length, out _);
+                proc.Add(ast);
             }
             else
             {
@@ -67,7 +66,7 @@
         RETURN:
             return answer;
         }
-        private static TryInterpretReturnValue NameDetect(ref TextFile file, ref MovetypeParserTempData tempData, ref Caret current, ASTTypePageIndexPairList* list)
+        private static TryInterpretReturnValue NameDetect(ref TextFile file, ref MovetypeParserTempData tempData, ref Caret current, ref InitialProc_USING_STRUCT proc)
         {
             var expression = new MovetypeTree.NameAssignExpression();
             var cs = stackalloc ushort[] { 'a', 'm', 'e' };
@@ -78,7 +77,7 @@
             var ast = MovetypeTree.Kind.name.CreateASTPair();
             if (ast.TryAddAST(tempData.Names, expression, tempData.NameCapacity, ref tempData.NameLength))
             {
-                ast.AddToTempJob(ref list->This.Values, ref list->This.Capacity, ref list->This.Length, out _);
+                proc.Add(ast);
             }
             else
             {
@@ -88,7 +87,7 @@
             return answer;
         }
 
-        private static TryInterpretReturnValue ConstiDetect(ref TextFile file, ref MovetypeParserTempData tempData, ref Caret current, ASTTypePageIndexPairList* list)
+        private static TryInterpretReturnValue ConstiDetect(ref TextFile file, ref MovetypeParserTempData tempData, ref Caret current, ref InitialProc_USING_STRUCT proc)
         {
             var expression = new MovetypeTree.ConstiAssignExpression();
             var cs = stackalloc ushort[] { 'o', 'n', 's', 't', 'i' };
@@ -105,7 +104,7 @@
             var ast = MovetypeTree.Kind.consti.CreateASTPair();
             if (ast.TryAddAST(tempData.Constis, expression, tempData.ConstiCapacity, ref tempData.ConstiLength))
             {
-                ast.AddToTempJob(ref list->This.Values, ref list->This.Capacity, ref list->This.Length, out _);
+                proc.Add(ast);
             }
             else
             {

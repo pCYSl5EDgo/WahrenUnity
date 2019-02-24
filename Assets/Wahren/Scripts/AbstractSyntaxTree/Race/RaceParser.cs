@@ -19,27 +19,27 @@ namespace pcysl5edgo.Wahren.AST
                             answer = tree.CloseBrace(ref tree.Start, out tree.Length, ref astValueTypePairList, _.list, ref tempData.Values, tempData.Capacity, ref tempData.Length, Location.Race, SuccessSentence.Kind.RaceTreeIntrepretSuccess, ref treeIndex, nextToLeftBrace, ref nextToRightBrace);
                             goto RETURN;
                         case 'a': // align
-                            if (!(answer = AlignDetect(ref file, ref tempData, ref nextToRightBrace, &_.list)))
+                            if (!(answer = AlignDetect(ref file, ref tempData, ref nextToRightBrace, ref _)))
                                 goto RETURN;
                             nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
                             break;
                         case 'b': // brave
-                            if (!(answer = BraveDetect(ref file, ref tempData, ref nextToRightBrace, &_.list)))
+                            if (!(answer = BraveDetect(ref file, ref tempData, ref nextToRightBrace, ref _)))
                                 goto RETURN;
                             nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
                             break;
                         case 'c': // consti
-                            if (!(answer = ConstiDetect(ref file, ref tempData, ref nextToRightBrace, &_.list)))
+                            if (!(answer = ConstiDetect(ref file, ref tempData, ref nextToRightBrace, ref _)))
                                 goto RETURN;
                             nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
                             break;
                         case 'm': // movetype
-                            if (!(answer = MoveTypeDetect(ref file, ref tempData, ref nextToRightBrace, &_.list)))
+                            if (!(answer = MoveTypeDetect(ref file, ref tempData, ref nextToRightBrace, ref _)))
                                 goto RETURN;
                             nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
                             break;
                         case 'n': // name
-                            if (!(answer = NameDetect(ref file, ref tempData, ref nextToRightBrace, &_.list)))
+                            if (!(answer = NameDetect(ref file, ref tempData, ref nextToRightBrace, ref _)))
                                 goto RETURN;
                             nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
                             break;
@@ -58,7 +58,7 @@ namespace pcysl5edgo.Wahren.AST
             return answer;
         }
 
-        private static TryInterpretReturnValue NameDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTTypePageIndexPairList* list)
+        private static TryInterpretReturnValue NameDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref InitialProc_USING_STRUCT proc)
         {
             var expression = new RaceTree.NameAssignExpression();
             var cs = stackalloc ushort[] { 'a', 'm', 'e' };
@@ -69,7 +69,7 @@ namespace pcysl5edgo.Wahren.AST
             var ast = RaceTree.Kind.name.CreateASTPair();
             if (ast.TryAddAST(tempData.Names, expression, tempData.NameCapacity, ref tempData.NameLength))
             {
-                ast.AddToTempJob(ref list->This.Values, ref list->This.Capacity, ref list->This.Length, out _);
+                proc.Add(ast);
             }
             else
             {
@@ -79,7 +79,7 @@ namespace pcysl5edgo.Wahren.AST
             return answer;
         }
 
-        private static TryInterpretReturnValue MoveTypeDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTTypePageIndexPairList* list)
+        private static TryInterpretReturnValue MoveTypeDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref InitialProc_USING_STRUCT proc)
         {
             var expression = new RaceTree.MovetypeAssignExpression();
             var cs = stackalloc ushort[] { 'o', 'v', 'e', 't', 'y', 'p', 'e' };
@@ -93,7 +93,7 @@ namespace pcysl5edgo.Wahren.AST
             var ast = RaceTree.Kind.movetype.CreateASTPair();
             if (ast.TryAddAST(tempData.Movetypes, expression, tempData.MovetypeCapacity, ref tempData.MovetypeLength))
             {
-                ast.AddToTempJob(ref list->This.Values, ref list->This.Capacity, ref list->This.Length, out _);
+                proc.Add(ast);
             }
             else
             {
@@ -103,7 +103,7 @@ namespace pcysl5edgo.Wahren.AST
             return answer;
         }
 
-        private static TryInterpretReturnValue ConstiDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTTypePageIndexPairList* list)
+        private static TryInterpretReturnValue ConstiDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref InitialProc_USING_STRUCT proc)
         {
             var expression = new RaceTree.ConstiAssignExpression();
             var cs = stackalloc ushort[] { 'o', 'n', 's', 't', 'i' };
@@ -120,7 +120,7 @@ namespace pcysl5edgo.Wahren.AST
             var ast = RaceTree.Kind.consti.CreateASTPair();
             if (ast.TryAddAST(tempData.Constis, expression, tempData.ConstiCapacity, ref tempData.ConstiLength))
             {
-                ast.AddToTempJob(ref list->This.Values, ref list->This.Capacity, ref list->This.Length, out _);
+                proc.Add(ast);
             }
             else
             {
@@ -141,7 +141,7 @@ namespace pcysl5edgo.Wahren.AST
             return new TryInterpretReturnValue(span, default, default, InterpreterStatus.Success);
         }
 
-        private static TryInterpretReturnValue BraveDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTTypePageIndexPairList* list)
+        private static TryInterpretReturnValue BraveDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref InitialProc_USING_STRUCT proc)
         {
             var expression = new RaceTree.BraveAssignExpression();
             var cs = stackalloc ushort[] { 'r', 'a', 'v', 'e' };
@@ -155,7 +155,7 @@ namespace pcysl5edgo.Wahren.AST
             var ast = RaceTree.Kind.brave.CreateASTPair();
             if (ast.TryAddAST(tempData.Braves, expression, tempData.BraveCapacity, ref tempData.BraveLength))
             {
-                ast.AddToTempJob(ref list->This.Values, ref list->This.Capacity, ref list->This.Length, out _);
+                proc.Add(ast);
             }
             else
             {
@@ -165,7 +165,7 @@ namespace pcysl5edgo.Wahren.AST
             return answer;
         }
 
-        private static TryInterpretReturnValue AlignDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ASTTypePageIndexPairList* list)
+        private static TryInterpretReturnValue AlignDetect(ref TextFile file, ref RaceParserTempData tempData, ref Caret current, ref InitialProc_USING_STRUCT proc)
         {
             var expression = new RaceTree.AlignAssignExpression();
             var cs = stackalloc ushort[] { 'l', 'i', 'g', 'n' };
@@ -179,7 +179,7 @@ namespace pcysl5edgo.Wahren.AST
             var ast = RaceTree.Kind.align.CreateASTPair();
             if (ast.TryAddAST(tempData.Aligns, expression, tempData.AlignCapacity, ref tempData.AlignLength))
             {
-                ast.AddToTempJob(ref list->This.Values, ref list->This.Capacity, ref list->This.Length, out _);
+                proc.Add(ast);
             }
             else
             {

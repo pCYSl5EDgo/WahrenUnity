@@ -24,27 +24,6 @@ namespace pcysl5edgo.Wahren.AST
             currentCapacity *= 2;
         }
 
-        public static void AddToTempJob<T>(this ref T value, ref T* values, ref int capacity, ref int length, out int index) where T : unmanaged
-        {
-            if (capacity == 0)
-            {
-                capacity = 2;
-                values = (T*)UnsafeUtility.Malloc(sizeof(T) * capacity, 4, Allocator.Temp);
-                values[0] = value;
-                index = 0;
-                length = 1;
-                return;
-            }
-            if (capacity == length)
-            {
-                capacity *= 2;
-                var tmps = (T*)UnsafeUtility.Malloc(sizeof(T) * capacity, 4, Allocator.Temp);
-                UnsafeUtility.MemCpy(tmps, values, sizeof(T) * length);
-                UnsafeUtility.Free(values, Allocator.Temp);
-                values = tmps;
-            }
-            values[index = length++] = value;
-        }
         public static bool TryAddToMultiThread<T>(this ref T value, ref T* values, int capacity, ref int length, out int index) where T : unmanaged
         {
             do
