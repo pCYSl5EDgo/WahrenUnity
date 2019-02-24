@@ -34,8 +34,8 @@ public class TestScript
             }
             buffer.Clear();
             const int MovetypeCount_Vahren = 12;
-            A.AreEqual(MovetypeCount_Vahren, scriptManager.MovetypeParserTempData.Length);
-            for (int i = 0; i < scriptManager.MovetypeParserTempData.Length; i++)
+            A.AreEqual(MovetypeCount_Vahren, scriptManager.MovetypeParserTempData.Values2.Length);
+            for (int i = 0, end = scriptManager.MovetypeParserTempData.Values2.Length; i < end; i++)
             {
                 if (i != 0)
                     buffer.AppendLine();
@@ -93,7 +93,7 @@ public class TestScript
 
     private static unsafe void AppendMovetype(StringBuilder buffer, ScriptAnalyzeDataManager scriptManager, int i)
     {
-        buffer.AppendEx(scriptManager.MovetypeParserTempData.Values[i], scriptManager.Files, scriptManager.MovetypeParserTempData, scriptManager.ASTValueTypePairList);
+        buffer.AppendEx(scriptManager.MovetypeParserTempData.Values2.GetRef<MovetypeTree>(i), scriptManager.Files, scriptManager.MovetypeParserTempData, scriptManager.ASTValueTypePairList);
     }
 
     private static unsafe void AppendRace(StringBuilder buffer, ScriptAnalyzeDataManager scriptManager, int i)

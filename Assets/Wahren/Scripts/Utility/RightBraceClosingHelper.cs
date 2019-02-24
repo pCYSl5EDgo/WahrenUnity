@@ -16,13 +16,24 @@ namespace pcysl5edgo.Wahren.AST
             treeStart = astValueTypePairList.TryAddBulkMultiThread(tmpList, out treeLength);
             if (treeStart == -1)
             {
-                return TryInterpretReturnValue.CreatePending(new Span(nextToLeftBrace, 0), Location.Race, PendingReason.ASTValueTypePairListCapacityShortage);
+                return TryInterpretReturnValue.CreatePending(new Span(nextToLeftBrace, 0), location, PendingReason.ASTValueTypePairListCapacityShortage);
             }
             if (tree.TryAddToMultiThread(ref dataValues, dataCapacity, ref dataLength, out _))
             {
                 return new TryInterpretReturnValue(nextToRightBrace, successKind);
             }
-            return TryInterpretReturnValue.CreatePending(new Span(nextToLeftBrace, 0), Location.Race, PendingReason.TreeListCapacityShortage);
+            return TryInterpretReturnValue.CreatePending(new Span(nextToLeftBrace, 0), location, PendingReason.TreeListCapacityShortage);
+        }
+        public static unsafe TryInterpretReturnValue CloseBrace<TTree>(this ref TTree tree, ref int treeStart, out int treeLength, ref ASTTypePageIndexPairList astValueTypePairList, in ASTTypePageIndexPairList tmpList, ref ListLinkedList data, Location location, SuccessSentence.Kind successKind, Caret nextToLeftBrace, ref Caret nextToRightBrace, Allocator allocator) where TTree : unmanaged, INameStruct
+        {
+            nextToRightBrace.Column++;
+            treeStart = astValueTypePairList.TryAddBulkMultiThread(tmpList, out treeLength);
+            if (treeStart == -1)
+            {
+                return TryInterpretReturnValue.CreatePending(new Span(nextToLeftBrace, 0), location, PendingReason.ASTValueTypePairListCapacityShortage);
+            }
+            data.Add(ref tree, out _, out _, allocator);
+            return new TryInterpretReturnValue(nextToRightBrace, successKind);
         }
     }
 }

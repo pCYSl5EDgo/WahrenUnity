@@ -14,7 +14,7 @@
                     switch ((file.Contents + file.LineStarts[raw])[column])
                     {
                         case '}':
-                            answer = tree.CloseBrace(ref tree.Start, out tree.Length, ref astValueTypePairList, _.list, ref tempData.Values, tempData.Capacity, ref tempData.Length, Location.Movetype, SuccessSentence.Kind.MovetypeTreeInterpretSuccess, nextToLeftBrace, ref nextToRightBrace);
+                            answer = tree.CloseBrace<MovetypeTree>(ref tree.Start, out tree.Length, ref astValueTypePairList, _.list, ref tempData.Values2, Location.Movetype, SuccessSentence.Kind.MovetypeTreeInterpretSuccess, nextToLeftBrace, ref nextToRightBrace, allocator);
                             goto RETURN;
                         case 'n':
                             if (!(answer = NameDetect(ref file, ref tempData, ref nextToRightBrace, ref _)))

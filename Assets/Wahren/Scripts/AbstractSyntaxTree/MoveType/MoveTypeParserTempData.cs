@@ -5,11 +5,6 @@ namespace pcysl5edgo.Wahren.AST
 {
     public unsafe struct MovetypeParserTempData : IParserTempData
     {
-        public int Length;
-
-        public int Capacity;
-
-        public MovetypeTree* Values;
         public ListLinkedList Values2;
         public ListLinkedList Names2;
         public ListLinkedList Helps2;
@@ -19,13 +14,10 @@ namespace pcysl5edgo.Wahren.AST
 
         public MovetypeParserTempData(int capacity, Allocator allocator)
         {
-            Length = 0;
-            Capacity = capacity;
             IdentifierNumberPairs = new IdentifierNumberPairList(capacity, allocator);
             IdentifierNumberPairs2 = new IdentifierNumberPairListLinkedList(capacity, allocator);
             if (capacity != 0)
             {
-                Values = (MovetypeTree*)UnsafeUtility.Malloc(sizeof(MovetypeTree) * capacity, 4, allocator);
                 Names2 = new ListLinkedList(capacity, sizeof(MovetypeTree.NameAssignExpression), allocator);
                 Helps2 = new ListLinkedList(capacity, sizeof(MovetypeTree.HelpAssignExpression), allocator);
                 Constis2 = new ListLinkedList(capacity, sizeof(MovetypeTree.ConstiAssignExpression), allocator);
@@ -33,15 +25,12 @@ namespace pcysl5edgo.Wahren.AST
             }
             else
             {
-                Values = null;
                 Values2 = Names2 = Helps2 = Constis2 = default;
             }
         }
 
         public void Dispose(Allocator allocator)
         {
-            if (Capacity != 0)
-                UnsafeUtility.Free(Values, allocator);
             IdentifierNumberPairs.Dispose(allocator);
             IdentifierNumberPairs2.Dispose(allocator);
             Values2.Dispose(allocator);
@@ -83,14 +72,7 @@ namespace pcysl5edgo.Wahren.AST
                 case PendingReason.SectionListCapacityShortage:
                     throw new System.Exception();
                 case PendingReason.TreeListCapacityShortage:
-#if UNITY_EDITOR
-                    if (ShowLog)
-                    {
-                        UnityEngine.Debug.Log(prefix + " lengthen\n" + result.ToString());
-                    }
-#endif
-                    ListUtility.Lengthen(ref Values, ref Capacity, allocator);
-                    break;
+                    throw new System.Exception();
             }
         }
     }

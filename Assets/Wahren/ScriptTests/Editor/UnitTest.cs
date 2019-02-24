@@ -46,8 +46,8 @@ public unsafe class UnitTest
         }}";
         using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
-            AreEqual(_.script.MovetypeParserTempData.Length, 1);
-            ref var tree = ref _.script.MovetypeParserTempData.Values[0];
+            AreEqual(_.script.MovetypeParserTempData.Values2.Length, 1);
+            ref var tree = ref _.script.MovetypeParserTempData.Values2.GetRef<MovetypeTree>(0);
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
@@ -109,8 +109,8 @@ public unsafe class UnitTest
         }}";
         using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
-            AreEqual(_.script.MovetypeParserTempData.Length, 1);
-            ref var tree = ref _.script.MovetypeParserTempData.Values[0];
+            AreEqual(_.script.MovetypeParserTempData.Values2.Length, 1);
+            ref var tree = ref _.script.MovetypeParserTempData.Values2.GetRef<MovetypeTree>(0);
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
@@ -135,7 +135,7 @@ public unsafe class UnitTest
         }}";
         using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
-            AreEqual(_.script.MovetypeParserTempData.Length, 0);
+            AreEqual(_.script.MovetypeParserTempData.Values2.Length, 0);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
             AreEqual(_.commonData.LastParentNameSpan.Length, 0);
             AreEqual(_.commonData.LastStructKind, Location.Movetype);
@@ -154,8 +154,8 @@ public unsafe class UnitTest
         }}";
         using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
-            AreEqual(_.script.MovetypeParserTempData.Length, 1);
-            ref var tree = ref _.script.MovetypeParserTempData.Values[0];
+            AreEqual(_.script.MovetypeParserTempData.Values2.Length, 1);
+            ref var tree = ref _.script.MovetypeParserTempData.Values2.GetRef<MovetypeTree>(0);
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
@@ -179,7 +179,7 @@ public unsafe class UnitTest
         }}";
         using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
-            AreEqual(_.script.MovetypeParserTempData.Length, 0);
+            AreEqual(_.script.MovetypeParserTempData.Values2.Length, 0);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
             AreEqual(_.commonData.LastParentNameSpan.Length, 0);
             AreEqual(_.commonData.LastStructKind, Location.Movetype);

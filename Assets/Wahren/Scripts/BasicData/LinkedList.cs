@@ -39,6 +39,18 @@ namespace pcysl5edgo.Wahren.AST
             NodeCapacity = capacity;
         }
 
+        public ref T GetRef<T>(int index) where T : unmanaged
+        {
+            if (index < 0) throw new ArgumentOutOfRangeException();
+            for (var node = First; node != null; node = node->Next)
+            {
+                if (index < node->Length)
+                    return ref node->GetRef<T>(index);
+                index -= node->Length;
+            }
+            throw new ArgumentOutOfRangeException();
+        }
+
         public void Dispose(Allocator allocator)
         {
             if (First != null)
