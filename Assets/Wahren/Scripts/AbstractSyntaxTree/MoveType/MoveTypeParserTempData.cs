@@ -6,16 +6,10 @@ namespace pcysl5edgo.Wahren.AST
     public unsafe struct MovetypeParserTempData : IParserTempData
     {
         public int Length;
-        public int HelpLength;
-        public int ConstiLength;
 
         public int Capacity;
-        public int HelpCapacity;
-        public int ConstiCapacity;
 
         public MovetypeTree* Values;
-        public MovetypeTree.HelpAssignExpression* Helps;
-        public MovetypeTree.ConstiAssignExpression* Constis;
         public ListLinkedList Values2;
         public ListLinkedList Names2;
         public ListLinkedList Helps2;
@@ -24,34 +18,26 @@ namespace pcysl5edgo.Wahren.AST
 
         public MovetypeParserTempData(int capacity, Allocator allocator)
         {
-            Length  = HelpLength = ConstiLength = 0;
-            Capacity = HelpCapacity = ConstiCapacity = capacity;
+            Length = 0;
+            Capacity = capacity;
             IdentifierNumberPairs = new IdentifierNumberPairList(capacity, allocator);
             if (capacity != 0)
             {
                 Values = (MovetypeTree*)UnsafeUtility.Malloc(sizeof(MovetypeTree) * capacity, 4, allocator);
-                Helps = (MovetypeTree.HelpAssignExpression*)UnsafeUtility.Malloc(sizeof(MovetypeTree.HelpAssignExpression) * capacity, 4, allocator);
-                Constis = (MovetypeTree.ConstiAssignExpression*)UnsafeUtility.Malloc(sizeof(MovetypeTree.ConstiAssignExpression) * capacity, 4, allocator);
                 Names2 = new ListLinkedList(capacity, sizeof(MovetypeTree.NameAssignExpression), allocator);
-                Helps2 = new ListLinkedList(capacity, sizeof(MovetypeTree.HelpAssignExpression),allocator);
+                Helps2 = new ListLinkedList(capacity, sizeof(MovetypeTree.HelpAssignExpression), allocator);
                 Constis2 = new ListLinkedList(capacity, sizeof(MovetypeTree.ConstiAssignExpression), allocator);
-                Values2 = new ListLinkedList(capacity, sizeof(MovetypeTree),allocator);
+                Values2 = new ListLinkedList(capacity, sizeof(MovetypeTree), allocator);
             }
             else
             {
                 Values = null;
-                Helps = null;
-                Constis = null;
                 Values2 = Names2 = Helps2 = Constis2 = default;
             }
         }
 
         public void Dispose(Allocator allocator)
         {
-            if (HelpCapacity != 0)
-                UnsafeUtility.Free(Helps, allocator);
-            if (ConstiCapacity != 0)
-                UnsafeUtility.Free(Constis, allocator);
             if (Capacity != 0)
                 UnsafeUtility.Free(Values, allocator);
             IdentifierNumberPairs.Dispose(allocator);
@@ -92,30 +78,7 @@ namespace pcysl5edgo.Wahren.AST
                     identifierNumberPairs.Lengthen(allocator);
                     break;
                 case PendingReason.SectionListCapacityShortage:
-                    switch ((MovetypeTree.Kind)result.SubDataIndex)
-                    {
-                        case MovetypeTree.Kind.name: // name
-                            throw new System.Exception();
-                        case MovetypeTree.Kind.help: // help
-#if UNITY_EDITOR
-                            if (ShowLog)
-                            {
-                                UnityEngine.Debug.Log(prefix + " help lengthen\n" + result.ToString());
-                            }
-#endif
-                            ListUtility.Lengthen(ref Helps, ref HelpCapacity, allocator);
-                            break;
-                        case MovetypeTree.Kind.consti: // consti
-#if UNITY_EDITOR
-                            if (ShowLog)
-                            {
-                                UnityEngine.Debug.Log(prefix + " consti lengthen\n" + result.ToString());
-                            }
-#endif
-                            ListUtility.Lengthen(ref Constis, ref ConstiCapacity, allocator);
-                            break;
-                    }
-                    break;
+                    throw new System.Exception();
                 case PendingReason.TreeListCapacityShortage:
 #if UNITY_EDITOR
                     if (ShowLog)

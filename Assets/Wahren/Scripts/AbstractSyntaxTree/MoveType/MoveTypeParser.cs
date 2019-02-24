@@ -55,14 +55,8 @@
             answer = new TryInterpretReturnValue(file.ReadLine(current), SuccessSentence.Kind.AssignmentInterpretationSuccess);
             expression.Value = answer.Span;
             var ast = MovetypeTree.Kind.help.CreateASTPair();
-            if (ast.TryAddAST(tempData.Helps, expression, tempData.HelpCapacity, ref tempData.HelpLength))
-            {
-                proc.Add(ast);
-            }
-            else
-            {
-                answer = MovetypeTree.Kind.help.CreatePending(answer.Span);
-            }
+            tempData.Helps2.Add(ref expression, out ast.Page, out ast.Index, proc.allocator);
+            proc.Add(ast);
         RETURN:
             return answer;
         }
@@ -96,14 +90,8 @@
             if (answer.IsError)
                 goto RETURN;
             var ast = MovetypeTree.Kind.consti.CreateASTPair();
-            if (ast.TryAddAST(tempData.Constis, expression, tempData.ConstiCapacity, ref tempData.ConstiLength))
-            {
-                proc.Add(ast);
-            }
-            else
-            {
-                answer = MovetypeTree.Kind.consti.CreatePending(answer.Span);
-            }
+            tempData.Constis2.Add(ref expression, out ast.Page, out ast.Index, proc.allocator);
+            proc.Add(ast);
         RETURN:
             return answer;
         }

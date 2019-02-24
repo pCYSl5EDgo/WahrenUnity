@@ -127,10 +127,10 @@ namespace pcysl5edgo.Wahren.AST
                             buffer.Append(files, pair.GetRef<MovetypeTree.NameAssignExpression>());
                             break;
                         case MovetypeTree.Kind.consti:
-                            buffer.Append(files, tempData.Constis[pair.Index], tempData.IdentifierNumberPairs);
+                            buffer.Append(files, pair.GetRef<MovetypeTree.ConstiAssignExpression>(), tempData.IdentifierNumberPairs);
                             break;
                         case MovetypeTree.Kind.help:
-                            buffer.Append(files, tempData.Helps[pair.Index]);
+                            buffer.Append(files, pair.GetRef<MovetypeTree.HelpAssignExpression>());
                             break;
                     }
                 }
