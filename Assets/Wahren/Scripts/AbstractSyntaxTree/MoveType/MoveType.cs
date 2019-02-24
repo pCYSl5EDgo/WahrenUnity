@@ -1,10 +1,11 @@
 ﻿namespace pcysl5edgo.Wahren.AST
 {
-    public struct MovetypeTree : INameStruct
+    public unsafe struct MovetypeTree : INameStruct
     {
         public Span Name;
         public Span ParentName;
 
+        public ListLinkedListNode* Page;
         public int Start;
         public int Length;
 
@@ -30,6 +31,7 @@
         public unsafe struct ConstiAssignExpression // 2
         {
             public Span ScenarioVariant;
+            public ListLinkedListNode* Page;
             public int Start;
             public int Length;
         }

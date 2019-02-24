@@ -15,12 +15,14 @@ namespace pcysl5edgo.Wahren.AST
         public ListLinkedList Helps2;
         public ListLinkedList Constis2;
         public IdentifierNumberPairList IdentifierNumberPairs;
+        public IdentifierNumberPairListLinkedList IdentifierNumberPairs2;
 
         public MovetypeParserTempData(int capacity, Allocator allocator)
         {
             Length = 0;
             Capacity = capacity;
             IdentifierNumberPairs = new IdentifierNumberPairList(capacity, allocator);
+            IdentifierNumberPairs2 = new IdentifierNumberPairListLinkedList(capacity, allocator);
             if (capacity != 0)
             {
                 Values = (MovetypeTree*)UnsafeUtility.Malloc(sizeof(MovetypeTree) * capacity, 4, allocator);
@@ -41,6 +43,7 @@ namespace pcysl5edgo.Wahren.AST
             if (Capacity != 0)
                 UnsafeUtility.Free(Values, allocator);
             IdentifierNumberPairs.Dispose(allocator);
+            IdentifierNumberPairs2.Dispose(allocator);
             Values2.Dispose(allocator);
             Names2.Dispose(allocator);
             Helps2.Dispose(allocator);
