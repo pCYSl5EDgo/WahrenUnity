@@ -9,12 +9,10 @@ namespace pcysl5edgo.Wahren.AST
         public ListLinkedList Names;
         public ListLinkedList Helps;
         public ListLinkedList Constis;
-        public IdentifierNumberPairList IdentifierNumberPairs;
         public IdentifierNumberPairListLinkedList IdentifierNumberPairs2;
 
         public MovetypeParserTempData(int capacity, Allocator allocator)
         {
-            IdentifierNumberPairs = new IdentifierNumberPairList(capacity, allocator);
             IdentifierNumberPairs2 = new IdentifierNumberPairListLinkedList(capacity, allocator);
             if (capacity != 0)
             {
@@ -31,7 +29,6 @@ namespace pcysl5edgo.Wahren.AST
 
         public void Dispose(Allocator allocator)
         {
-            IdentifierNumberPairs.Dispose(allocator);
             IdentifierNumberPairs2.Dispose(allocator);
             Values.Dispose(allocator);
             Names.Dispose(allocator);
@@ -46,7 +43,6 @@ namespace pcysl5edgo.Wahren.AST
 #endif
         )
         {
-            ref var identifierNumberPairs = ref IdentifierNumberPairs;
             (_, var reason) = result;
             const string prefix = "movetype";
             switch (reason)
@@ -61,14 +57,7 @@ namespace pcysl5edgo.Wahren.AST
                     ListUtility.Lengthen(ref astValueTypePairList.This.Values, ref astValueTypePairList.This.Capacity, allocator);
                     break;
                 case PendingReason.IdentifierNumberPairListCapacityShortage:
-#if UNITY_EDITOR
-                    if (ShowLog)
-                    {
-                        UnityEngine.Debug.Log(prefix + " identifier number pair lengthen\n" + result.ToString() + "\n" + identifierNumberPairs.This.Capacity);
-                    }
-#endif
-                    identifierNumberPairs.Lengthen(allocator);
-                    break;
+                    throw new System.Exception();
                 case PendingReason.SectionListCapacityShortage:
                     throw new System.Exception();
                 case PendingReason.TreeListCapacityShortage:

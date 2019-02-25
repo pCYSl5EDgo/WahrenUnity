@@ -60,11 +60,9 @@ public unsafe class UnitTest
             AreEqual(expression.ScenarioVariant.Length, 0);
             AreEqual(expression.Start, 0);
             AreEqual(expression.Length, itemLength);
-            var pairs = _.script.MovetypeParserTempData.IdentifierNumberPairs;
-            AreEqual(pairs.This.Length, itemLength);
             for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
             {
-                var p = pairs.This.Values[i];
+                var p = expression.Page->GetRef<IdentifierNumberPair>(i);
                 var (s, n) = strs[i - expression.Start];
                 AreEqual(buffer.Clear().AppendPrimitive(_.file, p.Span).ToString(), s);
                 AreEqual(p.Number, n);

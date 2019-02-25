@@ -9,11 +9,16 @@ namespace pcysl5edgo.Wahren.AST
     public static unsafe class StringBuilderExtensionUtility
     {
         internal static StringBuilder AppendPrimitive(this StringBuilder buffer, in TextFile file, Span span)
-        => span.Length == 0 ? buffer.Append('@') : buffer.Append((char*)file.Contents + file.LineStarts[span.Line] + span.Column, span.Length);
+        {
+            if (span.Length == 0)
+            {
+                return buffer.Append('@');
+            }
+            return buffer.Append((char*)file.CurrentCharPointer(span.Start), span.Length);
+        }
         internal static StringBuilder AppendPrimitive(this StringBuilder buffer, in ScriptAnalyzeDataManager script, Span span)
         => buffer.AppendPrimitive(script[span.File], span);
-        internal static StringBuilder AppendPrimitive(this StringBuilder buffer, TextFile* files, Span span)
-        => buffer.AppendPrimitive(files[span.File], span);
+        internal static StringBuilder AppendPrimitive(this StringBuilder buffer, TextFile* files, Span span) => buffer.AppendPrimitive(files[span.File], span);
 
         private static StringBuilder AppendExtension(this StringBuilder buffer, TextFile* files, string sectionName, Span scenarioVariant, Span value)
         {
@@ -55,6 +60,21 @@ namespace pcysl5edgo.Wahren.AST
             buffer.AppendPrimitive(files, list.This.Values[0].Span).Append('*').Append(list.This.Values[0].Number);
             for (int i = start + 1, end = start + length; i < end; i++)
                 buffer.Append(", ").AppendPrimitive(files, list.This.Values[i].Span).Append('*').Append(list.This.Values[i].Number);
+            return buffer;
+        }
+
+        private static StringBuilder AppendExtension(this StringBuilder buffer, TextFile* files, string sectionName, Span scenarioVariant, IdentifierNumberPairList* page, int start, int length)
+        {
+            buffer.Append(sectionName);
+            if (scenarioVariant.Length != 0)
+                buffer.Append('@').AppendPrimitive(files, scenarioVariant);
+            buffer.Append(" = ");
+            if (length == 0)
+                return buffer.Append('@');
+            var listPtr = page->GetPointer(start);
+            buffer.AppendPrimitive(files, listPtr[0].Span).Append('*').Append(listPtr[0].Number);
+            for (int i = 1; i < length; i++)
+                buffer.Append(", ").AppendPrimitive(files, listPtr[i].Span).Append('*').Append(listPtr[i].Number);
             return buffer;
         }
 
@@ -110,8 +130,8 @@ namespace pcysl5edgo.Wahren.AST
         private static StringBuilder Append(this StringBuilder buffer, TextFile* files, MovetypeTree.HelpAssignExpression expression)
         => buffer.AppendExtension(files, "help", expression.ScenarioVariant, expression.Value);
 
-        private static StringBuilder Append(this StringBuilder buffer, TextFile* files, MovetypeTree.ConstiAssignExpression expression, in IdentifierNumberPairList list)
-        => buffer.AppendExtension(files, "consti", expression.ScenarioVariant, list, expression.Start, expression.Length);
+        private static StringBuilder Append(this StringBuilder buffer, TextFile* files, MovetypeTree.ConstiAssignExpression expression)
+        => buffer.AppendExtension(files, "consti", expression.ScenarioVariant, (IdentifierNumberPairList*)expression.Page, expression.Start, expression.Length);
 
         public static StringBuilder AppendEx(this StringBuilder buffer, in MovetypeTree tree, TextFile* files, in MovetypeParserTempData tempData, in ASTTypePageIndexPairList astValueTypePairList)
         {
@@ -127,7 +147,7 @@ namespace pcysl5edgo.Wahren.AST
                             buffer.Append(files, pair.GetRef<MovetypeTree.NameAssignExpression>());
                             break;
                         case MovetypeTree.Kind.consti:
-                            buffer.Append(files, pair.GetRef<MovetypeTree.ConstiAssignExpression>(), tempData.IdentifierNumberPairs);
+                            buffer.Append(files, pair.GetRef<MovetypeTree.ConstiAssignExpression>());
                             break;
                         case MovetypeTree.Kind.help:
                             buffer.Append(files, pair.GetRef<MovetypeTree.HelpAssignExpression>());
