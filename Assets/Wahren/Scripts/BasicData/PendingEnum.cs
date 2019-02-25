@@ -30,6 +30,5 @@
         Other,
         ASTValueTypePairListCapacityShortage,
         SentenceListCapacityShortage,
-        TreeListCapacityShortage,
     }
 }

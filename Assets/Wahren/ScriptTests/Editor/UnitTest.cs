@@ -204,8 +204,8 @@ public unsafe class UnitTest
         }}";
         using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
-            AreEqual(_.script.RaceParserTempData.Length, 1);
-            ref var tree = ref _.script.RaceParserTempData.Values[0];
+            AreEqual(_.script.RaceParserTempData.Values.Length, 1);
+            ref var tree = ref _.script.RaceParserTempData.Values.GetRef<RaceTree>(0);
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
@@ -244,8 +244,8 @@ public unsafe class UnitTest
         }}";
         using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
-            AreEqual(_.script.RaceParserTempData.Length, 1);
-            ref var tree = ref _.script.RaceParserTempData.Values[0];
+            AreEqual(_.script.RaceParserTempData.Values.Length, 1);
+            ref var tree = ref _.script.RaceParserTempData.Values.GetRef<RaceTree>(0);
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
@@ -276,8 +276,8 @@ public unsafe class UnitTest
         }}";
         using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
-            AreEqual(_.script.RaceParserTempData.Length, 1);
-            ref var tree = ref _.script.RaceParserTempData.Values[0];
+            AreEqual(_.script.RaceParserTempData.Values.Length, 1);
+            ref var tree = ref _.script.RaceParserTempData.Values.GetRef<RaceTree>(0);
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
@@ -309,8 +309,8 @@ public unsafe class UnitTest
         }}";
         using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
-            AreEqual(_.script.RaceParserTempData.Length, 1);
-            ref var tree = ref _.script.RaceParserTempData.Values[0];
+            AreEqual(_.script.RaceParserTempData.Values.Length, 1);
+            ref var tree = ref _.script.RaceParserTempData.Values.GetRef<RaceTree>(0);
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
@@ -349,8 +349,8 @@ public unsafe class UnitTest
         }}";
         using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
-            AreEqual(_.script.RaceParserTempData.Length, 1);
-            ref var tree = ref _.script.RaceParserTempData.Values[0];
+            AreEqual(_.script.RaceParserTempData.Values.Length, 1);
+            ref var tree = ref _.script.RaceParserTempData.Values.GetRef<RaceTree>(0);
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
@@ -384,8 +384,8 @@ public unsafe class UnitTest
         }}";
         using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
-            AreEqual(_.script.RaceParserTempData.Length, 1);
-            ref var tree = ref _.script.RaceParserTempData.Values[0];
+            AreEqual(_.script.RaceParserTempData.Values.Length, 1);
+            ref var tree = ref _.script.RaceParserTempData.Values.GetRef<RaceTree>(0);
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
@@ -429,8 +429,8 @@ public unsafe class UnitTest
         }}";
         using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
-            AreEqual(_.script.RaceParserTempData.Length, 1);
-            ref var tree = ref _.script.RaceParserTempData.Values[0];
+            AreEqual(_.script.RaceParserTempData.Values.Length, 1);
+            ref var tree = ref _.script.RaceParserTempData.Values.GetRef<RaceTree>(0);
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
@@ -453,8 +453,8 @@ public unsafe class UnitTest
         }}";
         using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
-            AreEqual(_.script.RaceParserTempData.Length, 1);
-            ref var tree = ref _.script.RaceParserTempData.Values[0];
+            AreEqual(_.script.RaceParserTempData.Values.Length, 1);
+            ref var tree = ref _.script.RaceParserTempData.Values.GetRef<RaceTree>(0);
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
@@ -478,8 +478,8 @@ public unsafe class UnitTest
         }}";
         using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
-            AreEqual(_.script.RaceParserTempData.Length, 1);
-            ref var tree = ref _.script.RaceParserTempData.Values[0];
+            AreEqual(_.script.RaceParserTempData.Values.Length, 1);
+            ref var tree = ref _.script.RaceParserTempData.Values.GetRef<RaceTree>(0);
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
@@ -503,7 +503,7 @@ public unsafe class UnitTest
         }}";
         using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
-            AreEqual(_.script.RaceParserTempData.Length, 0);
+            AreEqual(_.script.RaceParserTempData.Values.Length, 0);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
             AreEqual(_.commonData.LastParentNameSpan.Length, 0);
             AreEqual(_.commonData.LastStructKind, Location.Race);
@@ -522,7 +522,7 @@ public unsafe class UnitTest
         }}";
         using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
-            AreEqual(_.script.RaceParserTempData.Length, 0);
+            AreEqual(_.script.RaceParserTempData.Values.Length, 0);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
             AreEqual(_.commonData.LastParentNameSpan.Length, 0);
             AreEqual(_.commonData.LastStructKind, Location.Race);
@@ -541,7 +541,7 @@ public unsafe class UnitTest
         }}";
         using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
-            AreEqual(_.script.RaceParserTempData.Length, 0);
+            AreEqual(_.script.RaceParserTempData.Values.Length, 0);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
             AreEqual(_.commonData.LastParentNameSpan.Length, 0);
             AreEqual(_.commonData.LastStructKind, Location.Race);
@@ -560,7 +560,7 @@ public unsafe class UnitTest
         }}";
         using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
-            AreEqual(_.script.RaceParserTempData.Length, 0);
+            AreEqual(_.script.RaceParserTempData.Values.Length, 0);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
             AreEqual(_.commonData.LastParentNameSpan.Length, 0);
             AreEqual(_.commonData.LastStructKind, Location.Race);
@@ -579,8 +579,8 @@ public unsafe class UnitTest
         }}";
         using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
-            AreEqual(_.script.RaceParserTempData.Length, 1);
-            ref var tree = ref _.script.RaceParserTempData.Values[0];
+            AreEqual(_.script.RaceParserTempData.Values.Length, 1);
+            ref var tree = ref _.script.RaceParserTempData.Values.GetRef<RaceTree>(0);
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
@@ -604,8 +604,8 @@ public unsafe class UnitTest
         }}";
         using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
-            AreEqual(_.script.RaceParserTempData.Length, 1);
-            ref var tree = ref _.script.RaceParserTempData.Values[0];
+            AreEqual(_.script.RaceParserTempData.Values.Length, 1);
+            ref var tree = ref _.script.RaceParserTempData.Values.GetRef<RaceTree>(0);
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
@@ -630,7 +630,7 @@ public unsafe class UnitTest
         }}";
         using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
         {
-            AreEqual(_.script.RaceParserTempData.Length, 0);
+            AreEqual(_.script.RaceParserTempData.Values.Length, 0);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, _.commonData.LastNameSpan).ToString(), str0);
             AreEqual(_.commonData.LastParentNameSpan.Length, 0);
             AreEqual(_.commonData.LastStructKind, Location.Race);

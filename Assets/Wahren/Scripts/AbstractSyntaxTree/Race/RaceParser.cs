@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace pcysl5edgo.Wahren.AST
+﻿namespace pcysl5edgo.Wahren.AST
 {
     public static unsafe class RaceParser
     {
@@ -16,7 +14,7 @@ namespace pcysl5edgo.Wahren.AST
                     switch ((file.Contents + file.LineStarts[raw])[column])
                     {
                         case '}':
-                            answer = tree.CloseBrace(ref tree.Start, out tree.Length, ref astValueTypePairList, _.list, ref tempData.Values, tempData.Capacity, ref tempData.Length, Location.Race, SuccessSentence.Kind.RaceTreeIntrepretSuccess, nextToLeftBrace, ref nextToRightBrace);
+                            answer = tree.CloseBrace(ref tree.Start, out tree.Length, ref astValueTypePairList, _.list, ref tempData.Values, Location.Race, SuccessSentence.Kind.RaceTreeIntrepretSuccess, nextToLeftBrace, ref nextToRightBrace, allocator);
                             goto RETURN;
                         case 'a': // align
                             if (!(answer = AlignDetect(ref file, ref tempData, ref nextToRightBrace, ref _)))

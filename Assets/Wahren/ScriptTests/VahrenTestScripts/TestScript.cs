@@ -4,11 +4,8 @@ using UnityEngine.TestTools;
 using pcysl5edgo.Wahren.AST;
 
 using A = UnityEngine.Assertions.Assert;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
 
 public class TestScript
 {
@@ -25,8 +22,9 @@ public class TestScript
             foreach (var _ in PreparationLoop(scriptManager))
                 yield return null;
             const int RaceCount_Vahren = 12;
-            A.AreEqual(RaceCount_Vahren, scriptManager.RaceParserTempData.Length);
-            for (int i = 0; i < scriptManager.RaceParserTempData.Length; i++)
+            int length = scriptManager.RaceParserTempData.Values.Length;
+            A.AreEqual(RaceCount_Vahren, length);
+            for (int i = 0; i < length; i++)
             {
                 if (i != 0)
                     buffer.AppendLine();
@@ -97,13 +95,7 @@ public class TestScript
         }
     }
 
-    private static unsafe void AppendMovetype(StringBuilder buffer, ScriptAnalyzeDataManager scriptManager, int i)
-    {
-        buffer.AppendEx(scriptManager.MovetypeParserTempData.Values.GetRef<MovetypeTree>(i), scriptManager.Files, scriptManager.MovetypeParserTempData, scriptManager.ASTValueTypePairList);
-    }
+    private static unsafe void AppendMovetype(StringBuilder buffer, ScriptAnalyzeDataManager scriptManager, int i) => buffer.AppendEx(scriptManager.MovetypeParserTempData.Values.GetRef<MovetypeTree>(i), scriptManager.Files, scriptManager.MovetypeParserTempData, scriptManager.ASTValueTypePairList);
 
-    private static unsafe void AppendRace(StringBuilder buffer, ScriptAnalyzeDataManager scriptManager, int i)
-    {
-        buffer.AppendEx(scriptManager.RaceParserTempData.Values[i], scriptManager.Files, scriptManager.RaceParserTempData, scriptManager.ASTValueTypePairList);
-    }
+    private static unsafe void AppendRace(StringBuilder buffer, ScriptAnalyzeDataManager scriptManager, int i) => buffer.AppendEx(scriptManager.RaceParserTempData.Values.GetRef<RaceTree>(i), scriptManager.Files, scriptManager.RaceParserTempData, scriptManager.ASTValueTypePairList);
 }
