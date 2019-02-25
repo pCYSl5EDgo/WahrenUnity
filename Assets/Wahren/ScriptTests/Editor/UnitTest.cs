@@ -213,7 +213,7 @@ public unsafe class UnitTest
             var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((RaceTree.Kind)type, RaceTree.Kind.consti);
-            AreEqual(_.script.RaceParserTempData.Constis2.Length, 1);
+            AreEqual(_.script.RaceParserTempData.Constis.Length, 1);
             var expression = ast.GetRef<RaceTree.ConstiAssignExpression>();
             AreEqual(expression.ScenarioVariant.Length, 0);
             AreEqual(expression.Start, 0);
@@ -253,7 +253,7 @@ public unsafe class UnitTest
             var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((RaceTree.Kind)type, RaceTree.Kind.consti);
-            AreEqual(_.script.RaceParserTempData.Constis2.Length, 1);
+            AreEqual(_.script.RaceParserTempData.Constis.Length, 1);
             var expression = ast.GetRef<RaceTree.ConstiAssignExpression>();
             AreEqual(expression.ScenarioVariant.Length, 0);
             AreEqual(expression.Start, 0);
@@ -285,7 +285,7 @@ public unsafe class UnitTest
             var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((RaceTree.Kind)type, RaceTree.Kind.consti);
-            AreEqual(_.script.RaceParserTempData.Constis2.Length, 1);
+            AreEqual(_.script.RaceParserTempData.Constis.Length, 1);
             var expression = ast.GetRef<RaceTree.ConstiAssignExpression>();
             AreEqual(expression.ScenarioVariant.Length, 0);
             AreEqual(expression.Start, 0);
@@ -318,7 +318,7 @@ public unsafe class UnitTest
             var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((RaceTree.Kind)type, RaceTree.Kind.consti);
-            AreEqual(_.script.RaceParserTempData.Constis2.Length, 1);
+            AreEqual(_.script.RaceParserTempData.Constis.Length, 1);
             var expression = ast.GetRef<RaceTree.ConstiAssignExpression>();
             AreEqual(expression.ScenarioVariant.Length, 0);
             AreEqual(expression.Start, 0);
@@ -358,7 +358,7 @@ public unsafe class UnitTest
             var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((RaceTree.Kind)type, RaceTree.Kind.consti);
-            AreEqual(_.script.RaceParserTempData.Constis2.Length, 1);
+            AreEqual(_.script.RaceParserTempData.Constis.Length, 1);
             var expression = ast.GetRef<RaceTree.ConstiAssignExpression>();
             AreEqual(expression.ScenarioVariant.Length, 0);
             AreEqual(expression.Start, 0);
@@ -393,7 +393,7 @@ public unsafe class UnitTest
             var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((RaceTree.Kind)type, RaceTree.Kind.consti);
-            AreEqual(_.script.RaceParserTempData.Constis2.Length, 1);
+            AreEqual(_.script.RaceParserTempData.Constis.Length, 1);
             var expression = ast.GetRef<RaceTree.ConstiAssignExpression>();
             AreEqual(expression.ScenarioVariant.Length, 0);
             AreEqual(expression.Start, 0);
@@ -438,8 +438,8 @@ public unsafe class UnitTest
             var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((RaceTree.Kind)type, RaceTree.Kind.movetype);
-            AreEqual(_.script.RaceParserTempData.MovetypeLength, 1);
-            var expression = _.script.RaceParserTempData.Movetypes[value];
+            AreEqual(_.script.RaceParserTempData.Movetypes.Length, 1);
+            var expression = ast.GetRef<RaceTree.MovetypeAssignExpression>();
             AreEqual(expression.ScenarioVariant.Length, 0);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, expression.Value).ToString(), str1);
         }
@@ -462,8 +462,8 @@ public unsafe class UnitTest
             var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((RaceTree.Kind)type, RaceTree.Kind.movetype);
-            AreEqual(_.script.RaceParserTempData.MovetypeLength, 1);
-            var expression = _.script.RaceParserTempData.Movetypes[value];
+            AreEqual(_.script.RaceParserTempData.Movetypes.Length, 1);
+            var expression = ast.GetRef<RaceTree.MovetypeAssignExpression>();
             AreEqual(expression.ScenarioVariant.Length, 0);
             AreEqual(expression.Value, new Span(0, 1, 23, 0));
         }
@@ -487,8 +487,8 @@ public unsafe class UnitTest
             var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((RaceTree.Kind)type, RaceTree.Kind.brave);
-            AreEqual(_.script.RaceParserTempData.BraveLength, 1);
-            var expression = _.script.RaceParserTempData.Braves[value];
+            AreEqual(_.script.RaceParserTempData.Braves.Length, 1);
+            var expression = ast.GetRef<RaceTree.BraveAssignExpression>();
             AreEqual(expression.ScenarioVariant.Length, 0);
             AreEqual(expression.Value, num0);
         }
@@ -588,8 +588,8 @@ public unsafe class UnitTest
             var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((RaceTree.Kind)type, RaceTree.Kind.align);
-            AreEqual(_.script.RaceParserTempData.AlignLength, 1);
-            var expression = _.script.RaceParserTempData.Aligns[value];
+            AreEqual(_.script.RaceParserTempData.Aligns.Length, 1);
+            var expression = ast.GetRef<RaceTree.AlignAssignExpression>();
             AreEqual(expression.ScenarioVariant.Length, 0);
             AreEqual(expression.Value, num0);
         }
@@ -613,8 +613,8 @@ public unsafe class UnitTest
             var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((RaceTree.Kind)type, RaceTree.Kind.name);
-            AreEqual(_.script.RaceParserTempData.NameLength, 1);
-            var expression = _.script.RaceParserTempData.Names[value];
+            AreEqual(_.script.RaceParserTempData.Names.Length, 1);
+            var expression = ast.GetRef<RaceTree.NameAssignExpression>();
             AreEqual(expression.ScenarioVariant.Length, 0);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, expression.Value).ToString(), str1);
         }

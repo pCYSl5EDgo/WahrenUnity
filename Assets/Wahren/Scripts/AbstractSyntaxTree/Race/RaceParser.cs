@@ -67,14 +67,8 @@ namespace pcysl5edgo.Wahren.AST
             answer = new TryInterpretReturnValue(file.ReadLine(current), SuccessSentence.Kind.AssignmentInterpretationSuccess);
             expression.Value = answer.Span;
             var ast = RaceTree.Kind.name.CreateASTPair();
-            if (ast.TryAddAST(tempData.Names, expression, tempData.NameCapacity, ref tempData.NameLength))
-            {
-                proc.Add(ast);
-            }
-            else
-            {
-                answer = RaceTree.Kind.name.CreatePending(answer.Span);
-            }
+            tempData.Names.Add(ref expression, out ast.Page, out ast.Index, proc.allocator);
+            proc.Add(ast);
         RETURN:
             return answer;
         }
@@ -91,14 +85,8 @@ namespace pcysl5edgo.Wahren.AST
             answer.DataIndex = (int)SuccessSentence.Kind.AssignmentInterpretationSuccess;
             expression.Value = answer.Span;
             var ast = RaceTree.Kind.movetype.CreateASTPair();
-            if (ast.TryAddAST(tempData.Movetypes, expression, tempData.MovetypeCapacity, ref tempData.MovetypeLength))
-            {
-                proc.Add(ast);
-            }
-            else
-            {
-                answer = RaceTree.Kind.movetype.CreatePending(answer.Span);
-            }
+            tempData.Movetypes.Add(ref expression, out ast.Page, out ast.Index, proc.allocator);
+            proc.Add(ast);
         RETURN:
             return answer;
         }
@@ -118,7 +106,7 @@ namespace pcysl5edgo.Wahren.AST
             if (answer.IsError)
                 goto RETURN;
             var ast = RaceTree.Kind.consti.CreateASTPair();
-            tempData.Constis2.Add(ref expression, out ast.Page, out ast.Index, proc.allocator);
+            tempData.Constis.Add(ref expression, out ast.Page, out ast.Index, proc.allocator);
             proc.Add(ast);
         RETURN:
             return answer;
@@ -147,14 +135,8 @@ namespace pcysl5edgo.Wahren.AST
                 goto RETURN;
             expression.Value = (sbyte)value;
             var ast = RaceTree.Kind.brave.CreateASTPair();
-            if (ast.TryAddAST(tempData.Braves, expression, tempData.BraveCapacity, ref tempData.BraveLength))
-            {
-                proc.Add(ast);
-            }
-            else
-            {
-                answer = RaceTree.Kind.brave.CreatePending(answer.Span);
-            }
+            tempData.Braves.Add(ref expression, out ast.Page, out ast.Index, proc.allocator);
+            proc.Add(ast);
         RETURN:
             return answer;
         }
@@ -171,14 +153,8 @@ namespace pcysl5edgo.Wahren.AST
                 goto RETURN;
             expression.Value = (sbyte)value;
             var ast = RaceTree.Kind.align.CreateASTPair();
-            if (ast.TryAddAST(tempData.Aligns, expression, tempData.AlignCapacity, ref tempData.AlignLength))
-            {
-                proc.Add(ast);
-            }
-            else
-            {
-                answer = RaceTree.Kind.align.CreatePending(answer.Span);
-            }
+            tempData.Aligns.Add(ref expression, out ast.Page, out ast.Index, proc.allocator);
+            proc.Add(ast);
         RETURN:
             return answer;
         }

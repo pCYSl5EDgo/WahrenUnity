@@ -104,19 +104,19 @@ namespace pcysl5edgo.Wahren.AST
                     switch ((RaceTree.Kind)pair.Type)
                     {
                         case RaceTree.Kind.name:
-                            buffer.Append(files, tempData.Names[pair.Index]);
+                            buffer.Append(files, pair.GetRef<RaceTree.NameAssignExpression>());
                             break;
                         case RaceTree.Kind.align:
-                            buffer.Append(files, tempData.Aligns[pair.Index]);
+                            buffer.Append(files, pair.GetRef<RaceTree.AlignAssignExpression>());
                             break;
                         case RaceTree.Kind.brave:
-                            buffer.Append(files, tempData.Braves[pair.Index]);
+                            buffer.Append(files, pair.GetRef<RaceTree.BraveAssignExpression>());
                             break;
                         case RaceTree.Kind.consti:
                             buffer.Append(files, pair.GetRef<RaceTree.ConstiAssignExpression>());
                             break;
                         case RaceTree.Kind.movetype:
-                            buffer.Append(files, tempData.Movetypes[pair.Index]);
+                            buffer.Append(files, pair.GetRef<RaceTree.MovetypeAssignExpression>());
                             break;
                     }
                 }

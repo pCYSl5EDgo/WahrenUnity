@@ -6,62 +6,42 @@ namespace pcysl5edgo.Wahren.AST
     public unsafe struct RaceParserTempData : IParserTempData
     {
         public int Length;
-        public int NameLength;
-        public int AlignLength;
-        public int BraveLength;
-        public int MovetypeLength;
         public int Capacity;
-        public int NameCapacity;
-        public int AlignCapacity;
-        public int BraveCapacity;
-        public int MovetypeCapacity;
         public RaceTree* Values;
-        public RaceTree.NameAssignExpression* Names;
-        public RaceTree.AlignAssignExpression* Aligns;
-        public RaceTree.BraveAssignExpression* Braves;
-        public RaceTree.MovetypeAssignExpression* Movetypes;
-        public ListLinkedList Constis2;
+        public ListLinkedList Names;
+        public ListLinkedList Aligns;
+        public ListLinkedList Braves;
+        public ListLinkedList Movetypes;
+        public ListLinkedList Constis;
         public IdentifierNumberPairListLinkedList IdentifierNumberPairs2;
 
         public RaceParserTempData(int capacity, Allocator allocator)
         {
-            Length = NameLength = AlignLength = BraveLength = MovetypeLength = 0;
-            Capacity = NameCapacity = AlignCapacity = BraveCapacity = MovetypeCapacity = capacity;
+            this = default;
+            Length = 0;
+            Capacity = capacity;
             IdentifierNumberPairs2 = new IdentifierNumberPairListLinkedList(capacity, allocator);
             if (capacity != 0)
             {
                 Values = (RaceTree*)UnsafeUtility.Malloc(sizeof(RaceTree) * capacity, 4, allocator);
-                Names = (RaceTree.NameAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.NameAssignExpression) * capacity, 4, allocator);
-                Aligns = (RaceTree.AlignAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.AlignAssignExpression) * capacity, 4, allocator);
-                Braves = (RaceTree.BraveAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.BraveAssignExpression) * capacity, 4, allocator);
-                Movetypes = (RaceTree.MovetypeAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.MovetypeAssignExpression) * capacity, 4, allocator);
-                Constis2 = new ListLinkedList(capacity, sizeof(RaceTree.ConstiAssignExpression), allocator);
-            }
-            else
-            {
-                Values = null;
-                Names = null;
-                Aligns = null;
-                Braves = null;
-                Movetypes = null;
-                Constis2 = default;
+                Names = new ListLinkedList(capacity, sizeof(RaceTree.NameAssignExpression), allocator);
+                Aligns = new ListLinkedList(capacity, sizeof(RaceTree.AlignAssignExpression), allocator);
+                Braves = new ListLinkedList(capacity, sizeof(RaceTree.BraveAssignExpression), allocator);
+                Movetypes = new ListLinkedList(capacity, sizeof(RaceTree.MovetypeAssignExpression), allocator);
+                Constis = new ListLinkedList(capacity, sizeof(RaceTree.ConstiAssignExpression), allocator);
             }
         }
 
         public void Dispose(Allocator allocator)
         {
-            if (NameCapacity != 0)
-                UnsafeUtility.Free(Names, allocator);
-            if (AlignCapacity != 0)
-                UnsafeUtility.Free(Aligns, allocator);
-            if (BraveCapacity != 0)
-                UnsafeUtility.Free(Braves, allocator);
-            if (MovetypeCapacity != 0)
-                UnsafeUtility.Free(Movetypes, allocator);
             if (Capacity != 0)
                 UnsafeUtility.Free(Values, allocator);
             IdentifierNumberPairs2.Dispose(allocator);
-            Constis2.Dispose(allocator);
+            Names.Dispose(allocator);
+            Aligns.Dispose(allocator);
+            Braves.Dispose(allocator);
+            Movetypes.Dispose(allocator);
+            Constis.Dispose(allocator);
             this = default;
         }
 
@@ -85,50 +65,8 @@ namespace pcysl5edgo.Wahren.AST
                     ListUtility.Lengthen(ref astValueTypePairList.This.Values, ref astValueTypePairList.This.Capacity, allocator);
                     break;
                 case PendingReason.IdentifierNumberPairListCapacityShortage:
-                    throw new System.Exception();
                 case PendingReason.SectionListCapacityShortage:
-                    switch ((RaceTree.Kind)result.SubDataIndex)
-                    {
-                        case RaceTree.Kind.name: // name
-#if UNITY_EDITOR
-                            if (ShowLog)
-                            {
-                                UnityEngine.Debug.Log(prefix + " name lengthen\n" + result.ToString());
-                            }
-#endif
-                            ListUtility.Lengthen(ref Names, ref NameCapacity, allocator);
-                            break;
-                        case RaceTree.Kind.align: // align
-#if UNITY_EDITOR
-                            if (ShowLog)
-                            {
-                                UnityEngine.Debug.Log(prefix + " align lengthen\n" + result.ToString());
-                            }
-#endif
-                            ListUtility.Lengthen(ref Aligns, ref AlignCapacity, allocator);
-                            break;
-                        case RaceTree.Kind.brave: // brave
-#if UNITY_EDITOR
-                            if (ShowLog)
-                            {
-                                UnityEngine.Debug.Log(prefix + " brave lengthen\n" + result.ToString());
-                            }
-#endif
-                            ListUtility.Lengthen(ref Braves, ref BraveCapacity, allocator);
-                            break;
-                        case RaceTree.Kind.consti: //consti
-                            throw new System.Exception();
-                        case RaceTree.Kind.movetype: // movetype
-#if UNITY_EDITOR
-                            if (ShowLog)
-                            {
-                                UnityEngine.Debug.Log(prefix + " movetype lengthen\n" + result.ToString());
-                            }
-#endif
-                            ListUtility.Lengthen(ref Movetypes, ref MovetypeCapacity, allocator);
-                            break;
-                    }
-                    break;
+                    throw new System.Exception();
                 case PendingReason.TreeListCapacityShortage:
 #if UNITY_EDITOR
                     if (ShowLog)
