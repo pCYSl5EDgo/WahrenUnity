@@ -2,7 +2,7 @@
 {
     public static unsafe class MovetypeParser
     {
-        public static TryInterpretReturnValue TryParseMovetypeStructMultiThread(this ref TextFile file, ref MovetypeParserTempData tempData, ref ASTTypePageIndexPairList astValueTypePairList, Span name, Span parentName, Caret nextToLeftBrace, out Caret nextToRightBrace, Unity.Collections.Allocator allocator)
+        public static TryInterpretReturnValue TryParseMovetypeStructMultiThread(this ref TextFile file, ref MovetypeParserTempData tempData, ref ASTTypePageIndexPairListLinkedList astValueTypePairList, Span name, Span parentName, Caret nextToLeftBrace, out Caret nextToRightBrace, Unity.Collections.Allocator allocator)
         {
             var tree = CreateNameTreeHelper.Create<MovetypeTree>(name, parentName);
             var _ = new InitialProc_USING_STRUCT(3, file, nextToLeftBrace, out nextToRightBrace, out var answer, allocator);
@@ -14,7 +14,7 @@
                     switch ((file.Contents + file.LineStarts[raw])[column])
                     {
                         case '}':
-                            answer = tree.CloseBrace<MovetypeTree>(ref tree.Start, out tree.Length, ref astValueTypePairList, _.list, ref tempData.Values, Location.Movetype, SuccessSentence.Kind.MovetypeTreeInterpretSuccess, nextToLeftBrace, ref nextToRightBrace, allocator);
+                            answer = tree.CloseBrace<MovetypeTree>(out tree.Page, out tree.Start, out tree.Length, ref astValueTypePairList, _.list, ref tempData.Values, Location.Movetype, SuccessSentence.Kind.MovetypeTreeInterpretSuccess, nextToLeftBrace, ref nextToRightBrace, allocator);
                             goto RETURN;
                         case 'n':
                             if (!(answer = NameDetect(ref file, ref tempData, ref nextToRightBrace, ref _)))

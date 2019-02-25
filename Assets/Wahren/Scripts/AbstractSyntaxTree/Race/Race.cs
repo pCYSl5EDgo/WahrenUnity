@@ -1,10 +1,11 @@
 ﻿namespace pcysl5edgo.Wahren.AST
 {
-    public struct RaceTree : INameStruct
+    public unsafe struct RaceTree : INameStruct
     {
         public Span Name;
         public Span ParentName;
 
+        public ASTTypePageIndexPairList* Page;
         public int Start;
         public int Length;
 

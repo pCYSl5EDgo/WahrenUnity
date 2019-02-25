@@ -34,7 +34,7 @@ unsafe struct USING_STRUCT : System.IDisposable
         {
             script = new ScriptAnalyzeDataManager_Internal
             {
-                ASTValueTypePairList = new ASTTypePageIndexPairList(4, allocator),
+                ASTValueTypePairList = new ASTTypePageIndexPairListLinkedList(4, allocator),
                 FileLength = 1,
                 Files = (TextFile*)UnsafeUtility.Malloc(sizeof(System.IntPtr), 4, allocator),
                 MovetypeParserTempData = new MovetypeParserTempData(1, allocator),
@@ -43,27 +43,9 @@ unsafe struct USING_STRUCT : System.IDisposable
             *script.Files = file;
             var job = new ParseJob(&token, scriptPtr, file, &cdata, allocator);
             ref var result = ref cdata.Result;
-        PARSE:
             job.Execute();
             if (result.Status == InterpreterStatus.Pending)
-            {
-                var (location, reason) = result;
-                switch (location)
-                {
-                    case Location.Race:
-                        script.RaceParserTempData.Lengthen(ref script.ASTValueTypePairList, result, allocator, false);
-                        break;
-                    case Location.Movetype:
-                        script.MovetypeParserTempData.Lengthen(ref script.ASTValueTypePairList, result, allocator, false);
-                        break;
-                    default:
-                        Assert.Fail();
-                        break;
-                }
-                result = default;
-                token = default;
-                goto PARSE;
-            }
+                throw new System.Exception();
         }
         commonData = cdata;
     }

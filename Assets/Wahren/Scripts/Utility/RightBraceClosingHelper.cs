@@ -9,14 +9,10 @@ namespace pcysl5edgo.Wahren.AST
 {
     public static class RightBraceClosingHelper
     {
-        public static unsafe TryInterpretReturnValue CloseBrace<TTree>(this ref TTree tree, ref int treeStart, out int treeLength, ref ASTTypePageIndexPairList astValueTypePairList, in ASTTypePageIndexPairList tmpList, ref ListLinkedList data, Location location, SuccessSentence.Kind successKind, Caret nextToLeftBrace, ref Caret nextToRightBrace, Allocator allocator) where TTree : unmanaged, INameStruct
+        public static unsafe TryInterpretReturnValue CloseBrace<TTree>(this ref TTree tree, out ASTTypePageIndexPairList* treePage, out int treeStart, out int treeLength, ref ASTTypePageIndexPairListLinkedList astValueTypePairList, in ASTTypePageIndexPairList tmpList, ref ListLinkedList data, Location location, SuccessSentence.Kind successKind, Caret nextToLeftBrace, ref Caret nextToRightBrace, Allocator allocator) where TTree : unmanaged, INameStruct
         {
             nextToRightBrace.Column++;
-            treeStart = astValueTypePairList.TryAddBulkMultiThread(tmpList, out treeLength);
-            if (treeStart == -1)
-            {
-                return TryInterpretReturnValue.CreatePending(new Span(nextToLeftBrace, 0), location, PendingReason.ASTValueTypePairListCapacityShortage);
-            }
+            astValueTypePairList.AddRange(tmpList.This.Values, treeLength = tmpList.This.Length, out treePage, out treeStart, allocator);
             data.Add(ref tree, out _, out _, allocator);
             return new TryInterpretReturnValue(nextToRightBrace, successKind);
         }

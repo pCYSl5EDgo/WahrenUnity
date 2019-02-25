@@ -24,11 +24,4 @@
         Voice = 19,
         WorkSpace = 20,
     }
-    public enum PendingReason
-    {
-        None,
-        Other,
-        ASTValueTypePairListCapacityShortage,
-        SentenceListCapacityShortage,
-    }
 }

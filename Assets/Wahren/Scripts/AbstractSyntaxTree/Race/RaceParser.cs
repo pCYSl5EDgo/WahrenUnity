@@ -2,7 +2,7 @@
 {
     public static unsafe class RaceParser
     {
-        public static TryInterpretReturnValue TryParseRaceStructMultiThread(this ref TextFile file, ref RaceParserTempData tempData, ref ASTTypePageIndexPairList astValueTypePairList, Span name, Span parentName, Caret nextToLeftBrace, out Caret nextToRightBrace, Unity.Collections.Allocator allocator)
+        public static TryInterpretReturnValue TryParseRaceStructMultiThread(this ref TextFile file, ref RaceParserTempData tempData, ref ASTTypePageIndexPairListLinkedList astValueTypePairList, Span name, Span parentName, Caret nextToLeftBrace, out Caret nextToRightBrace, Unity.Collections.Allocator allocator)
         {
             var tree = CreateNameTreeHelper.Create<RaceTree>(name, parentName);
             var _ = new InitialProc_USING_STRUCT(4, file, nextToLeftBrace, out nextToRightBrace, out TryInterpretReturnValue answer, allocator);
@@ -14,7 +14,7 @@
                     switch ((file.Contents + file.LineStarts[raw])[column])
                     {
                         case '}':
-                            answer = tree.CloseBrace(ref tree.Start, out tree.Length, ref astValueTypePairList, _.list, ref tempData.Values, Location.Race, SuccessSentence.Kind.RaceTreeIntrepretSuccess, nextToLeftBrace, ref nextToRightBrace, allocator);
+                            answer = tree.CloseBrace(out tree.Page, out tree.Start, out tree.Length, ref astValueTypePairList, _.list, ref tempData.Values, Location.Race, SuccessSentence.Kind.RaceTreeIntrepretSuccess, nextToLeftBrace, ref nextToRightBrace, allocator);
                             goto RETURN;
                         case 'a': // align
                             if (!(answer = AlignDetect(ref file, ref tempData, ref nextToRightBrace, ref _)))

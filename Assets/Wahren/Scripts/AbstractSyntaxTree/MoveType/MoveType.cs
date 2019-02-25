@@ -5,7 +5,7 @@
         public Span Name;
         public Span ParentName;
 
-        public ListLinkedListNode* Page;
+        public ASTTypePageIndexPairList* Page;
         public int Start;
         public int Length;
 

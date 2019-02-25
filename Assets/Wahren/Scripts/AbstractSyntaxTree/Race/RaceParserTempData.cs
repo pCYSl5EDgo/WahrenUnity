@@ -3,7 +3,7 @@ using Unity.Collections.LowLevel.Unsafe;
 
 namespace pcysl5edgo.Wahren.AST
 {
-    public unsafe struct RaceParserTempData : IParserTempData
+    public unsafe struct RaceParserTempData
     {
         public ListLinkedList Values;
         public ListLinkedList Names;
@@ -38,28 +38,6 @@ namespace pcysl5edgo.Wahren.AST
             Movetypes.Dispose(allocator);
             Constis.Dispose(allocator);
             this = default;
-        }
-
-        public void Lengthen(ref ASTTypePageIndexPairList astValueTypePairList, in TryInterpretReturnValue result, Allocator allocator
-#if UNITY_EDITOR
-        , bool ShowLog
-#endif
-        )
-        {
-            (_, var reason) = result;
-            const string prefix = "race";
-            switch (reason)
-            {
-                case PendingReason.ASTValueTypePairListCapacityShortage:
-#if UNITY_EDITOR
-                    if (ShowLog)
-                    {
-                        UnityEngine.Debug.Log(prefix + " ast value type pair lengthen\n" + result.ToString());
-                    }
-#endif
-                    ListUtility.Lengthen(ref astValueTypePairList.This.Values, ref astValueTypePairList.This.Capacity, allocator);
-                    break;
-            }
         }
     }
 }

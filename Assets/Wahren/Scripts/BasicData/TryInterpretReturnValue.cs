@@ -56,16 +56,6 @@
 
         public static TryInterpretReturnValue CreateSuccessDetectStructType(in Caret caret, int length, Location location) => new TryInterpretReturnValue(new Span(caret, length), SuccessSentence.Kind.StructKindInterpretSuccess, (int)location);
 
-        public static TryInterpretReturnValue CreatePending(Span span, Location location, PendingReason reason, int subDataIndex = 0) => new TryInterpretReturnValue
-        {
-            Span = span,
-            DataIndex = 0,
-            SubDataIndex = subDataIndex,
-            SubData0 = (long)location,
-            SubData1 = (long)reason,
-            Status = InterpreterStatus.Pending,
-        };
-
         public static TryInterpretReturnValue CreateRightBraceNotFound(Caret current) => new TryInterpretReturnValue(current, ErrorSentence.Kind.ExpectedCharNotFoundError, 2);
         public static TryInterpretReturnValue CreateNotExpectedCharacter(Caret current) => new TryInterpretReturnValue
         {
@@ -78,27 +68,12 @@
             Status = InterpreterStatus.Error,
         };
 
-        public void Deconstruct(out Location location, out PendingReason reason)
-        {
-            location = (Location)SubData0;
-            reason = (PendingReason)SubData1;
-        }
-
         public static implicit operator bool(in TryInterpretReturnValue value) => value.Status == InterpreterStatus.Success;
 
         public override string ToString()
         {
             var buffer = new System.Text.StringBuilder(128);
-            buffer.Append(Span.ToString()).Append(", ").AppendLine(Status.ToString());
-            if (Status == InterpreterStatus.Pending)
-            {
-                var (location, reason) = this;
-                buffer.Append(location).Append(", ").Append(reason).AppendLine().Append(SubDataIndex);
-            }
-            else
-            {
-                buffer.Append(DataIndex).Append(", ").Append(SubDataIndex).AppendLine().Append(SubData0).AppendLine().Append(SubData1);
-            }
+            buffer.Append(Span.ToString()).Append(", ").AppendLine(Status.ToString()).Append(DataIndex).Append(", ").Append(SubDataIndex).AppendLine().Append(SubData0).AppendLine().Append(SubData1);
             return buffer.ToString();
         }
     }

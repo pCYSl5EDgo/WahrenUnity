@@ -93,13 +93,13 @@ namespace pcysl5edgo.Wahren.AST
         private static StringBuilder Append(this StringBuilder buffer, TextFile* files, in RaceTree.ConstiAssignExpression expression)
         => buffer.AppendExtension(files, "consti", expression.ScenarioVariant, expression.Page, expression.Start, expression.Length);
 
-        public static StringBuilder AppendEx(this StringBuilder buffer, in RaceTree tree, TextFile* files, in RaceParserTempData tempData, in ASTTypePageIndexPairList astValueTypePairList)
+        public static StringBuilder AppendEx(this StringBuilder buffer, in RaceTree tree, TextFile* files, in RaceParserTempData tempData)
         {
             using (new ClosingStruct(buffer, files, "race", tree.Name, tree.ParentName))
             {
                 for (int i = tree.Start, end = tree.Start + tree.Length; i < end; i++)
                 {
-                    ref var pair = ref astValueTypePairList.This.Values[i];
+                    ref var pair = ref tree.Page->GetRef(i);
                     buffer.Append("\n  ");
                     switch ((RaceTree.Kind)pair.Type)
                     {
@@ -133,13 +133,13 @@ namespace pcysl5edgo.Wahren.AST
         private static StringBuilder Append(this StringBuilder buffer, TextFile* files, MovetypeTree.ConstiAssignExpression expression)
         => buffer.AppendExtension(files, "consti", expression.ScenarioVariant, (IdentifierNumberPairList*)expression.Page, expression.Start, expression.Length);
 
-        public static StringBuilder AppendEx(this StringBuilder buffer, in MovetypeTree tree, TextFile* files, in MovetypeParserTempData tempData, in ASTTypePageIndexPairList astValueTypePairList)
+        public static StringBuilder AppendEx(this StringBuilder buffer, in MovetypeTree tree, TextFile* files, in MovetypeParserTempData tempData)
         {
             using (new ClosingStruct(buffer, files, "movetype", tree.Name, tree.ParentName))
             {
                 for (int i = tree.Start, end = tree.Start + tree.Length; i < end; i++)
                 {
-                    var pair = astValueTypePairList.This.Values[i];
+                    var pair = tree.Page->GetRef(i);
                     buffer.Append("\n  ");
                     switch ((MovetypeTree.Kind)pair.Type)
                     {

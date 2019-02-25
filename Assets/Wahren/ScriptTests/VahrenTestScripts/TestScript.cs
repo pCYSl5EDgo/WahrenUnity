@@ -95,7 +95,7 @@ public class TestScript
         }
     }
 
-    private static unsafe void AppendMovetype(StringBuilder buffer, ScriptAnalyzeDataManager scriptManager, int i) => buffer.AppendEx(scriptManager.MovetypeParserTempData.Values.GetRef<MovetypeTree>(i), scriptManager.Files, scriptManager.MovetypeParserTempData, scriptManager.ASTValueTypePairList);
+    private static unsafe void AppendMovetype(StringBuilder buffer, ScriptAnalyzeDataManager scriptManager, int i) => buffer.AppendEx(scriptManager.MovetypeParserTempData.Values.GetRef<MovetypeTree>(i), scriptManager.Files, scriptManager.MovetypeParserTempData);
 
-    private static unsafe void AppendRace(StringBuilder buffer, ScriptAnalyzeDataManager scriptManager, int i) => buffer.AppendEx(scriptManager.RaceParserTempData.Values.GetRef<RaceTree>(i), scriptManager.Files, scriptManager.RaceParserTempData, scriptManager.ASTValueTypePairList);
+    private static unsafe void AppendRace(StringBuilder buffer, ScriptAnalyzeDataManager scriptManager, int i) => buffer.AppendEx(scriptManager.RaceParserTempData.Values.GetRef<RaceTree>(i), scriptManager.Files, scriptManager.RaceParserTempData);
 }

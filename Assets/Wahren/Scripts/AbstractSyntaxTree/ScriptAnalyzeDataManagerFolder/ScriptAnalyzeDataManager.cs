@@ -99,32 +99,8 @@ namespace pcysl5edgo.Wahren.AST
 
         private void ReSchedule(ref ParseJob job, Allocator allocator)
         {
-            ref var result = ref job.CommonPtr->Result;
-            var (location, reason) = result;
-            if (reason != PendingReason.Other)
-            {
-                switch (location)
-                {
-                    case Location.Race:
-                        RaceParserTempData.Lengthen(ref ASTValueTypePairList, result, allocator
-#if UNITY_EDITOR
-                        , ShowLog
-#endif
-                        );
-                        break;
-                    case Location.Movetype:
-                        MovetypeParserTempData.Lengthen(ref ASTValueTypePairList, result, allocator
-#if UNITY_EDITOR
-                        , ShowLog
-#endif
-                        );
-                        break;
-                    default:
-                        throw new System.NotImplementedException(this.FullPaths[result.Span.File] + "  " + location.ToString() + " : " + reason.ToString() + " " + result.Span.ToString());
-                }
-            }
             *Status = InterpreterStatus.None;
-            result = new TryInterpretReturnValue(job.CommonPtr->LastNameSpan, 0, InterpreterStatus.None);
+            job.CommonPtr->Result = new TryInterpretReturnValue(job.CommonPtr->LastNameSpan, 0, InterpreterStatus.None);
             handles.Add(job.Schedule());
         }
 

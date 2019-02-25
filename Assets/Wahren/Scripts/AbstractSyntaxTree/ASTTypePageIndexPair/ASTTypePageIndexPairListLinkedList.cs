@@ -16,6 +16,18 @@ namespace pcysl5edgo.Wahren.AST
             public volatile int NodeCapacity;
         }
 
+        public ref ASTTypePageIndexPair GetRef(int index)
+        {
+            if(index < 0) throw new System.ArgumentOutOfRangeException();
+            for (var node = This.First; node != null; node = node->Next)
+            {
+                int length = node->This.Length;
+                if (index < length)
+                    return ref node->This.Values[index];
+                index -= length;
+            }
+            throw new System.ArgumentOutOfRangeException();
+        }
 
         public ASTTypePageIndexPairListLinkedList(int capacity, Allocator allocator)
         {

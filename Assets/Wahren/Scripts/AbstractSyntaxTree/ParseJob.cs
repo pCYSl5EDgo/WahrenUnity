@@ -98,11 +98,6 @@ namespace pcysl5edgo.Wahren.AST
                             SaveSuccess(ref currentCaret);
                             continue;
                         }
-                        if (CommonPtr->Result.IsPending)
-                        {
-                            *CancellationTokenPtr = InterpreterStatus.Pending;
-                            var (location, _) = CommonPtr->Result;
-                        }
                         return;
                     default:
                         return;
