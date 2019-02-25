@@ -56,10 +56,6 @@ namespace pcysl5edgo.Wahren.AST
 #endif
                     ListUtility.Lengthen(ref astValueTypePairList.This.Values, ref astValueTypePairList.This.Capacity, allocator);
                     break;
-                case PendingReason.IdentifierNumberPairListCapacityShortage:
-                    throw new System.Exception();
-                case PendingReason.SectionListCapacityShortage:
-                    throw new System.Exception();
                 case PendingReason.TreeListCapacityShortage:
                     throw new System.Exception();
             }

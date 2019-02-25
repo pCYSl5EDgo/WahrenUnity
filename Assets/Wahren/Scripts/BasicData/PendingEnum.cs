@@ -29,9 +29,7 @@
         None,
         Other,
         ASTValueTypePairListCapacityShortage,
-        IdentifierNumberPairListCapacityShortage,
         SentenceListCapacityShortage,
         TreeListCapacityShortage,
-        SectionListCapacityShortage,
     }
 }
