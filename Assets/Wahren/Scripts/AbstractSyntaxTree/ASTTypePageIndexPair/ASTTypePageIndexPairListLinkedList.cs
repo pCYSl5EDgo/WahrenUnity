@@ -4,7 +4,7 @@ using Unity.Collections;
 namespace pcysl5edgo.Wahren.AST
 {
     [StructLayout(LayoutKind.Explicit)]
-    public unsafe struct ASTTypePageIndexPiarListLinkedList : ILinkedList<ASTTypePageIndexPair, ASTTypePageIndexPairList>
+    public unsafe struct ASTTypePageIndexPairListLinkedList : ILinkedList<ASTTypePageIndexPair, ASTTypePageIndexPairList>
     {
         [FieldOffset(0)]
         public ListLinkedList List;
@@ -17,7 +17,7 @@ namespace pcysl5edgo.Wahren.AST
         }
 
 
-        public ASTTypePageIndexPiarListLinkedList(int capacity, Allocator allocator)
+        public ASTTypePageIndexPairListLinkedList(int capacity, Allocator allocator)
         {
             this = default;
             List = new ListLinkedList(capacity, sizeof(ASTTypePageIndexPair), allocator);
