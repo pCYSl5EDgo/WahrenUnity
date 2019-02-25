@@ -157,7 +157,8 @@ public unsafe class UnitTest
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
-            var (type, page, value) = _.script.ASTValueTypePairList[tree.Start];
+            ref var ast = ref _.script.ASTValueTypePairList[tree.Start];
+            var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((MovetypeTree.Kind)type, MovetypeTree.Kind.name);
             AreEqual(_.script.MovetypeParserTempData.Names.Length, 1);
@@ -208,19 +209,18 @@ public unsafe class UnitTest
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
-            var (type, page, value) = _.script.ASTValueTypePairList[tree.Start];
+            ref var ast = ref _.script.ASTValueTypePairList[tree.Start];
+            var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((RaceTree.Kind)type, RaceTree.Kind.consti);
-            AreEqual(_.script.RaceParserTempData.ConstiLength, 1);
-            var expression = _.script.RaceParserTempData.Constis[value];
+            AreEqual(_.script.RaceParserTempData.Constis2.Length, 1);
+            var expression = ast.GetRef<RaceTree.ConstiAssignExpression>();
             AreEqual(expression.ScenarioVariant.Length, 0);
             AreEqual(expression.Start, 0);
             AreEqual(expression.Length, strs.Length);
-            var pairs = _.script.RaceParserTempData.IdentifierNumberPairs;
-            AreEqual(pairs.This.Length, strs.Length);
             for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
             {
-                var p = pairs.This.Values[i];
+                var p = expression.Page->GetRef(i);
                 var (s, n) = strs[i - expression.Start];
                 AreEqual(buffer.Clear().AppendPrimitive(_.file, p.Span).ToString(), s);
                 AreEqual(p.Number, n);
@@ -249,19 +249,18 @@ public unsafe class UnitTest
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
-            var (type, page, value) = _.script.ASTValueTypePairList[tree.Start];
+            ref var ast = ref _.script.ASTValueTypePairList[tree.Start];
+            var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((RaceTree.Kind)type, RaceTree.Kind.consti);
-            AreEqual(_.script.RaceParserTempData.ConstiLength, 1);
-            var expression = _.script.RaceParserTempData.Constis[value];
+            AreEqual(_.script.RaceParserTempData.Constis2.Length, 1);
+            var expression = ast.GetRef<RaceTree.ConstiAssignExpression>();
             AreEqual(expression.ScenarioVariant.Length, 0);
             AreEqual(expression.Start, 0);
             AreEqual(expression.Length, 1);
-            var pairs = _.script.RaceParserTempData.IdentifierNumberPairs;
-            AreEqual(pairs.This.Length, 1);
             for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
             {
-                var p = pairs.This.Values[i];
+                var p = expression.Page->GetRef(i);
                 var (s, n) = strs[i - expression.Start];
                 AreEqual(buffer.Clear().AppendPrimitive(_.file, p.Span).ToString(), s);
                 AreEqual(p.Number, n);
@@ -282,11 +281,12 @@ public unsafe class UnitTest
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
-            var (type, page, value) = _.script.ASTValueTypePairList[tree.Start];
+            ref var ast = ref _.script.ASTValueTypePairList[tree.Start];
+            var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((RaceTree.Kind)type, RaceTree.Kind.consti);
-            AreEqual(_.script.RaceParserTempData.ConstiLength, 1);
-            var expression = _.script.RaceParserTempData.Constis[value];
+            AreEqual(_.script.RaceParserTempData.Constis2.Length, 1);
+            var expression = ast.GetRef<RaceTree.ConstiAssignExpression>();
             AreEqual(expression.ScenarioVariant.Length, 0);
             AreEqual(expression.Start, 0);
             AreEqual(expression.Length, 0);
@@ -314,19 +314,18 @@ public unsafe class UnitTest
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
-            var (type, page, value) = _.script.ASTValueTypePairList[tree.Start];
+            ref var ast = ref _.script.ASTValueTypePairList[tree.Start];
+            var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((RaceTree.Kind)type, RaceTree.Kind.consti);
-            AreEqual(_.script.RaceParserTempData.ConstiLength, 1);
-            var expression = _.script.RaceParserTempData.Constis[value];
+            AreEqual(_.script.RaceParserTempData.Constis2.Length, 1);
+            var expression = ast.GetRef<RaceTree.ConstiAssignExpression>();
             AreEqual(expression.ScenarioVariant.Length, 0);
             AreEqual(expression.Start, 0);
             AreEqual(expression.Length, strs.Length);
-            var pairs = _.script.RaceParserTempData.IdentifierNumberPairs;
-            AreEqual(pairs.This.Length, strs.Length);
             for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
             {
-                var p = pairs.This.Values[i];
+                var p = expression.Page->GetRef(i);
                 var (s, n) = strs[i - expression.Start];
                 AreEqual(buffer.Clear().AppendPrimitive(_.file, p.Span).ToString(), s);
                 AreEqual(p.Number, n);
@@ -355,19 +354,18 @@ public unsafe class UnitTest
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
-            var (type, page, value) = _.script.ASTValueTypePairList[tree.Start];
+            ref var ast = ref _.script.ASTValueTypePairList[tree.Start];
+            var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((RaceTree.Kind)type, RaceTree.Kind.consti);
-            AreEqual(_.script.RaceParserTempData.ConstiLength, 1);
-            var expression = _.script.RaceParserTempData.Constis[value];
+            AreEqual(_.script.RaceParserTempData.Constis2.Length, 1);
+            var expression = ast.GetRef<RaceTree.ConstiAssignExpression>();
             AreEqual(expression.ScenarioVariant.Length, 0);
             AreEqual(expression.Start, 0);
             AreEqual(expression.Length, 1);
-            var pairs = _.script.RaceParserTempData.IdentifierNumberPairs;
-            AreEqual(pairs.This.Length, 1);
             for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
             {
-                var p = pairs.This.Values[i];
+                var p = expression.Page->GetRef(i);
                 var (s, n) = strs[i - expression.Start];
                 AreEqual(buffer.Clear().AppendPrimitive(_.file, p.Span).ToString(), s);
                 AreEqual(p.Number, n);
@@ -391,11 +389,12 @@ public unsafe class UnitTest
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
-            var (type, page, value) = _.script.ASTValueTypePairList[tree.Start];
+            ref var ast = ref _.script.ASTValueTypePairList[tree.Start];
+            var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((RaceTree.Kind)type, RaceTree.Kind.consti);
-            AreEqual(_.script.RaceParserTempData.ConstiLength, 1);
-            var expression = _.script.RaceParserTempData.Constis[value];
+            AreEqual(_.script.RaceParserTempData.Constis2.Length, 1);
+            var expression = ast.GetRef<RaceTree.ConstiAssignExpression>();
             AreEqual(expression.ScenarioVariant.Length, 0);
             AreEqual(expression.Start, 0);
             AreEqual(expression.Length, 0);
@@ -435,7 +434,8 @@ public unsafe class UnitTest
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
-            var (type, page, value) = _.script.ASTValueTypePairList[tree.Start];
+            var ast = _.script.ASTValueTypePairList[tree.Start];
+            var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((RaceTree.Kind)type, RaceTree.Kind.movetype);
             AreEqual(_.script.RaceParserTempData.MovetypeLength, 1);
@@ -458,7 +458,8 @@ public unsafe class UnitTest
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
-            var (type, page, value) = _.script.ASTValueTypePairList[tree.Start];
+            ref var ast = ref _.script.ASTValueTypePairList[tree.Start];
+            var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((RaceTree.Kind)type, RaceTree.Kind.movetype);
             AreEqual(_.script.RaceParserTempData.MovetypeLength, 1);
@@ -482,7 +483,8 @@ public unsafe class UnitTest
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
-            var (type, page, value) = _.script.ASTValueTypePairList[tree.Start];
+            ref var ast = ref _.script.ASTValueTypePairList[tree.Start];
+            var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((RaceTree.Kind)type, RaceTree.Kind.brave);
             AreEqual(_.script.RaceParserTempData.BraveLength, 1);
@@ -582,7 +584,8 @@ public unsafe class UnitTest
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
-            var (type, page, value) = _.script.ASTValueTypePairList[tree.Start];
+            ref var ast = ref _.script.ASTValueTypePairList[tree.Start];
+            var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((RaceTree.Kind)type, RaceTree.Kind.align);
             AreEqual(_.script.RaceParserTempData.AlignLength, 1);
@@ -606,7 +609,8 @@ public unsafe class UnitTest
             AreEqual(tree.Length, 1);
             AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
             AreEqual(tree.ParentName.Length, 0);
-            var (type, page, value) = _.script.ASTValueTypePairList[tree.Start];
+            ref var ast = ref _.script.ASTValueTypePairList[tree.Start];
+            var (type, page, value) = ast;
             AreEqual(value, 0);
             AreEqual((RaceTree.Kind)type, RaceTree.Kind.name);
             AreEqual(_.script.RaceParserTempData.NameLength, 1);

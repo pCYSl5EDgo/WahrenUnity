@@ -9,35 +9,33 @@ namespace pcysl5edgo.Wahren.AST
         public int NameLength;
         public int AlignLength;
         public int BraveLength;
-        public int ConstiLength;
         public int MovetypeLength;
         public int Capacity;
         public int NameCapacity;
         public int AlignCapacity;
         public int BraveCapacity;
-        public int ConstiCapacity;
         public int MovetypeCapacity;
         public RaceTree* Values;
         public RaceTree.NameAssignExpression* Names;
         public RaceTree.AlignAssignExpression* Aligns;
         public RaceTree.BraveAssignExpression* Braves;
-        public RaceTree.ConstiAssignExpression* Constis;
         public RaceTree.MovetypeAssignExpression* Movetypes;
-        public IdentifierNumberPairList IdentifierNumberPairs;
+        public ListLinkedList Constis2;
+        public IdentifierNumberPairListLinkedList IdentifierNumberPairs2;
 
         public RaceParserTempData(int capacity, Allocator allocator)
         {
-            Length = NameLength = AlignLength = BraveLength = ConstiLength = MovetypeLength = 0;
-            Capacity = NameCapacity = AlignCapacity = BraveCapacity = ConstiCapacity = MovetypeCapacity = capacity;
-            IdentifierNumberPairs = new IdentifierNumberPairList(capacity, allocator);
+            Length = NameLength = AlignLength = BraveLength = MovetypeLength = 0;
+            Capacity = NameCapacity = AlignCapacity = BraveCapacity = MovetypeCapacity = capacity;
+            IdentifierNumberPairs2 = new IdentifierNumberPairListLinkedList(capacity, allocator);
             if (capacity != 0)
             {
                 Values = (RaceTree*)UnsafeUtility.Malloc(sizeof(RaceTree) * capacity, 4, allocator);
                 Names = (RaceTree.NameAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.NameAssignExpression) * capacity, 4, allocator);
                 Aligns = (RaceTree.AlignAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.AlignAssignExpression) * capacity, 4, allocator);
                 Braves = (RaceTree.BraveAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.BraveAssignExpression) * capacity, 4, allocator);
-                Constis = (RaceTree.ConstiAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.ConstiAssignExpression) * capacity, 4, allocator);
                 Movetypes = (RaceTree.MovetypeAssignExpression*)UnsafeUtility.Malloc(sizeof(RaceTree.MovetypeAssignExpression) * capacity, 4, allocator);
+                Constis2 = new ListLinkedList(capacity, sizeof(RaceTree.ConstiAssignExpression), allocator);
             }
             else
             {
@@ -45,8 +43,8 @@ namespace pcysl5edgo.Wahren.AST
                 Names = null;
                 Aligns = null;
                 Braves = null;
-                Constis = null;
                 Movetypes = null;
+                Constis2 = default;
             }
         }
 
@@ -60,11 +58,10 @@ namespace pcysl5edgo.Wahren.AST
                 UnsafeUtility.Free(Braves, allocator);
             if (MovetypeCapacity != 0)
                 UnsafeUtility.Free(Movetypes, allocator);
-            if (ConstiCapacity != 0)
-                UnsafeUtility.Free(Constis, allocator);
             if (Capacity != 0)
                 UnsafeUtility.Free(Values, allocator);
-            IdentifierNumberPairs.Dispose(allocator);
+            IdentifierNumberPairs2.Dispose(allocator);
+            Constis2.Dispose(allocator);
             this = default;
         }
 
@@ -74,7 +71,6 @@ namespace pcysl5edgo.Wahren.AST
 #endif
         )
         {
-            ref var identifierNumberPairs = ref IdentifierNumberPairs;
             (_, var reason) = result;
             const string prefix = "race";
             switch (reason)
@@ -89,14 +85,7 @@ namespace pcysl5edgo.Wahren.AST
                     ListUtility.Lengthen(ref astValueTypePairList.This.Values, ref astValueTypePairList.This.Capacity, allocator);
                     break;
                 case PendingReason.IdentifierNumberPairListCapacityShortage:
-#if UNITY_EDITOR
-                    if (ShowLog)
-                    {
-                        UnityEngine.Debug.Log(prefix + " identifier number pair lengthen\n" + result.ToString() + "\nCapacity: " + identifierNumberPairs.This.Capacity + " , Length: " + identifierNumberPairs.This.Length);
-                    }
-#endif
-                    identifierNumberPairs.Lengthen(allocator);
-                    break;
+                    throw new System.Exception();
                 case PendingReason.SectionListCapacityShortage:
                     switch ((RaceTree.Kind)result.SubDataIndex)
                     {
@@ -128,14 +117,7 @@ namespace pcysl5edgo.Wahren.AST
                             ListUtility.Lengthen(ref Braves, ref BraveCapacity, allocator);
                             break;
                         case RaceTree.Kind.consti: //consti
-#if UNITY_EDITOR
-                            if (ShowLog)
-                            {
-                                UnityEngine.Debug.Log(prefix + " consti lengthen\n" + result.ToString());
-                            }
-#endif
-                            ListUtility.Lengthen(ref Constis, ref ConstiCapacity, allocator);
-                            break;
+                            throw new System.Exception();
                         case RaceTree.Kind.movetype: // movetype
 #if UNITY_EDITOR
                             if (ShowLog)

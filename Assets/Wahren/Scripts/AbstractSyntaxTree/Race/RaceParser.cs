@@ -109,32 +109,26 @@ namespace pcysl5edgo.Wahren.AST
             var cs = stackalloc ushort[] { 'o', 'n', 's', 't', 'i' };
             if (!file.TryInitializeDetect(cs, 5, ref current, out var answer, out expression.ScenarioVariant))
                 goto RETURN;
-            answer = file.TryReadIdentifierNumberPairs(Location.Race, ref tempData.IdentifierNumberPairs, current, out expression.Start, out expression.Length);
+            answer = file.TryReadIdentifierNumberPairs(Location.Race, ref tempData.IdentifierNumberPairs2, current, out expression.Page, out expression.Start, out expression.Length, proc.allocator);
             if (!answer)
                 goto RETURN;
             current = answer.Span.CaretNextToEndOfThisSpan;
             file.SkipWhiteSpace(ref current);
-            answer = VerifyConsti(expression, tempData.IdentifierNumberPairs, answer.Span);
+            answer = VerifyConsti(expression, answer.Span);
             if (answer.IsError)
                 goto RETURN;
             var ast = RaceTree.Kind.consti.CreateASTPair();
-            if (ast.TryAddAST(tempData.Constis, expression, tempData.ConstiCapacity, ref tempData.ConstiLength))
-            {
-                proc.Add(ast);
-            }
-            else
-            {
-                answer = RaceTree.Kind.consti.CreatePending(answer.Span);
-            }
+            tempData.Constis2.Add(ref expression, out ast.Page, out ast.Index, proc.allocator);
+            proc.Add(ast);
         RETURN:
             return answer;
         }
 
-        internal static TryInterpretReturnValue VerifyConsti(RaceTree.ConstiAssignExpression expression, in IdentifierNumberPairList list, Span span)
+        internal static TryInterpretReturnValue VerifyConsti(RaceTree.ConstiAssignExpression expression, Span span)
         {
-            for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
+            for (int i = 0; i < expression.Length; i++)
             {
-                ref IdentifierNumberPair val = ref list.This.Values[i];
+                ref var val = ref expression.Page->GetRef(expression.Start + i);
                 if (val.Span.Length == 0 || val.Number < 0 || val.Number > 10)
                     return new TryInterpretReturnValue(val.NumberSpan, ErrorSentence.Kind.OutOfRangeError);
             }

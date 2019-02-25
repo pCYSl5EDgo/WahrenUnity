@@ -90,8 +90,8 @@ namespace pcysl5edgo.Wahren.AST
         private static StringBuilder Append(this StringBuilder buffer, TextFile* files, in RaceTree.NameAssignExpression expression)
         => buffer.AppendExtension(files, "name", expression.ScenarioVariant, expression.Value);
 
-        private static StringBuilder Append(this StringBuilder buffer, TextFile* files, in RaceTree.ConstiAssignExpression expression, in IdentifierNumberPairList list)
-        => buffer.AppendExtension(files, "consti", expression.ScenarioVariant, list, expression.Start, expression.Length);
+        private static StringBuilder Append(this StringBuilder buffer, TextFile* files, in RaceTree.ConstiAssignExpression expression)
+        => buffer.AppendExtension(files, "consti", expression.ScenarioVariant, expression.Page, expression.Start, expression.Length);
 
         public static StringBuilder AppendEx(this StringBuilder buffer, in RaceTree tree, TextFile* files, in RaceParserTempData tempData, in ASTTypePageIndexPairList astValueTypePairList)
         {
@@ -99,7 +99,7 @@ namespace pcysl5edgo.Wahren.AST
             {
                 for (int i = tree.Start, end = tree.Start + tree.Length; i < end; i++)
                 {
-                    var pair = astValueTypePairList.This.Values[i];
+                    ref var pair = ref astValueTypePairList.This.Values[i];
                     buffer.Append("\n  ");
                     switch ((RaceTree.Kind)pair.Type)
                     {
@@ -113,7 +113,7 @@ namespace pcysl5edgo.Wahren.AST
                             buffer.Append(files, tempData.Braves[pair.Index]);
                             break;
                         case RaceTree.Kind.consti:
-                            buffer.Append(files, tempData.Constis[pair.Index], tempData.IdentifierNumberPairs);
+                            buffer.Append(files, pair.GetRef<RaceTree.ConstiAssignExpression>());
                             break;
                         case RaceTree.Kind.movetype:
                             buffer.Append(files, tempData.Movetypes[pair.Index]);
