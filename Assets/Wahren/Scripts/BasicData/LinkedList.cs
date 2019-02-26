@@ -15,8 +15,8 @@ namespace pcysl5edgo.Wahren.AST
 
     public unsafe struct ListLinkedList
     {
-        public volatile ListLinkedListNode* First;
-        public volatile int NodeCapacity;
+        public ListLinkedListNode* First;
+        public int NodeCapacity;
 
         public int Length
         {
@@ -111,6 +111,13 @@ namespace pcysl5edgo.Wahren.AST
             {
                 tryNode = tryNode->Next;
             }
+        }
+        public void AddRange<TValue, TNode>(TValue* values, int length, out TNode* page, out int start, Allocator allocator)
+            where TValue : unmanaged
+            where TNode : unmanaged
+        {
+            AddRange(values, length, out var _page, out start, allocator);
+            page = (TNode*)_page;
         }
     }
 }
