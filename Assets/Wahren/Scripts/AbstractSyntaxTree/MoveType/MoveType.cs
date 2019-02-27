@@ -31,7 +31,7 @@
         public unsafe struct ConstiAssignExpression // 2
         {
             public Span ScenarioVariant;
-            public ListLinkedListNode* Page;
+            public IdentifierNumberPairList* Page;
             public int Start;
             public int Length;
         }

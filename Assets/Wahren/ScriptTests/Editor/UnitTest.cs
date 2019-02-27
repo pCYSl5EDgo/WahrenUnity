@@ -62,7 +62,7 @@ public unsafe class UnitTest
             AreEqual(expression.Length, itemLength);
             for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
             {
-                var p = expression.Page->GetRef<IdentifierNumberPair>(i);
+                var p = expression.Page->GetRef(i);
                 var (s, n) = strs[i - expression.Start];
                 AreEqual(buffer.Clear().AppendPrimitive(_.file, p.Span).ToString(), s);
                 AreEqual(p.Number, n);

@@ -100,7 +100,7 @@
         {
             for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
             {
-                ref var val = ref expression.Page->GetRef<IdentifierNumberPair>(i);
+                ref var val = ref expression.Page->GetRef(i);
                 if (val.Span.Length == 0 || val.Number < 0 || val.Number > 10)
                     return new TryInterpretReturnValue(val.NumberSpan, ErrorSentence.Kind.OutOfRangeError);
             }

@@ -12,12 +12,6 @@ namespace pcysl5edgo.Wahren.AST
     {
         public static Span ReadLine(this ref TextFile file, Caret current) => new Span(current, file.CurrentLineLength(current) - current.Column);
 
-        public static TryInterpretReturnValue TryReadIdentifierNumberPairs(this ref TextFile file, Location location, ref IdentifierNumberPairListLinkedList pairList, Caret current, out ListLinkedListNode* page, out int start, out int length, Allocator allocator, long defaultValue = 0)
-        {
-            var answer = TryReadIdentifierNumberPairs(ref file, location, ref pairList, current, out IdentifierNumberPairList* _page, out start, out length, allocator, defaultValue);
-            page = (ListLinkedListNode*)_page;
-            return answer;
-        }
         public static TryInterpretReturnValue TryReadIdentifierNumberPairs(this ref TextFile file, Location location, ref IdentifierNumberPairListLinkedList pairList, Caret current, out IdentifierNumberPairList* page, out int start, out int length, Allocator allocator, long defaultValue = 0)
         {
             file.SkipWhiteSpace(ref current);
