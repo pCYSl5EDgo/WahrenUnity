@@ -1,44 +1,43 @@
 ﻿using System;
 using System.Threading;
+using System.Runtime.InteropServices;
 using Unity.Collections;
 
 using static Unity.Collections.LowLevel.Unsafe.UnsafeUtility;
 
 namespace pcysl5edgo.Wahren.AST
 {
-    public unsafe struct NativeString
+    [StructLayout(LayoutKind.Explicit)]
+    public unsafe struct NativeStringList : ILinkedListNode<NativeString, NativeStringList>
     {
-        public long Start;
-        public long Length;
-        public int File;
-        public int LineStartInclusive;
-        public int ColumnStartInclusive;
-        public int LineEndInclusive;
-        public int ColumnEndExclusive;
-    }
-    public unsafe struct NativeStringList
-    {
-        public long Capacity;
-        public long Length;
-        public ushort* Values;
+        [FieldOffset(0)]
+        public ListLinkedListNode Node;
+        [FieldOffset(0)]
+        public _ This;
 
-        public NativeStringList(long capacity)
-        {
-            Length = 0;
-            Capacity = capacity;
-            if (Capacity == 0)
-                Values = null;
-            else
-                Values = (ushort*)Malloc(sizeof(ushort) * capacity, 2, Allocator.Persistent);
-        }
+        public NativeStringList* Next { get => This.Next; set => This.Next = value; }
 
-        public void Dispose()
+        public bool IsFull => This.Length == This.Capacity;
+
+        public NativeStringList(int capacity, Allocator allocator)
         {
-            if (Capacity != 0)
-            {
-                Free(Values, Allocator.Persistent);
-            }
             this = default;
+            Node = new ListLinkedListNode(capacity, sizeof(NativeString), allocator);
+        }
+        public void Dispose(Allocator allocator) => Node.Dispose(allocator);
+
+        public NativeString* GetPointer(int index) => Node.GetPointer<NativeString>(index);
+
+        public ref NativeString GetRef(int index) => ref Node.GetRef<NativeString>(index);
+
+        public bool TryAdd(NativeString* values, int length, out int start) => Node.TryAdd(values, length, out start);
+
+        public struct _
+        {
+            public NativeStringList* Next;
+            public NativeString* Values;
+            public int Capacity;
+            public int Length;
         }
     }
 }

@@ -1,18 +1,19 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System;
+using System.Threading;
+using Unity.Collections;
 
-public class NativeString : MonoBehaviour
+using static Unity.Collections.LowLevel.Unsafe.UnsafeUtility;
+
+namespace pcysl5edgo.Wahren.AST
 {
-    // Start is called before the first frame update
-    void Start()
+    public unsafe struct NativeString
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        public ushort* Values;
+        public int Length;
+        public int File;
+        public int LineStartInclusive;
+        public int ColumnStartInclusive;
+        public int LineEndInclusive;
+        public int ColumnEndExclusive;
     }
 }

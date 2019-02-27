@@ -82,6 +82,13 @@ namespace pcysl5edgo.Wahren.AST
                 tryNode = tryNode->Next;
             }
         }
+        public void Add<TValue, TNode>(ref TValue value, out TNode* page, out int index, Allocator allocator)
+            where TValue : unmanaged
+            where TNode : unmanaged, ILinkedListNode<TValue, TNode>
+        {
+            Add(ref value, out var _page, out index, allocator);
+            page = (TNode*)_page;
+        }
         public void AddRange<T>(T* values, int length, out ListLinkedListNode* page, out int start, Allocator allocator) where T : unmanaged
         {
             var tryNode = First;
