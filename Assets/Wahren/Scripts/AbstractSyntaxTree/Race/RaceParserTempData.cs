@@ -11,14 +11,14 @@ namespace pcysl5edgo.Wahren.AST
         public ListLinkedList Braves;
         public ListLinkedList Movetypes;
         public ListLinkedList Constis;
-        public IdentifierNumberPairListLinkedList IdentifierNumberPairs2;
+        public IdentifierNumberPairListLinkedList IdentifierNumberPairs;
 
         public RaceParserTempData(int capacity, Allocator allocator)
         {
             this = default;
-            IdentifierNumberPairs2 = new IdentifierNumberPairListLinkedList(capacity, allocator);
             if (capacity != 0)
             {
+                IdentifierNumberPairs = new IdentifierNumberPairListLinkedList(capacity, allocator);
                 Values = new ListLinkedList(capacity, sizeof(RaceTree), allocator);
                 Names = new ListLinkedList(capacity, sizeof(RaceTree.NameAssignExpression), allocator);
                 Aligns = new ListLinkedList(capacity, sizeof(RaceTree.AlignAssignExpression), allocator);
@@ -31,7 +31,7 @@ namespace pcysl5edgo.Wahren.AST
         public void Dispose(Allocator allocator)
         {
             Values.Dispose(allocator);
-            IdentifierNumberPairs2.Dispose(allocator);
+            IdentifierNumberPairs.Dispose(allocator);
             Names.Dispose(allocator);
             Aligns.Dispose(allocator);
             Braves.Dispose(allocator);
