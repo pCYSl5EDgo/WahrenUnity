@@ -29,6 +29,8 @@ namespace pcysl5edgo.Wahren.AST
 
         public bool TryAdd(Span* values, int length, out int start) => Node.TryAdd(values, length, out start);
 
+        public void Lengthen(Allocator allocator) => ListUtility.Lengthen(ref This.Values, ref This.Capacity, allocator);
+
         public struct _
         {
             public IdentifierList* Next;

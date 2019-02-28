@@ -1,7 +1,5 @@
 ﻿using Unity.Collections;
 
-using static Unity.Collections.LowLevel.Unsafe.UnsafeUtility;
-
 namespace pcysl5edgo.Wahren.AST
 {
     internal unsafe ref struct InitialProc_USING_STRUCT

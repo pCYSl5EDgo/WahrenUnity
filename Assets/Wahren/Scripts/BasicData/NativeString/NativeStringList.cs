@@ -3,8 +3,6 @@ using System.Threading;
 using System.Runtime.InteropServices;
 using Unity.Collections;
 
-using static Unity.Collections.LowLevel.Unsafe.UnsafeUtility;
-
 namespace pcysl5edgo.Wahren.AST
 {
     [StructLayout(LayoutKind.Explicit)]

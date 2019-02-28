@@ -2,8 +2,6 @@
 using System.Threading;
 using Unity.Collections;
 
-using static Unity.Collections.LowLevel.Unsafe.UnsafeUtility;
-
 namespace pcysl5edgo.Wahren.AST
 {
     public unsafe struct NativeString

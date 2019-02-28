@@ -18,81 +18,81 @@ namespace pcysl5edgo.Wahren.AST
                 switch (currentLine[column])
                 {
                     #region Alphabet
-                    case (ushort)'a':
-                    case (ushort)'b':
-                    case (ushort)'c':
-                    case (ushort)'d':
-                    case (ushort)'e':
-                    case (ushort)'f':
-                    case (ushort)'g':
-                    case (ushort)'h':
-                    case (ushort)'i':
-                    case (ushort)'j':
-                    case (ushort)'k':
-                    case (ushort)'l':
-                    case (ushort)'m':
-                    case (ushort)'n':
-                    case (ushort)'o':
-                    case (ushort)'p':
-                    case (ushort)'q':
-                    case (ushort)'r':
-                    case (ushort)'s':
-                    case (ushort)'t':
-                    case (ushort)'u':
-                    case (ushort)'v':
-                    case (ushort)'w':
-                    case (ushort)'x':
-                    case (ushort)'y':
-                    case (ushort)'z':
-                    case (ushort)'A':
-                    case (ushort)'B':
-                    case (ushort)'C':
-                    case (ushort)'D':
-                    case (ushort)'E':
-                    case (ushort)'F':
-                    case (ushort)'G':
-                    case (ushort)'H':
-                    case (ushort)'I':
-                    case (ushort)'J':
-                    case (ushort)'K':
-                    case (ushort)'L':
-                    case (ushort)'M':
-                    case (ushort)'N':
-                    case (ushort)'O':
-                    case (ushort)'P':
-                    case (ushort)'Q':
-                    case (ushort)'R':
-                    case (ushort)'S':
-                    case (ushort)'T':
-                    case (ushort)'U':
-                    case (ushort)'V':
-                    case (ushort)'W':
-                    case (ushort)'X':
-                    case (ushort)'Y':
-                    case (ushort)'Z':
+                    case 'a':
+                    case 'b':
+                    case 'c':
+                    case 'd':
+                    case 'e':
+                    case 'f':
+                    case 'g':
+                    case 'h':
+                    case 'i':
+                    case 'j':
+                    case 'k':
+                    case 'l':
+                    case 'm':
+                    case 'n':
+                    case 'o':
+                    case 'p':
+                    case 'q':
+                    case 'r':
+                    case 's':
+                    case 't':
+                    case 'u':
+                    case 'v':
+                    case 'w':
+                    case 'x':
+                    case 'y':
+                    case 'z':
+                    case 'A':
+                    case 'B':
+                    case 'C':
+                    case 'D':
+                    case 'E':
+                    case 'F':
+                    case 'G':
+                    case 'H':
+                    case 'I':
+                    case 'J':
+                    case 'K':
+                    case 'L':
+                    case 'M':
+                    case 'N':
+                    case 'O':
+                    case 'P':
+                    case 'Q':
+                    case 'R':
+                    case 'S':
+                    case 'T':
+                    case 'U':
+                    case 'V':
+                    case 'W':
+                    case 'X':
+                    case 'Y':
+                    case 'Z':
                     #endregion
-                    case (ushort)'_':
+                    case '_':
                         onlyDigit = false;
                         ++length;
                         break;
                     #region Digit
-                    case (ushort)'0':
-                    case (ushort)'1':
-                    case (ushort)'2':
-                    case (ushort)'3':
-                    case (ushort)'4':
-                    case (ushort)'5':
-                    case (ushort)'6':
-                    case (ushort)'7':
-                    case (ushort)'8':
-                    case (ushort)'9':
+                    case '0':
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                    case '8':
+                    case '9':
                         #endregion
                         ++length;
                         break;
-                    case (ushort)':':
-                    case (ushort)' ':
-                    case (ushort)'\t':
-                    case (ushort)'{':
+                    case ':':
+                    case ' ':
+                    case '\t':
+                    case '{':
                         goto RETURN;
                     default:
                         answer.DataIndex = (int)ErrorSentence.Kind.InvalidIdentifierError;
@@ -124,11 +124,11 @@ namespace pcysl5edgo.Wahren.AST
             ref var column = ref start.Column;
             switch ((file.Contents + file.LineStarts[start.Line])[column])
             {
-                case (ushort)':':
+                case ':':
                     column++;
                     file.SkipWhiteSpace(ref start);
                     return GetParentStructNameInternal(file.Contents + file.LineStarts[start.Line], file.LineLengths[start.Line] - start.Column, start);
-                case (ushort)'{':
+                case '{':
                     return new TryInterpretReturnValue(start, 0, InterpreterStatus.Success); ;
                 default:
                     return new TryInterpretReturnValue(start, ErrorSentence.Kind.NotExpectedCharacterError);
@@ -148,80 +148,80 @@ namespace pcysl5edgo.Wahren.AST
                 switch (start[i])
                 {
                     #region Alphabet
-                    case (ushort)'a':
-                    case (ushort)'b':
-                    case (ushort)'c':
-                    case (ushort)'d':
-                    case (ushort)'e':
-                    case (ushort)'f':
-                    case (ushort)'g':
-                    case (ushort)'h':
-                    case (ushort)'i':
-                    case (ushort)'j':
-                    case (ushort)'k':
-                    case (ushort)'l':
-                    case (ushort)'m':
-                    case (ushort)'n':
-                    case (ushort)'o':
-                    case (ushort)'p':
-                    case (ushort)'q':
-                    case (ushort)'r':
-                    case (ushort)'s':
-                    case (ushort)'t':
-                    case (ushort)'u':
-                    case (ushort)'v':
-                    case (ushort)'w':
-                    case (ushort)'x':
-                    case (ushort)'y':
-                    case (ushort)'z':
-                    case (ushort)'A':
-                    case (ushort)'B':
-                    case (ushort)'C':
-                    case (ushort)'D':
-                    case (ushort)'E':
-                    case (ushort)'F':
-                    case (ushort)'G':
-                    case (ushort)'H':
-                    case (ushort)'I':
-                    case (ushort)'J':
-                    case (ushort)'K':
-                    case (ushort)'L':
-                    case (ushort)'M':
-                    case (ushort)'N':
-                    case (ushort)'O':
-                    case (ushort)'P':
-                    case (ushort)'Q':
-                    case (ushort)'R':
-                    case (ushort)'S':
-                    case (ushort)'T':
-                    case (ushort)'U':
-                    case (ushort)'V':
-                    case (ushort)'W':
-                    case (ushort)'X':
-                    case (ushort)'Y':
-                    case (ushort)'Z':
+                    case 'a':
+                    case 'b':
+                    case 'c':
+                    case 'd':
+                    case 'e':
+                    case 'f':
+                    case 'g':
+                    case 'h':
+                    case 'i':
+                    case 'j':
+                    case 'k':
+                    case 'l':
+                    case 'm':
+                    case 'n':
+                    case 'o':
+                    case 'p':
+                    case 'q':
+                    case 'r':
+                    case 's':
+                    case 't':
+                    case 'u':
+                    case 'v':
+                    case 'w':
+                    case 'x':
+                    case 'y':
+                    case 'z':
+                    case 'A':
+                    case 'B':
+                    case 'C':
+                    case 'D':
+                    case 'E':
+                    case 'F':
+                    case 'G':
+                    case 'H':
+                    case 'I':
+                    case 'J':
+                    case 'K':
+                    case 'L':
+                    case 'M':
+                    case 'N':
+                    case 'O':
+                    case 'P':
+                    case 'Q':
+                    case 'R':
+                    case 'S':
+                    case 'T':
+                    case 'U':
+                    case 'V':
+                    case 'W':
+                    case 'X':
+                    case 'Y':
+                    case 'Z':
                     #endregion
-                    case (ushort)'_':
+                    case '_':
                         onlyDigit = false;
                         span.Length++;
                         break;
                     #region Digit
-                    case (ushort)'0':
-                    case (ushort)'1':
-                    case (ushort)'2':
-                    case (ushort)'3':
-                    case (ushort)'4':
-                    case (ushort)'5':
-                    case (ushort)'6':
-                    case (ushort)'7':
-                    case (ushort)'8':
-                    case (ushort)'9':
+                    case '0':
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                    case '8':
+                    case '9':
                         #endregion
                         span.Length++;
                         break;
-                    case (ushort)' ':
-                    case (ushort)'\t':
-                    case (ushort)'{':
+                    case ' ':
+                    case '\t':
+                    case '{':
                         goto RETURN;
                     default:
                         return new TryInterpretReturnValue(span, ErrorSentence.Kind.InvalidIdentifierError);
