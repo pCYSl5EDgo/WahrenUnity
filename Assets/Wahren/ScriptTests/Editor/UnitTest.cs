@@ -1,4 +1,6 @@
-﻿using NUnit.Framework;
+﻿using System;
+using System.Text;
+using NUnit.Framework;
 using pcysl5edgo.Wahren.AST;
 
 using static UnityEngine.Assertions.Assert;
@@ -9,6 +11,57 @@ using Unity.Collections;
 public unsafe class UnitTest
 {
     static readonly Allocator allocator = Allocator.Persistent;
+
+    [Test]
+    public void voice_delskill_success()
+    {
+        voice_delskill_success_many("hockey", null, " , ");
+        var strs = new string[] { "male" };
+        voice_delskill_success_many("hockey", strs, " , ");
+        strs = new string[] { "male", "female", "advance" };
+        voice_delskill_success_many("hockey", strs, " , ");
+        strs = new string[] { "male", "female", "advance", "back" };
+        voice_delskill_success_many("hockey", strs, " , ");
+    }
+
+    private static void voice_delskill_success_many(string str0, string[] strs, string space)
+    {
+        var buf = new StringBuilder(128);
+        buf.Append("voice ").Append(str0).Append("{\ndelskill=");
+        if (strs == null || strs.Length == 0)
+        {
+            buf.Append("@\n}");
+        }
+        else
+        {
+            buf.Append(strs[0]);
+            for (int i = 1; i < strs.Length; i++)
+                buf.Append(space).Append(strs[i]);
+            buf.Append("\n}");
+        }
+        var scriptText = buf.ToString();
+        var itemLength = strs?.Length ?? 0;
+        using (var _ = new USING_STRUCT(scriptText, allocator, out var buffer))
+        {
+            AreEqual(_.script.VoiceParserTempData.Values.Length, 1);
+            ref var tree = ref _.script.VoiceParserTempData.Values.GetRef<VoiceTree>(0);
+            AreEqual(tree.Length, 1);
+            AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
+            AreEqual(tree.ParentName.Length, 0);
+            ref var ast = ref tree.Page->GetRef(tree.Start);
+            var (type, page, value) = ast;
+            AreEqual(value, 0);
+            AreEqual((VoiceTree.Kind)type, VoiceTree.Kind.delskill);
+            AreEqual(_.script.VoiceParserTempData.Delskills.Length, 1);
+            var expression = ast.GetRef<VoiceTree.DelskillAssignExpression>();
+            AreEqual(expression.ScenarioVariant.Length, 0);
+            AreEqual(expression.Start, 0);
+            AreEqual(expression.Length, itemLength);
+            for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
+                AreEqual(buffer.Clear().AppendPrimitive(_.file, expression.Page->GetRef(i)).ToString(), strs[i - expression.Start]);
+        }
+    }
+
     [Test]
     public void movetype_consti_success_4()
     {

@@ -32,6 +32,7 @@ namespace pcysl5edgo.Wahren.AST
             File.SkipWhiteSpace(ref CommonPtr->Caret);
             var startCaret = CommonPtr->Caret;
             var currentCaret = CommonPtr->Caret;
+            ref var result = ref CommonPtr->Result;
             while (CommonPtr->Caret.Line < File.LineCount)
             {
                 // 少なくとも構造体の種類を確定させ、その名前と親は詳らかにせよ
@@ -39,36 +40,36 @@ namespace pcysl5edgo.Wahren.AST
                 File.SkipWhiteSpace(ref CommonPtr->Caret);
                 if (CommonPtr->LastStructKind == Location.None)
                 {
-                    CommonPtr->Result = StructAnalyzer.TryGetFirstStructLocation(File.CurrentCharPointer(CommonPtr->Caret), File.LineLengths[CommonPtr->Caret.Line], CommonPtr->Caret, CommonPtr->Caret.Column);
-                    if (CommonPtr->Result.IsError)
+                    result = StructAnalyzer.TryGetFirstStructLocation(File.CurrentCharPointer(CommonPtr->Caret), File.LineLengths[CommonPtr->Caret.Line], CommonPtr->Caret, CommonPtr->Caret.Column);
+                    if (result.IsError)
                     {
                         return;
                     }
-                    CommonPtr->LastStructKind = (Location)CommonPtr->Result.SubDataIndex;
-                    currentCaret = CommonPtr->Result.Span.CaretNextToEndOfThisSpan;
+                    CommonPtr->LastStructKind = (Location)result.SubDataIndex;
+                    currentCaret = result.Span.CaretNextToEndOfThisSpan;
                     File.SkipWhiteSpace(ref currentCaret);
                     if (StructAnalyzer.IsStructKindWithName(CommonPtr->LastStructKind))
                     {
-                        if (!(CommonPtr->Result = File.TryGetStructName(currentCaret)))
+                        if (!(result = File.TryGetStructName(currentCaret)))
                         {
                             return;
                         }
-                        CommonPtr->LastNameSpan = CommonPtr->Result.Span;
+                        CommonPtr->LastNameSpan = result.Span;
                         currentCaret = CommonPtr->LastNameSpan.CaretNextToEndOfThisSpan;
                         File.SkipWhiteSpace(ref currentCaret);
-                        if (!(CommonPtr->Result = StructWithNameAnalyzer.TryGetParentStructName(File, currentCaret)))
+                        if (!(result = StructWithNameAnalyzer.TryGetParentStructName(File, currentCaret)))
                         {
                             return;
                         }
-                        CommonPtr->LastParentNameSpan = CommonPtr->Result.Span;
+                        CommonPtr->LastParentNameSpan = result.Span;
                         currentCaret = CommonPtr->LastParentNameSpan.CaretNextToEndOfThisSpan;
                         File.SkipWhiteSpace(ref currentCaret);
                     }
-                    if (!(CommonPtr->Result = currentCaret.IsCurrentCharEquals((File.Contents + File.LineStarts[currentCaret.Line])[currentCaret.Column], '{')))
+                    if (!(result = currentCaret.IsCurrentCharEquals((File.Contents + File.LineStarts[currentCaret.Line])[currentCaret.Column], '{')))
                     {
                         return;
                     }
-                    currentCaret = CommonPtr->Result.Span.CaretNextToEndOfThisSpan;
+                    currentCaret = result.Span.CaretNextToEndOfThisSpan;
                 }
                 File.SkipWhiteSpace(ref currentCaret);
                 CommonPtr->Caret = currentCaret;
@@ -81,27 +82,22 @@ namespace pcysl5edgo.Wahren.AST
                 switch (CommonPtr->LastStructKind)
                 {
                     case Location.Race:
-                        if (CommonPtr->Result = File.TryParseRaceStructMultiThread(ref ScriptPtr->RaceParserTempData, ref ScriptPtr->ASTValueTypePairList, CommonPtr->LastNameSpan, CommonPtr->LastParentNameSpan, currentCaret, out currentCaret, allocator))
-                        {
-                            SaveSuccess(ref currentCaret);
-                            continue;
-                        }
-                        if (CommonPtr->Result.IsPending)
-                        {
-                            *CancellationTokenPtr = InterpreterStatus.Pending;
-                        }
+                        if (result = File.TryParseRaceStructMultiThread(ref ScriptPtr->RaceParserTempData, ref ScriptPtr->ASTValueTypePairList, CommonPtr->LastNameSpan, CommonPtr->LastParentNameSpan, currentCaret, out currentCaret, allocator))
+                            goto SAVESUCCESS;
                         return;
                     case Location.Movetype:
-                        CommonPtr->Result = File.TryParseMovetypeStructMultiThread(ref ScriptPtr->MovetypeParserTempData, ref ScriptPtr->ASTValueTypePairList, CommonPtr->LastNameSpan, CommonPtr->LastParentNameSpan, currentCaret, out currentCaret, allocator);
-                        if (CommonPtr->Result)
-                        {
-                            SaveSuccess(ref currentCaret);
-                            continue;
-                        }
+                        if (result = File.TryParseMovetypeStructMultiThread(ref ScriptPtr->MovetypeParserTempData, ref ScriptPtr->ASTValueTypePairList, CommonPtr->LastNameSpan, CommonPtr->LastParentNameSpan, currentCaret, out currentCaret, allocator))
+                            goto SAVESUCCESS;
+                        return;
+                    case Location.Voice:
+                        if (result = File.TryParseVoiceStructMultiThread(ref ScriptPtr->VoiceParserTempData, ref ScriptPtr->ASTValueTypePairList, CommonPtr->LastNameSpan, CommonPtr->LastParentNameSpan, currentCaret, out currentCaret, allocator))
+                            goto SAVESUCCESS;
                         return;
                     default:
                         return;
                 }
+            SAVESUCCESS:
+                SaveSuccess(ref currentCaret);
             }
         }
 

@@ -85,23 +85,11 @@ namespace pcysl5edgo.Wahren.AST
                 {
                     job = default;
                 }
-                else if (result.IsPending)
-                {
-                    ReSchedule(ref job, Allocator.Persistent);
-                    isNonePending = false;
-                }
             }
             if (isNonePending)
             {
                 currentStage = Stage.Done;
             }
-        }
-
-        private void ReSchedule(ref ParseJob job, Allocator allocator)
-        {
-            *Status = InterpreterStatus.None;
-            job.CommonPtr->Result = new TryInterpretReturnValue(job.CommonPtr->LastNameSpan, 0, InterpreterStatus.None);
-            handles.Add(job.Schedule());
         }
 
         private void CreateNewParseJob(TextFile file)

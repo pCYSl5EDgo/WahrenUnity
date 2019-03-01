@@ -30,22 +30,19 @@ unsafe struct USING_STRUCT : System.IDisposable
             LastStructKind = Location.None,
             Result = new TryInterpretReturnValue(new Span(), 0, 0, InterpreterStatus.None)
         };
+        script = new ScriptAnalyzeDataManager_Internal(1, allocator);
+        script.Files[0] = file;
+        // {
+        //     ASTValueTypePairList = new ASTTypePageIndexPairListLinkedList(4, allocator),
+        //     FileLength = 1,
+        //     Files = (TextFile*)UnsafeUtility.Malloc(sizeof(TextFile), 4, allocator),
+        //     MovetypeParserTempData = new MovetypeParserTempData(1, allocator),
+        //     RaceParserTempData = new RaceParserTempData(1, allocator),
+        //     VoiceParserTempData = new VoiceParserTempData(1, 128, allocator),
+        // };
         fixed (ScriptAnalyzeDataManager_Internal* scriptPtr = &script)
         {
-            script = new ScriptAnalyzeDataManager_Internal
-            {
-                ASTValueTypePairList = new ASTTypePageIndexPairListLinkedList(4, allocator),
-                FileLength = 1,
-                Files = (TextFile*)UnsafeUtility.Malloc(sizeof(System.IntPtr), 4, allocator),
-                MovetypeParserTempData = new MovetypeParserTempData(1, allocator),
-                RaceParserTempData = new RaceParserTempData(1, allocator),
-            };
-            *script.Files = file;
-            var job = new ParseJob(&token, scriptPtr, file, &cdata, allocator);
-            ref var result = ref cdata.Result;
-            job.Execute();
-            if (result.Status == InterpreterStatus.Pending)
-                throw new System.Exception();
+            new ParseJob(&token, scriptPtr, file, &cdata, allocator).Execute();
         }
         commonData = cdata;
     }

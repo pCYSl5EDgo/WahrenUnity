@@ -2,7 +2,7 @@
 {
     public enum InterpreterStatus
     {
-        None, Success, Error, Pending,
+        None, Success, Error,
     }
     public struct TryInterpretReturnValue
     {
@@ -15,7 +15,6 @@
 
         public bool IsSuccess => Status == InterpreterStatus.Success;
         public bool IsError => Status == InterpreterStatus.Error;
-        public bool IsPending => Status == InterpreterStatus.Pending;
 
         public TryInterpretReturnValue(Caret start, int dataIndex, InterpreterStatus status)
         {

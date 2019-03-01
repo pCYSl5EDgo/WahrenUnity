@@ -164,10 +164,6 @@ namespace pcysl5edgo.Wahren.AST
             {
                 buffer.Append("Error - ").AppendLine(ErrorSentence.Contents[(ErrorSentence.Kind)value.DataIndex]);
             }
-            else if (value.Status == InterpreterStatus.Pending)
-            {
-                buffer.AppendLine("Pending");
-            }
             buffer.Append("at (").Append(script.FullPaths[value.Span.File]).Append(':').Append(value.Span.Line + 1).Append('(').Append(value.Span.Column + 1);
             if (value.Span.Length > 1)
                 buffer.Append('-').Append(value.Span.Column + 1 + value.Span.Length);

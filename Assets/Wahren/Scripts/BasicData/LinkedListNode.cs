@@ -62,7 +62,7 @@ namespace pcysl5edgo.Wahren.AST
                 next->Dispose(allocator);
                 UnsafeUtility.Free(next, allocator);
             }
-            if (Capacity != 0)
+            if (Values != null)
             {
                 UnsafeUtility.Free(Values, allocator);
             }

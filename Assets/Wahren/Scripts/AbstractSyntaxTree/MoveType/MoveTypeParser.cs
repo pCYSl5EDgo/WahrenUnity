@@ -81,7 +81,7 @@
             var cs = stackalloc ushort[] { 'o', 'n', 's', 't', 'i' };
             if (!file.TryInitializeDetect(cs, 5, ref current, out var answer, out expression.ScenarioVariant))
                 goto RETURN;
-            answer = file.TryReadIdentifierNumberPairs(Location.Movetype, ref tempData.IdentifierNumberPairs2, current,  out expression.Page, out expression.Start, out expression.Length, proc.allocator);
+            answer = file.TryReadIdentifierNumberPairs(ref tempData.IdentifierNumberPairs2, current, out expression.Page, out expression.Start, out expression.Length, proc.allocator);
             if (!answer)
                 goto RETURN;
             current = answer.Span.CaretNextToEndOfThisSpan;

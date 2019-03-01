@@ -9,6 +9,7 @@ namespace pcysl5edgo.Wahren.AST
         public int FileLength;
         public RaceParserTempData RaceParserTempData;
         public MovetypeParserTempData MovetypeParserTempData;
+        public VoiceParserTempData VoiceParserTempData;
         public ASTTypePageIndexPairListLinkedList ASTValueTypePairList;
 
         public static ScriptAnalyzeDataManager_Internal* CreatePtr(int length, Allocator allocator)
@@ -17,7 +18,7 @@ namespace pcysl5edgo.Wahren.AST
             answer[0] = new ScriptAnalyzeDataManager_Internal(length, allocator);
             return answer;
         }
-        private ScriptAnalyzeDataManager_Internal(int length, Allocator allocator)
+        internal ScriptAnalyzeDataManager_Internal(int length, Allocator allocator)
         {
             FileLength = length;
             long size = sizeof(TextFile) * FileLength;
@@ -25,6 +26,7 @@ namespace pcysl5edgo.Wahren.AST
             UnsafeUtility.MemClear(Files, size);
             RaceParserTempData = new RaceParserTempData(16, allocator);
             MovetypeParserTempData = new MovetypeParserTempData(16, allocator);
+            VoiceParserTempData = new VoiceParserTempData(128, 256, allocator);
             ASTValueTypePairList = new ASTTypePageIndexPairListLinkedList(1024, allocator);
         }
 
@@ -47,6 +49,7 @@ namespace pcysl5edgo.Wahren.AST
             }
             RaceParserTempData.Dispose(allocator);
             MovetypeParserTempData.Dispose(allocator);
+            VoiceParserTempData.Dispose(allocator);
             ASTValueTypePairList.Dispose(allocator);
             this = default;
         }
