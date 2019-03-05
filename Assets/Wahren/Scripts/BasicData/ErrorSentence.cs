@@ -21,6 +21,7 @@ namespace pcysl5edgo.Wahren.AST
             InvalidEndOfLineError,
             InvalidMinusNumberError,
             OutOfRangeError,
+            SentencesEndWithSemicolonInterpretError,
         }
         static ErrorSentence()
         {
