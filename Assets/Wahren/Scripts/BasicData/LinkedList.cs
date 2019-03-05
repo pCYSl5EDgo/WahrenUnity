@@ -18,6 +18,58 @@ namespace pcysl5edgo.Wahren.AST
         public ListLinkedListNode* First;
         public int NodeCapacity;
 
+        public ref struct NodeEnumerator
+        {
+            public NodeEnumerator(ref ListLinkedList list)
+            {
+                Node = list.First;
+                isNotFirst = false;
+            }
+            private ListLinkedListNode* Node;
+            public ref ListLinkedListNode Current => ref *Node;
+            private bool isNotFirst;
+            public bool MoveNext()
+            {
+                if (isNotFirst)
+                    return (Node = Node->Next) != null;
+                else
+                    return isNotFirst = true;
+            }
+            public void Dispose() => Node = null;
+            public void Reset() => throw new System.NotImplementedException();
+        }
+
+        public NodeEnumerator GetNodeEnumerator() => new NodeEnumerator(ref this);
+
+        public ref struct ElementEnumerator<T> where T : unmanaged
+        {
+            public ElementEnumerator(ref ListLinkedList list)
+            {
+                index = -1;
+                Node = list.First;
+            }
+            private int index;
+            private ListLinkedListNode* Node;
+            public ref T Current => ref Node->GetRef<T>(index);
+            public bool MoveNext()
+            {
+                if (Node == null)
+                    return false;
+                if (++index == Node->Length)
+                {
+                    index = 0;
+                    Node = Node->Next;
+                    if (Node == null)
+                        return false;
+                }
+                return true;
+            }
+            public void Dispose() => Node = null;
+            public void Reset() => throw new System.NotImplementedException();
+        }
+
+        public ElementEnumerator<T> GetElementEnumerator<T>() where T : unmanaged => new ElementEnumerator<T>(ref this);
+
         public int Length
         {
             get
