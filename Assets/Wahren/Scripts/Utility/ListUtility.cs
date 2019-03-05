@@ -17,28 +17,15 @@ namespace pcysl5edgo.Wahren.AST
             ptr = _;
             currentCapacity *= 2;
         }
-
-        public static bool TryAddToMultiThread<T>(this ref T value, ref T* values, int capacity, ref int length, out int index) where T : unmanaged
+        public static void Lengthen(ref void* ptr, ref int currentCapacity, int size, Allocator allocator)
         {
-            do
-            {
-                index = length;
-                if (index == capacity)
-                    return false;
-            } while (index != Interlocked.CompareExchange(ref length, index + 1, index));
-            values[index] = value;
-            return true;
-        }
-        public static bool TryAddBulkToMultiThread<T>(T* srcValues, int srcLength, T* destValues, ref int destLength, int destCapacity, out int start) where T : unmanaged
-        {
-            do
-            {
-                start = destLength;
-                if (start + srcLength > destCapacity)
-                    return false;
-            } while (start != Interlocked.CompareExchange(ref destLength, start + srcLength, start));
-            UnsafeUtility.MemCpy(destValues + start, srcValues, srcLength * sizeof(T));
-            return true;
+            if (currentCapacity < 0) throw new ArgumentOutOfRangeException(nameof(currentCapacity) + " : " + currentCapacity);
+            if (currentCapacity == 0) return;
+            var _ = (void*)UnsafeUtility.Malloc(size * currentCapacity * 2, 4, allocator);
+            UnsafeUtility.MemCpy(_, ptr, size * currentCapacity);
+            UnsafeUtility.Free(ptr, allocator);
+            ptr = _;
+            currentCapacity *= 2;
         }
     }
 }
