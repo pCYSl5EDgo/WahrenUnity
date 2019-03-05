@@ -46,6 +46,8 @@ namespace pcysl5edgo.Wahren.AST
             return answer;
         }
 
+        public bool IsFull => Length == Capacity;
+
         public ref T GetRef<T>(int index) where T : unmanaged => ref ((T*)Values)[index];
         public T* GetPointer<T>(int index) where T : unmanaged => (T*)Values + index;
         public ListLinkedListNode* Next
