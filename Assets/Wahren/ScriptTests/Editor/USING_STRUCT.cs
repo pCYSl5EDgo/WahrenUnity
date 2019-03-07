@@ -32,14 +32,6 @@ unsafe struct USING_STRUCT : System.IDisposable
         };
         script = new ScriptAnalyzeDataManager_Internal(1, allocator);
         script.Files[0] = file;
-        // {
-        //     ASTValueTypePairList = new ASTTypePageIndexPairListLinkedList(4, allocator),
-        //     FileLength = 1,
-        //     Files = (TextFile*)UnsafeUtility.Malloc(sizeof(TextFile), 4, allocator),
-        //     MovetypeParserTempData = new MovetypeParserTempData(1, allocator),
-        //     RaceParserTempData = new RaceParserTempData(1, allocator),
-        //     VoiceParserTempData = new VoiceParserTempData(1, 128, allocator),
-        // };
         fixed (ScriptAnalyzeDataManager_Internal* scriptPtr = &script)
         {
             new ParseJob(&token, scriptPtr, file, &cdata, allocator).Execute();
