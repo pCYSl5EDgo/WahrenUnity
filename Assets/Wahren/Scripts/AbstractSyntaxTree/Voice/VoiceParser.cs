@@ -24,12 +24,12 @@ namespace pcysl5edgo.Wahren.AST
                                 if (!(answer = PowerDetect(ref file, ref tempData, ref nextToRightBrace, ref _)))
                                     goto RETURN;
                                 nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
-                                throw new System.NotImplementedException();
+                                break;
                             case 's': // spot
                                 if (!(answer = SpotDetect(ref file, ref tempData, ref nextToRightBrace, ref _)))
                                     goto RETURN;
                                 nextToRightBrace = answer.Span.CaretNextToEndOfThisSpan;
-                                throw new System.NotImplementedException();
+                                break;
                             case 'v': // voice_type
                                 if (!(answer = VoiceTypeDetect(ref file, ref tempData, ref nextToRightBrace, ref _)))
                                     goto RETURN;
@@ -102,7 +102,7 @@ namespace pcysl5edgo.Wahren.AST
             var cs = stackalloc ushort[] { 'p', 'o', 't' };
             if (!file.TryInitializeDetect(cs, 3, ref current, out var answer, out expression.ScenarioVariant))
                 goto RETURN;
-            answer = file.TryReadStringsEndWithSemicolon(ref tempData.Strings, ref tempData.StringMemories, current, ref expression.Value, proc.allocator);
+            answer = file.TryReadStringsEndWithSemicolon(ref tempData.Strings, ref tempData.StringMemories, current, out expression.Page, out expression.Start, out expression.Length, proc.allocator);
             if (!answer)
                 goto RETURN;
             current = answer.Span.CaretNextToEndOfThisSpan;
@@ -110,7 +110,6 @@ namespace pcysl5edgo.Wahren.AST
             var ast = VoiceTree.Kind.spot.CreateASTPair();
             tempData.Spots.Add(ref expression, out ast.Page, out ast.Index, proc.allocator);
             proc.Add(ast);
-            throw new NotImplementedException();
         RETURN:
             return answer;
         }
@@ -121,7 +120,7 @@ namespace pcysl5edgo.Wahren.AST
             var cs = stackalloc ushort[] { 'o', 'w', 'e', 'r' };
             if (!file.TryInitializeDetect(cs, 4, ref current, out var answer, out expression.ScenarioVariant))
                 goto RETURN;
-            answer = file.TryReadStringsEndWithSemicolon(ref tempData.Strings, ref tempData.StringMemories, current, ref expression.Value, proc.allocator);
+            answer = file.TryReadStringsEndWithSemicolon(ref tempData.Strings, ref tempData.StringMemories, current, out expression.Page, out expression.Start, out expression.Length, proc.allocator);
             if (!answer)
                 goto RETURN;
             current = answer.Span.CaretNextToEndOfThisSpan;
@@ -129,7 +128,6 @@ namespace pcysl5edgo.Wahren.AST
             var ast = VoiceTree.Kind.power.CreateASTPair();
             tempData.Powers.Add(ref expression, out ast.Page, out ast.Index, proc.allocator);
             proc.Add(ast);
-            throw new NotImplementedException();
         RETURN:
             return answer;
         }

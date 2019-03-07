@@ -13,6 +13,87 @@ public unsafe class UnitTest
     static readonly Allocator allocator = Allocator.Persistent;
 
     [Test]
+    public void voice_spot_success()
+    {
+        voice_spot_or_power_success_many("x", Voice_SpotOrPower_Kind.Spot, null, "", "", ",");
+        voice_spot_or_power_success_many("x", Voice_SpotOrPower_Kind.Spot, new string[] { "b" }, "", "", ",");
+        voice_spot_or_power_success_many("x", Voice_SpotOrPower_Kind.Spot, new string[] { "bullet" }, "", "", ",");
+        voice_spot_or_power_success_many("x", Voice_SpotOrPower_Kind.Spot, new string[] { "bullet", "こんんちくしょー！！！！" }, "", "", ",");
+    }
+
+    private static void voice_spot_or_power_success_many(string str0, Voice_SpotOrPower_Kind kind, string[] strs, string space, string indentation, string comma)
+    {
+        var buffer = new StringBuilder(128);
+        buffer.Append("voice ").Append(str0).Append("{\n\t");
+        int itemLength;
+        if (kind == Voice_SpotOrPower_Kind.Power)
+            buffer.Append("power = ");
+        else
+            buffer.Append("spot = ");
+        buffer.Append(space);
+        if (strs == null || strs.Length == 0)
+        {
+            itemLength = 0;
+            buffer.Append(";\n}");
+        }
+        else
+        {
+            itemLength = strs.Length;
+            buffer.Append(strs[0]);
+            for (int i = 1; i < strs.Length; i++)
+                buffer.Append(indentation).Append(comma).Append(indentation).Append(strs[i]);
+            buffer.Append(";\n}");
+        }
+        Log(buffer.ToString());
+        using (var _ = new USING_STRUCT(buffer.ToString(), allocator, out buffer))
+        {
+            AreEqual(_.script.VoiceParserTempData.Values.Length, 1);
+            ref var tree = ref _.script.VoiceParserTempData.Values.GetRef<VoiceTree>(0);
+            AreEqual(tree.Length, 1);
+            AreEqual(buffer.Clear().AppendPrimitive(_.file, tree.Name).ToString(), str0);
+            AreEqual(tree.ParentName.Length, 0);
+            ref var ast = ref tree.Page->GetRef(tree.Start);
+            var (type, page, value) = ast;
+            AreEqual(value, 0);
+            if (kind == Voice_SpotOrPower_Kind.Power)
+            {
+                AreEqual(_.script.VoiceParserTempData.Powers.Length, 1);
+                var expression = ast.GetRef<VoiceTree.PowerAssignExpression>();
+                AreEqual(expression.ScenarioVariant.Length, 0);
+                AreEqual(expression.Start, 0);
+                AreEqual(expression.Length, itemLength);
+                for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
+                {
+                    ref var nativeString = ref expression.Page->GetRef(i);
+                    AreEqual(nativeString.File, 0);
+                    AreEqual(new string((char*)nativeString.Values, 0, nativeString.Length), strs[i - expression.Start]);
+                }
+            }
+            else
+            {
+                AreEqual(_.script.VoiceParserTempData.Spots.Length, 1);
+                var expression = ast.GetRef<VoiceTree.SpotAssignExpression>();
+                AreEqual(expression.ScenarioVariant.Length, 0);
+                AreEqual(expression.Start, 0);
+                AreEqual(expression.Length, itemLength);
+                for (int i = expression.Start, end = expression.Start + expression.Length; i < end; i++)
+                {
+                    ref var nativeString = ref expression.Page->GetRef(i);
+                    AreEqual(nativeString.File, 0);
+                    string v = strs[i - expression.Start];
+                    AreEqual(nativeString.Length, v.Length);
+                    AreEqual(new string((char*)nativeString.Values, 0, nativeString.Length), v);
+                }
+            }
+        }
+    }
+
+    private enum Voice_SpotOrPower_Kind
+    {
+        Spot, Power
+    }
+
+    [Test]
     public void voice_delskill_success()
     {
         voice_delskill_success_many("hockey", null, " , ");

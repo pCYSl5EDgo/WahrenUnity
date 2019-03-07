@@ -15,7 +15,6 @@ namespace pcysl5edgo.Wahren.AST
         public static TryInterpretReturnValue TryReadIdentifierNumberPairs(this ref TextFile file, ref IdentifierNumberPairListLinkedList pairList, Caret current, out IdentifierNumberPairList* page, out int start, out int length, Allocator allocator, long defaultValue = 0)
         {
             file.SkipWhiteSpace(ref current);
-            var preservedFirstLocation = current;
             if (file.CurrentChar(current) == '@')
             {
                 page = null;
@@ -589,7 +588,6 @@ namespace pcysl5edgo.Wahren.AST
         public static TryInterpretReturnValue TryReadIdentifiers(this ref TextFile file, ref IdentifierListLinkedList list, Caret current, out IdentifierList* page, out int start, out int length, Allocator allocator)
         {
             file.SkipWhiteSpace(ref current);
-            var preservedFirstLocation = current;
             if (file.CurrentChar(current) == '@')
             {
                 page = null;
@@ -834,10 +832,153 @@ namespace pcysl5edgo.Wahren.AST
             return answer;
         }
 
-        public static TryInterpretReturnValue TryReadStringsEndWithSemicolon(this ref TextFile file, ref NativeStringListLinkedList strings, ref NativeStringMemorySoyrceLinkedList memories, Caret current, ref NativeString str, Allocator allocator)
+
+        public static TryInterpretReturnValue TryReadStringsEndWithSemicolon(this ref TextFile file, ref NativeStringListLinkedList strings, ref NativeStringMemorySoyrceLinkedList memories, Caret current, out NativeStringList* page, out int start, out int length, Allocator allocator)
         {
+            var node = new ListLinkedListNode(8, sizeof(NativeString), Allocator.Temp);
+            bool isComplete;
+            length = 0;
+            var nativeStringLength = 0;
+
+        READ_LOOP:
+            if (node.IsFull)
+                ListUtility.Lengthen(ref node.Values, ref node.Capacity, sizeof(NativeString), Allocator.Temp);
+            ref var lastString = ref node.GetRef<NativeString>(length);
+            if (!ReadNativeString(ref file, ref current, out lastString, out isComplete))
+                goto ERROR;
+            if (!lastString.IsEmpty)
+            {
+                nativeStringLength += lastString.Length;
+                node.Length = ++length;
+            }
+            if (isComplete) goto COMPLETE;
+#if UNITY_EDITOR
+            if (lastString.IsEmpty) throw new System.InvalidOperationException();
+#endif
+            goto READ_LOOP;
+
+        ERROR:
+            page = null;
+            start = 0;
+            // Error吐く以前のはキレイキレイしてあげなくては洩れる
+            for (int i = 0; i < node.Length; i++)
+            {
+                var values = node.GetRef<NativeString>(i).Values;
+                if (values != null)
+                    UnsafeUtility.Free(values, Allocator.Temp);
+            }
+            node.Dispose(Allocator.Temp);
+            return new TryInterpretReturnValue(current, ErrorSentence.Kind.SentencesEndWithSemicolonInterpretError);
+        COMPLETE:
+            if (length != 0)
+            {
+                // 断片化したメモリ領域に散らばった文字列集合を１つの文字列にまとめる
+                var tempMemory = (ushort*)UnsafeUtility.Malloc(sizeof(ushort) * nativeStringLength, 2, Allocator.Temp);
+                ref var ptri = ref node.GetRef<NativeString>(0);
+                for (int i = 0, accum = 0; i < length; i++)
+                {
+                    ptri = ref node.GetRef<NativeString>(i);
+                    if (ptri.IsAtmark) continue;
+                    // １つの文字列にコピペしたら元のは解放する
+                    UnsafeUtility.MemCpy(tempMemory + accum, ptri.Values, sizeof(ushort) * ptri.Length);
+                    UnsafeUtility.Free(ptri.Values, Allocator.Temp);
+                    ptri.Values = tempMemory + accum;
+                    accum += ptri.Length;
+                }
+                strings.AddRange(node.GetPointer<NativeString>(0), length, out page, out start, allocator);
+                memories.AddRange(tempMemory, nativeStringLength, allocator);
+                UnsafeUtility.Free(tempMemory, Allocator.Temp);
+            }
+            else
+            {
+                page = null;
+                start = 0;
+            }
+            node.Dispose(Allocator.Temp);
+            return new TryInterpretReturnValue(current, SuccessSentence.Kind.SentencesEndWithSemicolonInterpretSuccess);
+        }
+
+        private static bool ReadNativeString(ref TextFile file, ref Caret current, out NativeString answer, out bool isComplete)
+        {
+            answer = new NativeString { File = file.FilePathId };
+            var tempCapacity = 256;
+            var tempList = (ushort*)UnsafeUtility.Malloc(sizeof(ushort) * tempCapacity, 2, Allocator.Temp);
             file.SkipWhiteSpace(ref current);
-            throw new System.NotImplementedException();
+            var c = file.CurrentChar(current);
+            switch (c)
+            {
+                case '@':
+                    answer.ColumnStartInclusive = current.Column;
+                    answer.ColumnEndExclusive = current.Column + 1;
+                    answer.LineStartInclusive = answer.LineEndInclusive = current.Line;
+                    current.Column++;
+                    file.SkipWhiteSpace(ref current);
+                    switch (c)
+                    {
+                        case ';':
+                            UnsafeUtility.Free(tempList, Allocator.Temp);
+                            goto COMPLETE;
+                        case ',':
+                            goto CONTINUE;
+                        default:
+                            goto ERROR;
+                    }
+                case ',':
+                    goto ERROR;
+                case ';':
+                    UnsafeUtility.Free(tempList, Allocator.Temp);
+                    goto COMPLETE;
+                default:
+                    answer.Length = 1;
+                    answer.ColumnStartInclusive = current.Column;
+                    answer.LineStartInclusive = current.Line;
+                    *tempList = c;
+                    current.Column++;
+                    break;
+            }
+            for (; current.Line < file.LineCount; current.Column = 0, current.Line++)
+            {
+                file.SkipWhiteSpace(ref current);
+                for (; current.Column < file.LineLengths[current.Line]; current.Column++)
+                {
+                    c = file.CurrentChar(current);
+                    switch (c)
+                    {
+                        case '@':
+                            goto ERROR;
+                        case ';':
+                            answer.LineEndInclusive = current.Line;
+                            answer.ColumnEndExclusive = current.Column;
+                            answer.Values = tempList;
+                            goto COMPLETE;
+                        case ',':
+                            answer.LineEndInclusive = current.Line;
+                            answer.ColumnEndExclusive = current.Column;
+                            answer.Values = tempList;
+                            goto CONTINUE;
+                        default:
+                            if (answer.Length == tempCapacity)
+                            {
+                                ListUtility.Lengthen(ref tempList, ref tempCapacity, Allocator.Temp);
+                            }
+                            tempList[answer.Length++] = c;
+                            break;
+                    }
+                }
+            }
+        CONTINUE:
+            current.Column++;
+            isComplete = false;
+            return true;
+        COMPLETE:
+            current.Column++;
+            isComplete = true;
+            return true;
+        ERROR:
+            UnsafeUtility.Free(tempList, Allocator.Temp);
+            answer = default;
+            isComplete = true;
+            return false;
         }
     }
 }

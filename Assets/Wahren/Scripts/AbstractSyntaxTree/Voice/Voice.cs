@@ -36,13 +36,17 @@
         public struct PowerAssignExpression
         {
             public Span ScenarioVariant;
-            public NativeString Value;
+            public NativeStringList* Page;
+            public int Start;
+            public int Length;
         }
 
         public struct SpotAssignExpression
         {
             public Span ScenarioVariant;
-            public NativeString Value;
+            public NativeStringList* Page;
+            public int Start;
+            public int Length;
         }
 
         public void SetNameAndParentName(Span name, Span parentName)
