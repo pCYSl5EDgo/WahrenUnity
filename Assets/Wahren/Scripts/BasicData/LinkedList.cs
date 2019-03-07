@@ -10,13 +10,14 @@ namespace pcysl5edgo.Wahren.AST
         where TNode : unmanaged, ILinkedListNode<TValue, TNode>
     {
         void Dispose(Allocator allocator);
-        void AddRange(TValue* values, int length, out TNode* page, out int start, Allocator allocator);
+        void AddRange(TValue* copySource, int length, out TNode* page, out int start, Allocator allocator);
     }
 
     public unsafe struct ListLinkedList
     {
         public ListLinkedListNode* First;
         public int NodeCapacity;
+        private ListLinkedListNode* LastFull;
 
         public ref struct NodeEnumerator
         {
@@ -48,9 +49,16 @@ namespace pcysl5edgo.Wahren.AST
                 index = -1;
                 Node = list.First;
             }
-            private int index;
-            private ListLinkedListNode* Node;
-            public ref T Current => ref Node->GetRef<T>(index);
+            internal int index;
+            internal ListLinkedListNode* Node;
+            public ref T Current
+            {
+                get
+                {
+                    if (index < 0 || Node == null) throw new System.InvalidOperationException();
+                    return ref Node->GetRef<T>(index);
+                }
+            }
             public bool MoveNext()
             {
                 if (Node == null)
@@ -89,6 +97,7 @@ namespace pcysl5edgo.Wahren.AST
             First = (ListLinkedListNode*)UnsafeUtility.Malloc(sizeof(ListLinkedListNode), 4, allocator);
             *First = new ListLinkedListNode(capacity, size, allocator);
             NodeCapacity = capacity;
+            LastFull = null;
         }
 
         public ref T GetRef<T>(int index) where T : unmanaged
@@ -112,38 +121,53 @@ namespace pcysl5edgo.Wahren.AST
             }
             this = default;
         }
-        public void Add<T>(ref T value, out ListLinkedListNode* page, out int index, Allocator allocator) where T : unmanaged
+        public void Add<T>(ref T copySource, out ListLinkedListNode* page, out int index, Allocator allocator) where T : unmanaged
         {
-            var tryNode = First;
-            while (true)
+            ListLinkedListNode* tryNode;
+            if (LastFull == null)
             {
-                if (tryNode->TryAdd(ref value, out index))
+                tryNode = First;
+            }
+            else
+            {
+                tryNode = LastFull->Next;
+            }
+            for (; tryNode != null; tryNode = tryNode->Next)
+            {
+                if (tryNode->TryAdd(ref copySource, out index))
                 {
+                    if (tryNode->IsFull)
+                        LastFull = tryNode;
                     page = tryNode;
                     return;
                 }
-                if (tryNode->NextNodePtr == IntPtr.Zero)
-                {
-                    (page = ListLinkedListNode.Create<T>(NodeCapacity, allocator))->GetRef<T>(index = 0) = value;
-                    while (IntPtr.Zero != Interlocked.CompareExchange(ref tryNode->NextNodePtr, new IntPtr(page), IntPtr.Zero))
-                    {
-                        tryNode = tryNode->Next;
-                    }
-                    return;
-                }
-                tryNode = tryNode->Next;
+                UnityEngine.Debug.Log("LAST FULL RENEW");
+                LastFull = tryNode;
             }
+            page = ListLinkedListNode.Create<T>(NodeCapacity, allocator);
+            index = 0;
+            page->GetRef<T>(0) = copySource;
+            page->Length = 1;
+            for (tryNode = LastFull; IntPtr.Zero != Interlocked.CompareExchange(ref tryNode->NextNodePtr, new IntPtr(page), IntPtr.Zero); tryNode = tryNode->Next) ;
         }
-        public void Add<TValue, TNode>(ref TValue value, out TNode* page, out int index, Allocator allocator)
+        public void Add<TValue, TNode>(ref TValue copySource, out TNode* page, out int index, Allocator allocator)
             where TValue : unmanaged
             where TNode : unmanaged, ILinkedListNode<TValue, TNode>
         {
-            Add(ref value, out var _page, out index, allocator);
+            Add(ref copySource, out var _page, out index, allocator);
             page = (TNode*)_page;
         }
-        public void AddRange<T>(T* values, int length, out ListLinkedListNode* page, out int start, Allocator allocator) where T : unmanaged
+        public void AddRange<T>(T* copySource, int length, out ListLinkedListNode* page, out int start, Allocator allocator) where T : unmanaged
         {
-            var tryNode = First;
+            ListLinkedListNode* tryNode;
+            if (LastFull == null)
+                tryNode = First;
+            else if (LastFull->NextNodePtr == IntPtr.Zero)
+            {
+                tryNode = LastFull;
+                goto ADDNEWPAGE;
+            }
+            else tryNode = LastFull->Next;
             if (length > NodeCapacity)
             {
                 NodeCapacity = length;
@@ -151,8 +175,10 @@ namespace pcysl5edgo.Wahren.AST
             }
             while (true)
             {
-                if (tryNode->TryAdd(values, length, out start))
+                if (tryNode->TryAdd(copySource, length, out start))
                 {
+                    if (tryNode->IsFull && LastFull->Next == tryNode)
+                        LastFull = tryNode;
                     page = tryNode;
                     return;
                 }
@@ -165,17 +191,17 @@ namespace pcysl5edgo.Wahren.AST
         ADDNEWPAGE:
             page = ListLinkedListNode.Create<T>(NodeCapacity, allocator);
             start = 0;
-            UnsafeUtility.MemCpy(page->Values, values, sizeof(T) * length);
+            UnsafeUtility.MemCpy(page->Values, copySource, sizeof(T) * length);
             while (IntPtr.Zero != Interlocked.CompareExchange(ref tryNode->NextNodePtr, new IntPtr(page), IntPtr.Zero))
             {
                 tryNode = tryNode->Next;
             }
         }
-        public void AddRange<TValue, TNode>(TValue* values, int length, out TNode* page, out int start, Allocator allocator)
+        public void AddRange<TValue, TNode>(TValue* copySource, int length, out TNode* page, out int start, Allocator allocator)
             where TValue : unmanaged
             where TNode : unmanaged
         {
-            AddRange(values, length, out var _page, out start, allocator);
+            AddRange(copySource, length, out var _page, out start, allocator);
             page = (TNode*)_page;
         }
     }

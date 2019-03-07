@@ -37,6 +37,6 @@ namespace pcysl5edgo.Wahren.AST
 
         public void Dispose(Allocator allocator) => List.Dispose(allocator);
 
-        public void AddRange(ASTTypePageIndexPair* values, int length, out ASTTypePageIndexPairList* page, out int start, Allocator allocator) => List.AddRange(values, length, out page, out start, allocator);
+        public void AddRange(ASTTypePageIndexPair* copySource, int length, out ASTTypePageIndexPairList* page, out int start, Allocator allocator) => List.AddRange(copySource, length, out page, out start, allocator);
     }
 }
